@@ -626,6 +626,31 @@ em.matter,
   text-decoration: none;
 }
 
+/*
+ * The Atombot mark. The image is used as a mask, so the mark takes the current
+ * text color and works on any background and in both themes.
+ */
+.atombot-mark {
+  display: none;
+}
+
+@supports ((-webkit-mask-image: url("")) or (mask-image: url(""))) {
+  .atombot-mark {
+    display: inline-block;
+    width: 1em;
+    aspect-ratio: 640 / 588;
+    background: currentColor;
+    -webkit-mask: url("../img/atombot-mark.webp") center / contain no-repeat;
+    mask: url("../img/atombot-mark.webp") center / contain no-repeat;
+  }
+}
+
+.with-mark .atombot-mark {
+  width: 0.82em;
+  margin-right: 0.3em;
+  vertical-align: -0.06em;
+}
+
 .tag {
   display: inline-block;
   align-self: flex-start;
@@ -1513,8 +1538,38 @@ em.matter,
 }
 
 .feature h3 {
-  margin-top: 16px;
   font-size: clamp(1.7rem, 1.3rem + 1.5vw, 2.5rem);
+}
+
+.feature-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: clamp(14px, 2vw, 22px);
+}
+
+.feature-row .feature {
+  margin-top: 0;
+}
+
+.feature--half {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.feature--atombot {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(16px, 2vw, 28px);
+  align-items: center;
+}
+
+.feature-mark {
+  width: clamp(88px, 9vw, 128px);
+  color: var(--machine);
+  transition: transform 1.1s var(--ease);
+}
+
+.feature--atombot:hover .feature-mark {
+  transform: rotate(120deg);
 }
 
 .feature-body {
@@ -1522,7 +1577,7 @@ em.matter,
   gap: 20px;
 }
 
-.feature-body p {
+.feature-body p:not(.eyebrow) {
   font-size: 1.06rem;
   line-height: 1.55;
   color: var(--muted);
@@ -2028,9 +2083,10 @@ a.chip:hover {
 
 .segmented {
   display: inline-flex;
+  flex-wrap: wrap;
   padding: 3px;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: 22px;
   background: var(--surface);
 }
 
@@ -2712,7 +2768,7 @@ button.chip:hover {
   .contact,
   .research-intro,
   .domain-head,
-  .feature,
+  .feature-row,
   .demo {
     grid-template-columns: 1fr;
   }
@@ -2773,6 +2829,15 @@ button.chip:hover {
     grid-template-columns: 1fr;
   }
 
+  .feature--atombot {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-mark {
+    order: -1;
+    width: 84px;
+  }
+
   .footer-cols {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2819,6 +2884,12 @@ button.chip:hover {
 
   .segmented button {
     padding: 0 12px;
+  }
+
+  /* five formations have to fit on one line of a phone */
+  .demo-controls .segmented button {
+    padding: 0 10px;
+    font-size: 0.84rem;
   }
 
   .contact-list > div {

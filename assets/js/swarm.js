@@ -4,7 +4,8 @@
  * Each robot follows a few simple rules: keep a little distance from its
  * neighbors, steer around the pointer, and either flock with nearby robots or
  * head for its slot in a shared shape. Together they flock, form a ring, pack
- * into a lattice, or spell a Z, and they close ranks again after being pushed.
+ * into a lattice, spell a Z, or draw the Atombot mark, and they close ranks
+ * again after being pushed.
  */
 (() => {
   "use strict";
@@ -19,10 +20,63 @@
   const buttons = Array.from(root.querySelectorAll("[data-formation]"));
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  const MODES = ["flock", "ring", "lattice", "z"];
-  const LABELS = { flock: "Flock", ring: "Ring", lattice: "Lattice", z: "Letter Z" };
+  const MODES = ["flock", "ring", "lattice", "z", "atombot"];
+  const LABELS = { flock: "Flock", ring: "Ring", lattice: "Lattice", z: "Letter Z", atombot: "Atombot mark" };
   const Z_OUTLINE = [[0, 0], [0.8, 0], [0.8, 0.2], [0.28, 0.8], [0.8, 0.8], [0.8, 1], [0, 1], [0, 0.8], [0.52, 0.2], [0, 0.2]];
   const HOLD_SECS = 7; /* how long each formation shows while auto-cycling */
+
+  /* The Atombot mark as a small bitmap ('#' is ink), traced from the team's logo. */
+  const ATOMBOT_ART = [
+    "...........................#####............................",
+    ".........................#########..........................",
+    ".......................############.........................",
+    ".......................#############........................",
+    ".......................##############.......................",
+    "......................################......................",
+    "......................################......................",
+    ".....................##################.....................",
+    "....................####################....................",
+    "....................####################....................",
+    ".....................###.###############....................",
+    "..............................###########...................",
+    "...............................##########...................",
+    ".................................#########..................",
+    "..................................########..................",
+    "..................................########..................",
+    "...................................#######..................",
+    "....................................######..................",
+    "......................####...........######.................",
+    "...................######............######.................",
+    ".................#######..............#####.................",
+    "................######................#####.................",
+    "..............#######..................####.................",
+    ".............#######....................###.................",
+    "............#######.....................###.................",
+    "...........#######......................###.................",
+    "..........########.......................##.................",
+    ".........########........................##.................",
+    "........########.........................##.................",
+    ".......#########.........................#..................",
+    ".......#########............................................",
+    "......#########..................................#..........",
+    ".....##########..................................##.........",
+    ".....#########...................................###........",
+    "....##########...................................###........",
+    "....##########..................................#####.......",
+    "....##########.................................########.....",
+    "...###########................................#########.....",
+    "...###########.......##......................###########....",
+    "...###########........###..................#############....",
+    "...###########........######............################....",
+    "...############.........################################....",
+    "...############..........##############################.....",
+    "....###########...........#############################.....",
+    ".....###########............###########################.....",
+    ".....#############............########################......",
+    "......############..............#####################.......",
+    ".........#.####....................################.........",
+    "........................................########............",
+  ];
 
   let W = 0;
   let H = 0;
@@ -48,6 +102,74 @@
     }
     return inside;
   }
+
+  /* Centers of the inked bitmap cells, centered on the art and scaled so its longer side is 1. */
+  function artCells(art) {
+    const span = Math.max(art[0].length, art.length);
+    const cells = [];
+    art.forEach((row, j) => {
+      for (let i = 0; i < row.length; i++) {
+        if (row[i] === "#") cells.push([(i + 0.5 - row.length / 2) / span, (j + 0.5 - art.length / 2) / span]);
+      }
+    });
+    return cells;
+  }
+
+  /*
+   * Spread n points evenly over a set of cells: start from farthest-point
+   * sampling (each new point is the cell farthest from all points so far), then
+   * relax with a few rounds of Lloyd's algorithm (move each point to the middle
+   * of the cells closest to it).
+   */
+  function spread(cells, n) {
+    const m = cells.length;
+    const far = new Float32Array(m).fill(Infinity);
+    const pts = [];
+    let next = 0;
+    let best = Infinity;
+    for (let c = 0; c < m; c++) {
+      const d = cells[c][0] ** 2 + cells[c][1] ** 2;
+      if (d < best) {
+        best = d;
+        next = c;
+      }
+    }
+    while (pts.length < n) {
+      const p = cells[next];
+      pts.push([p[0], p[1]]);
+      let farthest = -1;
+      for (let c = 0; c < m; c++) {
+        const d = (cells[c][0] - p[0]) ** 2 + (cells[c][1] - p[1]) ** 2;
+        if (d < far[c]) far[c] = d;
+        if (farthest < 0 || far[c] > far[farthest]) farthest = c;
+      }
+      next = farthest;
+    }
+    for (let round = 0; round < 12; round++) {
+      const sum = pts.map(() => [0, 0, 0]);
+      for (let c = 0; c < m; c++) {
+        let near = 0;
+        let nearD = Infinity;
+        for (let k = 0; k < n; k++) {
+          const d = (cells[c][0] - pts[k][0]) ** 2 + (cells[c][1] - pts[k][1]) ** 2;
+          if (d < nearD) {
+            nearD = d;
+            near = k;
+          }
+        }
+        sum[near][0] += cells[c][0];
+        sum[near][1] += cells[c][1];
+        sum[near][2]++;
+      }
+      for (let k = 0; k < n; k++) {
+        if (sum[k][2]) pts[k] = [sum[k][0] / sum[k][2], sum[k][1] / sum[k][2]];
+      }
+    }
+    return pts;
+  }
+
+  const atombotCells = artCells(ATOMBOT_ART);
+  const atombotSlots = {}; /* cache: swarm size -> slots */
 
   function readColors() {
     const light = document.documentElement.dataset.theme === "light";
@@ -105,6 +227,10 @@
         else best.shift();
       }
       for (let i = 0; i < N; i++) out.push(best[i]);
+    } else if (kind === "atombot") {
+      if (!atombotSlots[N]) atombotSlots[N] = spread(atombotCells, N);
+      const scale = size * 0.92;
+      atombotSlots[N].forEach(([u, v]) => out.push([cx + u * scale, cy + v * scale]));
     }
     return out;
   }
@@ -174,6 +300,7 @@
     if (auto && modeT > HOLD_SECS) setMode(MODES[(MODES.indexOf(mode) + 1) % MODES.length], false);
 
     let settled = 0;
+    const personal = mode === "flock" ? 15 : 12.5; /* robots pack a little tighter inside a formation */
     for (let i = 0; i < N; i++) {
       let ax = 0;
       let ay = 0;
@@ -190,9 +317,9 @@
         const d2 = dx * dx + dy * dy;
         if (d2 > 2500) continue;
         const d = Math.sqrt(d2) + 0.01;
-        if (d < 15) {
+        if (d < personal) {
           /* separation */
-          const push = (15 - d) / 15;
+          const push = (personal - d) / personal;
           ax -= (dx / d) * push * 0.9;
           ay -= (dy / d) * push * 0.9;
         }

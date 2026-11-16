@@ -165,12 +165,12 @@
 
         <div class="demo demo--flip" data-swarm data-reveal>
           <div class="demo-stage">
-            <canvas role="img" aria-label="Animation of a swarm of small robots that flock, then arrange themselves into a ring, a hexagonal lattice, and the letter Z."></canvas>
+            <canvas role="img" aria-label="Animation of a swarm of small robots that flock, then arrange themselves into a ring, a hexagonal lattice, the letter Z, and the Atombot mark."></canvas>
           </div>
           <div class="demo-body">
             <p class="eyebrow">Interactive sketch</p>
             <h3>Many simple robots, one shape</h3>
-            <p>Each ring is a robot following a few local rules: keep a little distance from its neighbors, steer around obstacles, and head for a slot in a shared formation. No robot sees the whole picture, yet together they flock, close into a ring, pack into a lattice, or spell a letter.</p>
+            <p>Each ring is a robot following a few local rules: keep a little distance from its neighbors, steer around obstacles, and head for a slot in a shared formation. No robot sees the whole picture, yet together they flock, close into a ring, pack into a lattice, spell a letter, or draw the Atombot mark.</p>
             <div class="demo-readout">
               <span>Formation <b data-mode>Flock</b></span>
               <span>In place <b data-formed>free</b></span>
@@ -181,22 +181,36 @@
                 <button type="button" data-formation="ring" aria-pressed="false">Ring</button>
                 <button type="button" data-formation="lattice" aria-pressed="false">Lattice</button>
                 <button type="button" data-formation="z" aria-pressed="false">Z</button>
+                <button type="button" data-formation="atombot" aria-pressed="false">Atombot</button>
               </div>
             </div>
             <p class="demo-note">A toy model for illustration, not the lab's control software. Move your cursor through the swarm to push it around.</p>
           </div>
         </div>
 
-        <div class="feature" data-reveal>
-          <div>
-            <p class="eyebrow">From the lab</p>
-            <h3>Soft robots, in hardware and in simulation</h3>
+        <div class="feature-row">
+          <div class="feature feature--half feature--atombot" data-reveal>
+            <div class="feature-body">
+              <p class="eyebrow">The team</p>
+              <h3>Atombot</h3>
+              <p>Atombot is the lab's robotics team and the robot it builds. Ask the swarm above to draw its mark.</p>
+              <div class="feature-actions">
+                <a class="btn btn--small" href="people.html#atombot-alums">Atombot alums <span class="arrow" aria-hidden="true">&rarr;</span></a>
+                <a class="btn btn--ghost btn--small" href="calendar.html#atombot-calendar">Atombot calendar <span class="arrow" aria-hidden="true">&rarr;</span></a>
+              </div>
+            </div>
+            <span class="atombot-mark feature-mark" aria-hidden="true"></span>
           </div>
-          <div class="feature-body">
-            <p>An untethered soft robotic arm (US Patent No. 16/807,490), and Kraken, a MOOSE-based multiphysics simulation and control platform for soft robots.</p>
-            <div class="feature-actions">
-              <a class="btn btn--small" href="https://z-laboratory.github.io/Kraken/">Kraken documentation <span aria-hidden="true">&#8599;</span></a>
-              <a class="btn btn--ghost btn--small" href="publications.html?q=soft+robot">Related publications <span class="arrow" aria-hidden="true">&rarr;</span></a>
+
+          <div class="feature feature--half" data-reveal style="--d: 100ms">
+            <div class="feature-body">
+              <p class="eyebrow">From the lab</p>
+              <h3>Soft robots, in hardware and in simulation</h3>
+              <p>An untethered soft robotic arm (US Patent No. 16/807,490), and Kraken, a MOOSE-based multiphysics simulation and control platform for soft robots.</p>
+              <div class="feature-actions">
+                <a class="btn btn--small" href="https://z-laboratory.github.io/Kraken/">Kraken documentation <span aria-hidden="true">&#8599;</span></a>
+                <a class="btn btn--ghost btn--small" href="publications.html?q=soft+robot">Related publications <span class="arrow" aria-hidden="true">&rarr;</span></a>
+              </div>
             </div>
           </div>
         </div>

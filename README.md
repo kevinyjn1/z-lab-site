@@ -69,5 +69,8 @@ Then open <http://localhost:4173>.
 - CV and syllabus links point at the files on the official site (`cvBase` in
   `data/people.js`). To host them alongside these pages, copy the `cv/` folder next to
   `index.html` and set `cvBase` to `"cv/"`.
+- The Atombot mark (`assets/img/atombot-mark.webp`) is applied as a CSS mask, so one file takes
+  whatever text color surrounds it. Use `<span class="atombot-mark" aria-hidden="true"></span>`.
+  The swarm sketch draws the same mark from a small character bitmap at the top of `swarm.js`.
 - All motion respects the "reduce motion" system setting, and the hero has a pause button.
 - Fonts (Instrument Serif, Geist, Geist Mono) load from Google Fonts with system fallbacks.
