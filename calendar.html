@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calendar | Z Lab</title>
+  <meta name="description" content="The Z Lab and Atombot calendars.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#040c17">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Calendar | Z Lab">
+  <meta property="og:description" content="The Z Lab and Atombot calendars.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&amp;family=Geist+Mono:wght@400..600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/theme-init.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-nav" id="site-nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html" aria-label="Z Lab home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="#0a2548"/>
+          <circle cx="8.5" cy="8.5" r="2.5" fill="#ffcb05"/><circle cx="13.5" cy="8.5" r="2.5" fill="#ffcb05"/><circle cx="18.5" cy="8.5" r="2.5" fill="#ffcb05"/><circle cx="23.5" cy="8.5" r="2.5" fill="#ffcb05"/>
+          <circle cx="18.5" cy="13.5" r="2.5" fill="#d3ca58"/><circle cx="13.5" cy="18.5" r="2.5" fill="#a8c9ac"/>
+          <circle cx="8.5" cy="23.5" r="2.5" fill="#7cc8ff"/><circle cx="13.5" cy="23.5" r="2.5" fill="#7cc8ff"/><circle cx="18.5" cy="23.5" r="2.5" fill="#7cc8ff"/><circle cx="23.5" cy="23.5" r="2.5" fill="#7cc8ff"/>
+        </svg>
+        <span class="brand-name">Z Lab</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="research.html">Research</a>
+        <a href="people.html">People</a>
+        <a href="publications.html">Publications</a>
+        <a href="code.html">Software</a>
+        <a href="teaching.html">Teaching</a>
+        <a href="calendar.html" aria-current="page">Calendar</a>
+        <a class="nav-ext" href="https://sites.google.com/view/zlabintranet/">Intranet <span aria-hidden="true">&#8599;</span></a>
+      </nav>
+      <div class="nav-tools">
+        <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8 8 0 0 1 9.8 4 8 8 0 1 0 20 14.2Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+        </button>
+        <button class="icon-btn menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path class="bar bar-1" d="M4 7.5h16"/><path class="bar bar-2" d="M4 16.5h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="page-head dark-scope">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal>Calendar</p>
+        <h1 data-split data-reveal style="--d: 120ms">What's on</h1>
+        <p class="lead" data-reveal style="--d: 420ms">Lab meetings and Atombot team events, straight from the shared Google calendars.</p>
+        <nav class="chips" data-reveal style="--d: 520ms" aria-label="Jump to a calendar">
+          <a class="chip" href="#zlab-calendar">Z Lab Calendar</a>
+          <a class="chip" href="#atombot-calendar">Atombot Calendar</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cal" id="zlab-calendar" data-reveal>
+          <h2>Z Lab Calendar</h2>
+          <div class="cal-frame">
+            <iframe title="Z Lab Calendar" loading="lazy" src="https://calendar.google.com/calendar/embed?src=2dl0b47g6bt203a428mqgf0lio%40group.calendar.google.com&amp;ctz=America%2FDetroit"></iframe>
+          </div>
+        </div>
+        <div class="cal" id="atombot-calendar" data-reveal>
+          <h2>Atombot Calendar</h2>
+          <div class="cal-frame">
+            <iframe title="Atombot Calendar" loading="lazy" src="https://calendar.google.com/calendar/embed?src=04cab2fb29333de950f1514cd6899b1feafa41b1d51238da62022b195cf7011f%40group.calendar.google.com&amp;ctz=America%2FDetroit"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer dark-scope">
+    <div class="wrap">
+      <div class="footer-top">
+        <p class="footer-tagline">
+          <span><em class="matter-word">Matter</em> in extremes.</span>
+          <span><span class="machine-word">Machine</span> for extremes.</span>
+        </p>
+        <div class="footer-cols">
+          <div>
+            <h2>Explore</h2>
+            <ul class="plain">
+              <li><a href="research.html">Research</a></li>
+              <li><a href="people.html">People</a></li>
+              <li><a href="publications.html">Publications</a></li>
+              <li><a href="code.html">Software</a></li>
+              <li><a href="teaching.html">Teaching</a></li>
+              <li><a href="calendar.html">Calendar</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Elsewhere</h2>
+            <ul class="plain">
+              <li><a href="https://github.com/Z-Laboratory">GitHub</a></li>
+              <li><a href="https://scholar.google.com/citations?user=OIf2HXwAAAAJ&amp;hl=en">Google Scholar</a></li>
+              <li><a href="https://sites.google.com/view/zlabintranet/">Intranet</a></li>
+              <li><a href="https://z.engin.umich.edu/">Official site</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Contact</h2>
+            <address>2927 Cooley Bldg<br>2355 Bonisteel Blvd<br>Ann Arbor, MI 48109<br>yzyz AT umich DOT edu</address>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Z Lab &middot; University of Michigan</span>
+        <span>Unofficial redesign concept. The official site is <a href="https://z.engin.umich.edu/">z.engin.umich.edu</a>.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/site.js" defer></script>
+  <script src="assets/js/fx.js" defer></script>
+</body>
+</html>
