@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Research | Z Lab</title>
-  <meta name="description" content="Matter in extremes, machine for extremes: the two research domains of the Z Lab at the University of Michigan.">
+  <meta name="description" content="Matter in extremes, Machine for extremes: the two research domains of the Z Lab at the University of Michigan.">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#040c17">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Research | Z Lab">
-  <meta property="og:description" content="Matter in extremes, machine for extremes: the two research domains of the Z Lab at the University of Michigan.">
+  <meta property="og:description" content="Matter in extremes, Machine for extremes: the two research domains of the Z Lab at the University of Michigan.">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,7 @@
     <header class="page-head dark-scope">
       <div class="wrap">
         <p class="eyebrow" data-reveal>Research</p>
-        <h1 data-split data-reveal style="--d: 120ms"><em class="matter-word">Matter</em> in extremes, <span class="machine-word">machine</span> for extremes</h1>
+        <h1 data-split data-reveal style="--d: 120ms"><em class="matter-word">Matter</em> in extremes, <span class="machine-word">Machine</span> for extremes</h1>
         <p class="lead" data-reveal style="--d: 420ms">The Z Lab's research can be summarized into two words: Matter and Machine.</p>
       </div>
     </header>
@@ -144,26 +144,36 @@
           <p class="lead">Robots for extreme environments, including swarm robots, wheel-leg hybrid robots, and soft robots.</p>
         </div>
 
-        <div class="topic-grid topic-grid--four">
+        <div class="topic-grid">
           <article class="topic" data-reveal>
             <span class="topic-num">A / 01</span>
             <h3>Robots in extreme environments</h3>
+            <p>Robots for mission-critical work in extreme environments. The <span class="nowrap">near-term</span> focus is the energy sector and homeland security.</p>
           </article>
-          <article class="topic" data-reveal style="--d: 70ms">
+          <article class="topic" data-reveal style="--d: 80ms">
             <span class="topic-num">A / 02</span>
             <h3>Swarm robots and collective intelligence</h3>
+            <p>Many simple robots that coordinate to complete tasks no single robot could handle. Atombot Hydrogen builds a miniature swarm platform for studying emergent behavior in <span class="nowrap">many-robot</span> systems.</p>
+            <a class="text-link" href="#swarm">Watch a swarm take shape <span class="arrow" aria-hidden="true">&rarr;</span></a>
           </article>
-          <article class="topic" data-reveal style="--d: 140ms">
+          <article class="topic" data-reveal>
             <span class="topic-num">A / 03</span>
             <h3>Wheel-leg hybrid robots</h3>
+            <p>Atombot Helium works toward a more practical robot unit: the team builds a legged robot <span class="nowrap">in-house</span> and trains locomotion for <span class="nowrap">wheel-legged</span> robots.</p>
+            <a class="text-link" href="#atombot">Meet the Atombot team <span class="arrow" aria-hidden="true">&rarr;</span></a>
           </article>
-          <article class="topic" data-reveal style="--d: 210ms">
+          <article class="topic" data-reveal style="--d: 80ms">
             <span class="topic-num">A / 04</span>
             <h3>Soft robots and human-compatible machines</h3>
+            <p>An untethered soft robotic arm (US Patent No. 16/807,490), and Kraken, a MOOSE-based multiphysics simulation and control platform for soft robots.</p>
+            <div class="topic-links">
+              <a class="text-link" href="https://z-laboratory.github.io/Kraken/">Kraken documentation <span aria-hidden="true">&#8599;</span></a>
+              <a class="text-link" href="publications.html?q=soft+robot">Related publications <span class="arrow" aria-hidden="true">&rarr;</span></a>
+            </div>
           </article>
         </div>
 
-        <div class="demo demo--flip" data-swarm data-reveal>
+        <div class="demo demo--flip" id="swarm" data-swarm data-reveal>
           <div class="demo-stage">
             <canvas role="img" aria-label="Animation of a swarm of small robots that flock, then arrange themselves into a ring, a hexagonal lattice, the letter Z, and the Atombot mark."></canvas>
           </div>
@@ -188,16 +198,17 @@
           </div>
         </div>
 
-        <div class="feature feature--atombot" data-reveal>
+        <div class="feature feature--atombot" id="atombot" data-reveal>
           <div class="feature-body">
             <div>
               <p class="eyebrow">The team</p>
               <h3 class="with-mark"><span class="atombot-mark" aria-hidden="true"></span>Atombot</h3>
             </div>
-            <p>Atombot is the lab's wheel-leg hybrid robot project and the student team behind it, more than 50 members strong at this kickoff. Ask the swarm above to draw its mark.</p>
+            <p>Atombot is the lab's student robotics team: about 50 undergraduate, master's, and PhD students, working with the Multidisciplinary Design Program. It runs two projects, Hydrogen and Helium, and building hardware is the main focus.</p>
             <div class="feature-actions">
-              <a class="btn btn--small" href="people.html#atombot-alums">Atombot alums <span class="arrow" aria-hidden="true">&rarr;</span></a>
-              <a class="btn btn--ghost btn--small" href="calendar.html#atombot-calendar">Atombot calendar <span class="arrow" aria-hidden="true">&rarr;</span></a>
+              <a class="btn btn--small" href="https://mdp.engin.umich.edu/research_teams/atombot-27/">Join through MDP <span aria-hidden="true">&#8599;</span></a>
+              <a class="btn btn--ghost btn--small" href="people.html#atombot-alums">Alums <span class="arrow" aria-hidden="true">&rarr;</span></a>
+              <a class="btn btn--ghost btn--small" href="calendar.html#atombot-calendar">Calendar <span class="arrow" aria-hidden="true">&rarr;</span></a>
             </div>
           </div>
           <figure class="feature-photo">
@@ -208,19 +219,20 @@
           </figure>
         </div>
 
-        <div class="feature" data-reveal>
-          <div>
-            <p class="eyebrow">From the lab</p>
-            <h3>Soft robots, in hardware and in simulation</h3>
+        <dl class="facts" data-reveal>
+          <div class="fact">
+            <dt>Hydrogen</dt>
+            <dd>A miniature swarm platform: small robots built in numbers to study how collective behavior emerges.</dd>
           </div>
-          <div class="feature-body">
-            <p>An untethered soft robotic arm (US Patent No. 16/807,490), and Kraken, a MOOSE-based multiphysics simulation and control platform for soft robots.</p>
-            <div class="feature-actions">
-              <a class="btn btn--small" href="https://z-laboratory.github.io/Kraken/">Kraken documentation <span aria-hidden="true">&#8599;</span></a>
-              <a class="btn btn--ghost btn--small" href="publications.html?q=soft+robot">Related publications <span class="arrow" aria-hidden="true">&rarr;</span></a>
-            </div>
+          <div class="fact">
+            <dt>Helium</dt>
+            <dd>Legged and <span class="nowrap">wheel-legged</span> robots: a quadruped built <span class="nowrap">in-house</span>, and locomotion learned in simulation, then tested on real robots.</dd>
           </div>
-        </div>
+          <div class="fact">
+            <dt>How it runs</dt>
+            <dd>A weekly all-hands meeting, plus small task groups that each have a lead.</dd>
+          </div>
+        </dl>
       </div>
     </section>
 

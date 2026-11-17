@@ -42,7 +42,7 @@
       (g) =>
         '<section class="group" id="' + esc(g.id) + '">' +
         '<div class="group-head" data-reveal><h2>' + esc(g.title) + '</h2><span class="group-count">' + String(g.members.length).padStart(2, "0") + "</span></div>" +
-        '<div class="roster' + (g.size === "lg" ? " roster--lg" : "") + '">' + g.members.map(person).join("") + "</div>" +
+        '<div class="roster">' + g.members.map(person).join("") + "</div>" +
         "</section>"
     )
     .join("");

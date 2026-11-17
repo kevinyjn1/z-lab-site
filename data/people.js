@@ -20,7 +20,6 @@ window.ZLAB_PEOPLE = {
     {
       id: "postdocs",
       title: "Postdocs and Research Fellows",
-      size: "lg",
       members: [
         { name: "Eric Flynn", photo: "eric-flynn.webp", cv: "CV_Eric_Flynn.pdf" },
         { name: "Natei Ermias", photo: "natei-ermias.webp" },
@@ -29,7 +28,6 @@ window.ZLAB_PEOPLE = {
     {
       id: "phd",
       title: "PhD Students",
-      size: "lg",
       members: [
         { name: "Lucas Trojanowski", photo: "lucas-trojanowski.webp", cv: "CV_Lucas_Trojanowski.pdf" },
         { name: "Naomi Raicu", photo: "naomi-raicu.webp", cv: "CV_Naomi_Raicu.pdf" },
@@ -41,7 +39,6 @@ window.ZLAB_PEOPLE = {
     {
       id: "ms",
       title: "MS Students",
-      size: "sm",
       members: [
         { name: "Alex Blickhan", photo: "alex-blickhan.webp" },
         { name: "Pranav Jain", photo: "pranav-jain.webp" },
@@ -51,7 +48,6 @@ window.ZLAB_PEOPLE = {
     {
       id: "undergrad",
       title: "Undergraduate Students",
-      size: "sm",
       members: [
         { name: "Majid Al Buraiky", photo: "majid-al-buraiky.webp" },
         { name: "Keegan Balcerzak", photo: "keegan-balcerzak.webp" },
