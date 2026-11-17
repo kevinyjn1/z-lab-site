@@ -65,17 +65,20 @@ with a name and an optional email. Out of the box each device keeps its own top 
 share one leaderboard between all visitors, use a Google Form and its Sheet:
 
 1. Create a Google Form with six short-answer questions in this order: Name, Email, Score,
-   Events, Streak, Seconds. Make only Name and Score required. In Settings, leave "Collect
-   email addresses" and "Limit to 1 response" off, so no sign-in is needed.
-2. In the form's Responses tab, choose "Link to Sheets".
-3. In that spreadsheet add a tab named `Leaderboard` and put this formula in cell A1:
+   Events, Streak, Seconds. In Settings, leave "Collect email addresses" and "Limit to 1
+   response" off, so no sign-in is needed. Publish the form for anyone with the link.
+2. In the form's Responses tab, choose "Link to Sheets". This is the private spreadsheet:
+   it holds the emails, so never publish or share it.
+3. Create a second, separate spreadsheet for the public list and put this formula in cell
+   A1, with the private spreadsheet's address in place of `PRIVATE_SHEET_URL`. Click "Allow
+   access" when the cell asks for it.
 
    ```
-   =QUERY('Form Responses 1'!A:G, "select B, D, E where D is not null order by D desc limit 100 label B 'name', D 'score', E 'events'", 1)
+   =QUERY(IMPORTRANGE("PRIVATE_SHEET_URL","Form Responses 1!A:G"),"select Col2, Col4, Col5 where Col2 is not null",1)
    ```
 
-4. File, Share, Publish to web: choose only the `Leaderboard` tab and the CSV format, then
-   publish and copy the link.
+4. In that second spreadsheet: File, Share, Publish to web, choose the CSV format, publish,
+   and copy the link. It carries only names, scores, and event counts.
 5. Fill in `data/leaderboard.js`: `form` is the form's public link with `viewform` replaced
    by `formResponse`; `fields` are the question ids (use the form's "Get pre-filled link",
    answer each question with its own name, and read the `entry.123...` parts from the link it
@@ -83,9 +86,11 @@ share one leaderboard between all visitors, use a Google Form and its Sheet:
 
 Things to know:
 
-- Emails stay in the spreadsheet. Only the `Leaderboard` tab is published, so never publish
-  the responses tab and do not share the spreadsheet itself.
-- To remove a score, delete its row in the responses tab.
+- Emails stay in the private spreadsheet. The public one only imports the name, score, and
+  events columns, so publishing it cannot expose an email.
+- To remove a score, delete its row in the private spreadsheet's responses tab.
+- A new score can take a few minutes to appear for other visitors, because Google refreshes
+  the published file on its own schedule.
 - Scores are sent by the visitor's browser, so they can be faked. The game ignores posted
   scores above 3000; anything else that looks wrong has to be deleted by hand.
 
