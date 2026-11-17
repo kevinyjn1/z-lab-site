@@ -28,8 +28,9 @@ each file explains the fields.
 
 - **Add a paper:** `data/publications.js`. Copy an entry and paste it at the top.
   The Publications page, the home page list, and the numbers strip update themselves.
-- **Add or move a person:** `data/people.js`. Drop their photo in `assets/img/people/`
-  (roughly 600 px on the short side is plenty; WebP or JPEG). People without a photo
+- **Add or move a person:** `data/people.js`. Drop their photo in `assets/img/people/`,
+  cropped square with the face centered and the eyes a little above the middle so it lines
+  up with the rest (about 560 px a side is plenty; WebP or JPEG). People without a photo
   get a monogram. Moving someone to `alumni` is a cut and paste.
 - **Everything else** (research text, software, courses) is ordinary HTML in the page files.
   The header and footer are repeated in each page, so a navigation change means editing

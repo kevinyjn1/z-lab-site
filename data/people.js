@@ -4,9 +4,10 @@
  * To add someone, add { name, photo, cv } to the right group:
  *   name   as it should appear
  *   photo  file name inside assets/img/people/ (optional; initials are shown without one).
- *          Any reasonably sized image works; around 600 px on the short side is plenty.
- *   pos    CSS object-position used to frame the face in the square crop (optional),
- *          e.g. "50% 15%" moves the crop window toward the top of the photo.
+ *          Crop it square with the face centered and the eyes a little above the middle,
+ *          so it lines up with the others; around 560 px a side is plenty.
+ *   pos    only for a photo that is not square: CSS object-position that frames the face,
+ *          e.g. "50% 15%" moves the crop window toward the top of the photo (optional).
  *   cv     file name of the CV inside cvBase (optional)
  *
  * When someone leaves, move them to `alumni` (or `atombotAlumni`).
@@ -68,7 +69,7 @@ window.ZLAB_PEOPLE = {
         { name: "Carlota Navarro", photo: "carlota-navarro.webp" },
         { name: "Trevor Nelson", photo: "trevor-nelson.webp" },
         { name: "Mason Niu", photo: "mason-niu.webp" },
-        { name: "Erik Rollmann", photo: "erik-rollmann.webp", pos: "64% 22%" },
+        { name: "Erik Rollmann", photo: "erik-rollmann.webp" },
         { name: "Brian Totonchi", photo: "brian-totonchi.webp" },
         { name: "Madelyn Tran", photo: "madelyn-tran.webp" },
         { name: "John Verga", photo: "john-verga.webp" },
