@@ -1,14 +1,20 @@
 /*
- * Rare Event: a small hidden game.
+ * Rare Event: a small game.
  *
  * Pilot the Atombot mark through a sample of matter that keeps changing state
  * (liquid, crystal, gas, glass), catch rare events before they fade, and drop
  * bias hills to push the atoms away. A toy for fun, not research code or data.
  *
- * site.js loads this file and game.css on demand, so a normal page view pays nothing.
- * Everything is created on open and torn down on close.
+ * site.js loads this file, game.css, and data/leaderboard.js on demand, so a normal page
+ * view pays nothing. Everything is created on open and torn down on close.
  *
- *   window.ZLabGame.open()      show the game over the current page
+ * Leaderboard: the start and result screens list the top scores, and a finished run can be
+ * posted with a name and an optional email. Where scores go is set in data/leaderboard.js;
+ * with nothing set there, each device keeps its own list. Scores come from the visitor's
+ * browser, so they can be faked: treat the list as fun, not as a record.
+ *
+ *   window.ZLabGame.open()      show the game over the current page;
+ *                               open({ view: "board" }) puts the leaderboard up front
  *   window.ZLabGame.close()     remove it and give the page back
  *   window.ZLabGame.snapshot()  read-only copy of the current state (for tests and the curious)
  */
@@ -21,6 +27,10 @@
     : new URL("assets/js/game.js", document.baseURI).href;
   const MARK_URL = new URL("../img/atombot-mark.webp", SELF).href;
   const BEST_KEY = "zlab-rare-event-best";
+  const BOARD_KEY = "zlab-rare-event-board"; /* this device's own top scores */
+  const NAME_KEY = "zlab-rare-event-name"; /* the name last posted from this device */
+  const BOARD_SIZE = 10;
+  const MAX_SCORE = 3000; /* more than a real run reaches; larger posted scores are ignored */
 
   /* Tuning. Lengths are in "units": about one CSS pixel on a laptop, smaller on a phone. */
   const STEP = 1 / 120; /* fixed simulation step, seconds */
@@ -60,6 +70,13 @@
   const ICON_PAUSE = '<svg class="zg-ic-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></svg>';
   const ICON_CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
+  const BOARD_HTML =
+    '<aside class="zg-board" data-board aria-label="Leaderboard">' +
+      '<p class="eyebrow zg-board-head"><span>Leaderboard</span><span class="zg-board-scope" data-board-scope></span></p>' +
+      '<ol class="zg-board-list" data-board-list></ol>' +
+      '<p class="zg-board-note" data-board-note>Loading scores</p>' +
+    "</aside>";
+
   const TEMPLATE =
     '<canvas class="zgame-canvas" aria-hidden="true"></canvas>' +
     '<div class="zgame-top">' +
@@ -80,7 +97,8 @@
       "<span>bias</span>" +
     "</button>" +
     '<div class="zgame-cue" data-cue aria-hidden="true"><em></em><span></span></div>' +
-    '<div class="zgame-panel" data-panel="start">' +
+    '<div class="zgame-panel zgame-panel--wide" data-panel="start">' +
+      '<div class="zg-main">' +
       '<span class="atombot-mark zg-logo" aria-hidden="true"></span>' +
       '<p class="eyebrow">Z Lab &middot; hidden sample</p>' +
       '<h2 class="zg-title">Rare <em>Event</em></h2>' +
@@ -97,6 +115,8 @@
         '<button class="btn btn--ghost" type="button" data-close>Back to the site</button>' +
       "</div>" +
       '<p class="zg-best" data-best></p>' +
+      "</div>" +
+      BOARD_HTML +
     "</div>" +
     '<div class="zgame-panel zgame-panel--small" data-panel="pause" hidden>' +
       '<p class="eyebrow">Run on hold</p>' +
@@ -106,7 +126,8 @@
         '<button class="btn btn--ghost" type="button" data-close>Back to the site</button>' +
       "</div>" +
     "</div>" +
-    '<div class="zgame-panel" data-panel="over" hidden>' +
+    '<div class="zgame-panel zgame-panel--wide" data-panel="over" hidden>' +
+      '<div class="zg-main">' +
       '<p class="eyebrow">Run complete &middot; your rank</p>' +
       '<h2 class="zg-title" data-rank></h2>' +
       '<p class="zg-lead" data-rank-note></p>' +
@@ -117,10 +138,24 @@
         "<div><dt>survived</dt><dd data-time>0 s</dd></div>" +
       "</dl>" +
       '<p class="zg-best" data-best-over></p>' +
+      '<form class="zg-post" data-post novalidate>' +
+        '<p class="zg-post-title">Post your score</p>' +
+        '<div class="zg-fields">' +
+          '<label><span>Name</span><input name="name" type="text" maxlength="20" autocomplete="nickname" spellcheck="false" required></label>' +
+          '<label class="zg-field-email"><span>Email <i>optional</i></span><input name="email" type="email" maxlength="80" autocomplete="email" spellcheck="false"></label>' +
+        "</div>" +
+        '<div class="zg-post-row">' +
+          '<button class="btn btn--small" type="submit">Post score</button>' +
+          '<p class="zg-post-status" data-post-status role="status"></p>' +
+        "</div>" +
+        '<p class="zg-post-note" data-post-note></p>' +
+      "</form>" +
       '<div class="zg-actions">' +
         '<button class="btn" type="button" data-start>Run again <span class="arrow" aria-hidden="true">&rarr;</span></button>' +
         '<button class="btn btn--ghost" type="button" data-close>Back to the site</button>' +
       "</div>" +
+      "</div>" +
+      BOARD_HTML +
     "</div>";
 
   const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
@@ -145,6 +180,164 @@
     }
   };
 
+  /* Leaderboard --------------------------------------------------------------- */
+
+  const boardConfig = () => Object.assign({ form: "", fields: {}, scores: "" }, window.ZLAB_LEADERBOARD || {});
+  const sharesBoard = () => {
+    const config = boardConfig();
+    return Boolean(config.form && config.fields && config.fields.name && config.fields.score);
+  };
+  const cleanName = (value) =>
+    String(value == null ? "" : value)
+      .replace(/[\u0000-\u001f\u007f<>]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 20);
+  const validRow = (row) => row.name.length >= 2 && Number.isFinite(row.score) && row.score > 0 && row.score <= MAX_SCORE;
+  const byScore = (a, b) => b.score - a.score || a.name.localeCompare(b.name);
+  const toRow = (name, score) => ({ name: cleanName(name), score: Math.round(Number(score)) });
+
+  function deviceRows() {
+    try {
+      const rows = JSON.parse(localStorage.getItem(BOARD_KEY) || "[]");
+      return Array.isArray(rows) ? rows.map((r) => toRow(r && r.name, r && r.score)).filter(validRow).sort(byScore) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function keepOnDevice(row) {
+    try {
+      const rows = deviceRows();
+      rows.push(row);
+      rows.sort(byScore);
+      localStorage.setItem(BOARD_KEY, JSON.stringify(rows.slice(0, BOARD_SIZE)));
+    } catch (e) {
+      /* storage unavailable: the score lasts for this visit only */
+    }
+  }
+
+  const readName = () => {
+    try {
+      return cleanName(localStorage.getItem(NAME_KEY));
+    } catch (e) {
+      return "";
+    }
+  };
+  const writeName = (name) => {
+    try {
+      localStorage.setItem(NAME_KEY, name);
+    } catch (e) {
+      /* storage unavailable */
+    }
+  };
+
+  /* A small CSV reader: commas, quoted cells, doubled quotes inside them. */
+  function parseCsv(text) {
+    const rows = [];
+    let row = [];
+    let cell = "";
+    let quoted = false;
+    const endRow = () => {
+      row.push(cell);
+      cell = "";
+      if (row.some((value) => value !== "")) rows.push(row);
+      row = [];
+    };
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quoted) {
+        if (c !== '"') cell += c;
+        else if (text[i + 1] === '"') {
+          cell += '"';
+          i++;
+        } else quoted = false;
+      } else if (c === '"') quoted = true;
+      else if (c === ",") {
+        row.push(cell);
+        cell = "";
+      } else if (c === "\n" || c === "\r") {
+        if (c === "\r" && text[i + 1] === "\n") i++;
+        endRow();
+      } else cell += c;
+    }
+    endRow();
+    return rows;
+  }
+
+  /* Kept between openings of the game on the same page. */
+  const board = { rows: [], shared: false, failed: false, loaded: false, posted: [] };
+
+  function loadBoard() {
+    const config = boardConfig();
+    if (!config.scores) {
+      board.rows = deviceRows();
+      board.shared = false;
+      board.failed = false;
+      board.loaded = true;
+      return Promise.resolve();
+    }
+    return fetch(config.scores, { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("leaderboard " + res.status);
+        return res.text();
+      })
+      .then((text) => {
+        const table = parseCsv(text);
+        const head = (table[0] || []).map((value) => value.trim().toLowerCase());
+        const named = head.includes("name") && head.includes("score");
+        const nameAt = named ? head.indexOf("name") : 0;
+        const scoreAt = named ? head.indexOf("score") : 1;
+        board.rows = table
+          .slice(named ? 1 : 0)
+          .map((cells) => toRow(cells[nameAt], cells[scoreAt]))
+          .filter(validRow)
+          .sort(byScore)
+          .slice(0, 100);
+        board.shared = true;
+        board.failed = false;
+      })
+      .catch(() => {
+        board.rows = deviceRows();
+        board.shared = false;
+        board.failed = true;
+      })
+      .then(() => {
+        board.loaded = true;
+      });
+  }
+
+  /* The list to show: loaded scores plus any posted from this page that are not in it yet. */
+  function boardRows() {
+    const rows = board.rows.slice();
+    for (const mine of board.posted) {
+      if (!rows.some((row) => row.name === mine.name && row.score === mine.score)) rows.push(mine);
+    }
+    return rows.sort(byScore);
+  }
+
+  /* Resolves true once sent to the shared leaderboard, false if that failed, null if there is none. */
+  function postScore(entry) {
+    const row = toRow(entry.name, entry.score);
+    keepOnDevice(row);
+    board.posted.push(row);
+    if (!sharesBoard()) return Promise.resolve(null);
+    const config = boardConfig();
+    const fields = config.fields;
+    const body = new URLSearchParams();
+    body.set(fields.name, row.name);
+    body.set(fields.score, String(row.score));
+    if (fields.email && entry.email) body.set(fields.email, entry.email);
+    if (fields.events) body.set(fields.events, String(entry.events));
+    if (fields.streak) body.set(fields.streak, String(entry.streak));
+    if (fields.seconds) body.set(fields.seconds, String(entry.seconds));
+    /* The form sends no cross-origin headers, so its reply cannot be read: a request that left is all that can be known. */
+    return fetch(config.form, { method: "POST", mode: "no-cors", body }).then(
+      () => true,
+      () => false
+    );
+  }
+
   /* Soft round sprite, same recipe as the particles in the home page hero. */
   function glowSprite(r, g, b, core) {
     const c = document.createElement("canvas");
@@ -162,17 +355,17 @@
     return c;
   }
 
-  function createGame() {
+  function createGame(options) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const listeners = new AbortController();
     const on = (target, type, fn, opts) => target.addEventListener(type, fn, Object.assign({ signal: listeners.signal }, opts || {}));
     const returnFocus = document.activeElement;
 
     const root = document.createElement("div");
-    root.className = "zgame dark-scope";
+    root.className = "zgame dark-scope" + (options && options.view === "board" ? " zgame--board" : "");
     root.setAttribute("role", "dialog");
     root.setAttribute("aria-modal", "true");
-    root.setAttribute("aria-label", "Rare Event, a hidden game");
+    root.setAttribute("aria-label", "Rare Event, a game");
     root.tabIndex = -1;
     root.innerHTML = TEMPLATE;
 
@@ -1313,6 +1506,97 @@
       cueUntil = clock + secs;
     }
 
+    /* ---- leaderboard ------------------------------------------------------ */
+
+    const boardEls = Array.from(root.querySelectorAll("[data-board]"));
+    const postForm = $("[data-post]");
+    const postStatus = $("[data-post-status]");
+    let mine = null; /* the row posted for the run just finished */
+
+    function renderBoard() {
+      const rows = boardRows();
+      const mineAt = mine ? rows.findIndex((row) => row.name === mine.name && row.score === mine.score) : -1;
+      for (const el of boardEls) {
+        el.querySelector("[data-board-scope]").textContent = !board.loaded ? "" : board.shared ? "all players" : "this device";
+        const list = el.querySelector("[data-board-list]");
+        list.textContent = "";
+        const add = (row, place, you) => {
+          const item = document.createElement("li");
+          if (you) item.className = "is-you";
+          for (const [cls, text] of [["zg-rank", String(place).padStart(2, "0")], ["zg-name", row.name], ["zg-score", String(row.score)]]) {
+            const span = document.createElement("span");
+            span.className = cls;
+            span.textContent = text;
+            item.append(span);
+          }
+          list.append(item);
+        };
+        rows.slice(0, BOARD_SIZE).forEach((row, i) => add(row, i + 1, i === mineAt));
+        if (mineAt >= BOARD_SIZE) add(rows[mineAt], mineAt + 1, true);
+        el.querySelector("[data-board-note]").textContent = !board.loaded
+          ? "Loading scores"
+          : board.failed
+            ? "The shared leaderboard could not be reached, so these are this device's scores."
+            : rows.length
+              ? ""
+              : "No scores yet. Be the first.";
+      }
+    }
+
+    function refreshBoard() {
+      renderBoard();
+      loadBoard().then(() => {
+        if (!destroyed) renderBoard();
+      });
+    }
+
+    /* Get the form ready for the run that just ended. */
+    function readyPost() {
+      mine = null;
+      const shared = sharesBoard();
+      postForm.hidden = score <= 0;
+      postForm.classList.toggle("zg-post--device", !shared);
+      postForm.elements.name.value = readName();
+      postForm.elements.email.value = "";
+      for (const el of postForm.elements) el.disabled = false;
+      postStatus.textContent = "";
+      $("[data-post-note]").textContent = shared
+        ? "Your name and score appear on the leaderboard. Your email is optional, is never shown, and goes only to the people who run this site."
+        : "Scores are kept on this device.";
+    }
+
+    on(postForm, "submit", (e) => {
+      e.preventDefault();
+      if (mine || mode !== "over") return;
+      const name = cleanName(postForm.elements.name.value);
+      const email = postForm.elements.email.value.trim();
+      if (name.length < 2) {
+        postStatus.textContent = "Enter a name of at least two characters.";
+        postForm.elements.name.focus();
+        return;
+      }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        postStatus.textContent = "That email does not look right. Fix it or leave it empty.";
+        postForm.elements.email.focus();
+        return;
+      }
+      mine = toRow(name, score);
+      writeName(name);
+      for (const el of postForm.elements) el.disabled = true;
+      postStatus.textContent = "Posting";
+      postScore({ name, email, score, events, streak: bestStreak, seconds: Math.round(runTime) }).then((sent) => {
+        if (destroyed) return;
+        postStatus.textContent =
+          sent === true
+            ? "Posted. It can take a few minutes to reach everyone's list."
+            : sent === false
+              ? "Saved on this device. The shared leaderboard could not be reached."
+              : "Saved on this device.";
+        renderBoard();
+      });
+      renderBoard();
+    });
+
     function showPanel(name) {
       for (const key of Object.keys(panels)) panels[key].hidden = key !== name;
       root.dataset.mode = mode;
@@ -1389,6 +1673,8 @@
       $("[data-time]").textContent = Math.round(runTime) + " s";
       $("[data-best-over]").textContent = isBest && score > 0 ? "New best." : bestLine();
       $("[data-best]").textContent = bestLine();
+      readyPost();
+      refreshBoard();
       sparks = [];
       beam.on = false;
       cueOn = false;
@@ -1463,7 +1749,7 @@
     const DIRS = { arrowup: "up", w: "up", arrowdown: "down", s: "down", arrowleft: "left", a: "left", arrowright: "right", d: "right" };
 
     function focusables() {
-      return Array.from(root.querySelectorAll("button")).filter(
+      return Array.from(root.querySelectorAll("button, input")).filter(
         (el) => !el.disabled && el.offsetParent !== null && getComputedStyle(el).visibility !== "hidden"
       );
     }
@@ -1487,6 +1773,7 @@
         return;
       }
       e.stopPropagation(); /* the page behind should not react to game keys */
+      if (e.target && e.target.tagName === "INPUT") return; /* typing a name or email */
       if (mode === "play") {
         if (DIRS[key]) {
           keys[DIRS[key]] = true;
@@ -1603,6 +1890,7 @@
     seedAtoms();
     $("[data-best]").textContent = bestLine();
     showPanel("start");
+    refreshBoard();
     syncHud();
     panels.start.querySelector("[data-start]").focus({ preventScroll: true });
     last = performance.now();
@@ -1643,14 +1931,14 @@
 
   let game = null;
   const api = {
-    open() {
-      if (!game) game = createGame();
+    open(options) {
+      if (!game) game = createGame(options);
     },
     close() {
       if (!game) return;
       game.destroy();
       game = null;
-      if (location.hash === "#play") history.replaceState(null, "", location.pathname + location.search);
+      if (location.hash === "#play" || location.hash === "#leaderboard") history.replaceState(null, "", location.pathname + location.search);
     },
     snapshot() {
       return game ? game.snapshot() : null;

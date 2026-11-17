@@ -1,6 +1,6 @@
 /*
  * Shared behavior for every page: navigation state, mobile menu, theme toggle,
- * scroll reveal, the loader for the hidden game, and a few helpers used by the
+ * scroll reveal, the loader for the game, and a few helpers used by the
  * page scripts (window.ZLab).
  */
 (() => {
@@ -96,41 +96,45 @@
   reveal();
 
   /*
-   * Hidden game ("Rare Event", assets/js/game.js). Nothing is downloaded until a visitor
-   * finds it: type "atombot", press the Atombot mark in the footer, or open any page with #play.
+   * The game ("Rare Event", assets/js/game.js). Nothing is downloaded until a visitor opens
+   * it: a "Play Rare Event" or "Leaderboard" button, typing "atombot", or a page address
+   * ending in #play or #leaderboard. view "board" opens it with the leaderboard up front.
    */
   let gameFiles = null;
-  const openGame = () => {
+  const openGame = (view) => {
     if (!gameFiles) {
       gameFiles = new Promise((resolve, reject) => {
         const css = document.createElement("link");
         css.rel = "stylesheet";
         css.href = new URL("../css/game.css", here).href;
+        const board = document.createElement("script");
+        board.src = new URL("../../data/leaderboard.js", here).href;
         const js = document.createElement("script");
         js.src = new URL("game.js", here).href;
-        let waiting = 2;
+        const parts = [css, board, js];
+        let waiting = parts.length;
         const loaded = () => {
           if (--waiting === 0) resolve();
         };
         const failed = () => {
-          css.remove();
-          js.remove();
+          parts.forEach((el) => el.remove());
           gameFiles = null; /* let the next attempt try again */
           reject(new Error("game files did not load"));
         };
-        css.addEventListener("load", loaded);
-        js.addEventListener("load", loaded);
-        css.addEventListener("error", failed);
-        js.addEventListener("error", failed);
-        document.head.append(css, js);
+        parts.forEach((el) => {
+          el.addEventListener("load", loaded);
+          el.addEventListener("error", failed);
+        });
+        document.head.append(...parts);
       });
     }
-    gameFiles.then(() => window.ZLabGame.open()).catch(() => {});
+    gameFiles.then(() => window.ZLabGame.open({ view: view || "" })).catch(() => {});
   };
   document.addEventListener("click", (e) => {
-    if (e.target.closest("[data-game]")) {
+    const trigger = e.target.closest("[data-game]");
+    if (trigger) {
       e.preventDefault();
-      openGame();
+      openGame(trigger.dataset.game);
     }
   });
   let typed = "";
@@ -146,6 +150,7 @@
   });
   const openFromHash = () => {
     if (location.hash === "#play") openGame();
+    else if (location.hash === "#leaderboard") openGame("board");
   };
   window.addEventListener("hashchange", openFromHash);
   openFromHash();

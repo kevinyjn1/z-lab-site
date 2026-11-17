@@ -52,11 +52,42 @@ assets/js/home.js        home page numbers and recent publications
 assets/js/people.js      renders the People page from data/people.js
 assets/js/publications.js renders the Publications page from data/publications.js
 assets/js/game.js        "Rare Event", the hidden game; loaded only when a visitor finds it
-assets/css/game.css      styles for the hidden game
-data/                    people and publications
+assets/css/game.css      styles for the game
+data/                    people, publications, and the game's leaderboard settings
 ```
 
 The two interactive sketches are illustrative toy models, not research code or data.
+
+## Leaderboard for Rare Event
+
+The game's start and result screens list the top scores, and a finished run can be posted
+with a name and an optional email. Out of the box each device keeps its own top ten. To
+share one leaderboard between all visitors, use a Google Form and its Sheet:
+
+1. Create a Google Form with six short-answer questions in this order: Name, Email, Score,
+   Events, Streak, Seconds. Make only Name and Score required. In Settings, leave "Collect
+   email addresses" and "Limit to 1 response" off, so no sign-in is needed.
+2. In the form's Responses tab, choose "Link to Sheets".
+3. In that spreadsheet add a tab named `Leaderboard` and put this formula in cell A1:
+
+   ```
+   =QUERY('Form Responses 1'!A:G, "select B, D, E where D is not null order by D desc limit 100 label B 'name', D 'score', E 'events'", 1)
+   ```
+
+4. File, Share, Publish to web: choose only the `Leaderboard` tab and the CSV format, then
+   publish and copy the link.
+5. Fill in `data/leaderboard.js`: `form` is the form's public link with `viewform` replaced
+   by `formResponse`; `fields` are the question ids (use the form's "Get pre-filled link",
+   answer each question with its own name, and read the `entry.123...` parts from the link it
+   gives you); `scores` is the link from step 4.
+
+Things to know:
+
+- Emails stay in the spreadsheet. Only the `Leaderboard` tab is published, so never publish
+  the responses tab and do not share the spreadsheet itself.
+- To remove a score, delete its row in the responses tab.
+- Scores are sent by the visitor's browser, so they can be faked. The game ignores posted
+  scores above 3000; anything else that looks wrong has to be deleted by hand.
 
 ## Previewing locally
 

@@ -2720,7 +2720,13 @@ button.chip:hover {
   color: var(--muted);
 }
 
-/* The game's button in the footer of every page (assets/js/game.js). */
+/* The game's buttons in the footer of every page (assets/js/game.js). */
+.footer-game {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .egg {
   display: none;
 }
@@ -2730,7 +2736,7 @@ button.chip:hover {
   align-items: center;
   gap: 8px;
   margin-block: -7px;
-  padding: 6px 14px 6px 10px;
+  padding: 6px 14px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: transparent;
@@ -2744,6 +2750,7 @@ button.chip:hover {
 
 .egg .atombot-mark {
   width: 1.2em;
+  margin-left: -4px;
   color: var(--maize);
   transition: transform 0.7s var(--ease);
 }

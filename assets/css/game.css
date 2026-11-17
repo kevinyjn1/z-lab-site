@@ -306,6 +306,14 @@ html.zgame-lock {
   width: min(400px, calc(100% - 28px));
 }
 
+/* Start and result screens: the screen's own content beside the leaderboard. */
+.zgame-panel--wide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 280px);
+  gap: clamp(24px, 4vw, 44px);
+  width: min(920px, calc(100% - 28px));
+}
+
 .zg-logo.atombot-mark {
   display: block;
   width: 46px;
@@ -486,6 +494,227 @@ html.zgame-lock {
 
 .zg-stats div:first-child dd {
   color: var(--maize);
+}
+
+/* Leaderboard and the form that posts to it ----------------------------------- */
+
+.zg-board {
+  padding-left: clamp(22px, 3.4vw, 40px);
+  border-left: 1px solid var(--line);
+}
+
+.zg-board-head {
+  display: flex;
+  align-items: center;
+}
+
+.zg-board-scope {
+  margin-left: auto;
+  padding-left: 10px;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: var(--faint);
+}
+
+.zg-board-list {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zg-board-list li {
+  display: grid;
+  grid-template-columns: 2.4ch minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.zg-board-list li:first-child {
+  border-top: 0;
+}
+
+.zg-board-list li.is-you {
+  margin-inline: -10px;
+  padding-inline: 10px;
+  border-radius: 8px;
+  background: rgba(255, 203, 5, 0.1);
+  box-shadow: inset 2px 0 0 var(--maize);
+}
+
+.zg-rank {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+
+.zg-name {
+  overflow: hidden;
+  font-size: 0.96rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.zg-score {
+  font-family: var(--font-serif);
+  font-size: 1.32rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.zg-board-list li:first-child .zg-score {
+  color: var(--maize);
+}
+
+.zg-board-note {
+  margin: 14px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--faint);
+}
+
+.zg-board-note:empty {
+  display: none;
+}
+
+.zg-post {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.zg-post[hidden] {
+  display: none;
+}
+
+.zg-post-title {
+  margin: 0;
+  font-weight: 550;
+  color: var(--text);
+}
+
+.zg-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.zg-post--device .zg-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.zg-post--device .zg-field-email {
+  display: none;
+}
+
+.zg-post label {
+  display: grid;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.zg-post label i {
+  font-style: normal;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.zg-post input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--font-sans);
+  font-size: 1rem; /* 16px keeps phones from zooming in on focus */
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+}
+
+.zg-post input:focus-visible {
+  outline: 2px solid var(--maize);
+  outline-offset: 1px;
+}
+
+.zg-post input:disabled {
+  opacity: 0.6;
+}
+
+.zg-post-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.zg-post-row .btn {
+  cursor: pointer;
+}
+
+.zg-post-row .btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.zg-post-status {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text);
+}
+
+.zg-post-note {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--faint);
+}
+
+@media (max-width: 760px) {
+  .zgame-panel--wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .zg-board {
+    padding: 20px 0 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  /* shorter list on a phone, but always keep the player's own row */
+  .zg-board-list li:nth-child(n + 6):not(.is-you) {
+    display: none;
+  }
+
+  /* opened from a "Leaderboard" button: the scores come first */
+  .zgame--board [data-panel="start"] .zg-board {
+    order: -1;
+    padding: 0 0 20px;
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .zgame--board [data-panel="start"] .zg-logo.atombot-mark,
+  .zgame--board [data-panel="start"] .zg-how,
+  .zgame--board [data-panel="start"] .zg-controls {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .zg-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* Small screens ------------------------------------------------------------- */
