@@ -10,8 +10,10 @@
  *
  * Leaderboard: the start and result screens list the top scores, and a finished run can be
  * posted with a name and an optional email. Where scores go is set in data/leaderboard.js;
- * with nothing set there, each device keeps its own list. Scores come from the visitor's
- * browser, so they can be faked: treat the list as fun, not as a record.
+ * with nothing set there, each device keeps its own list. The shared list reaches the page a
+ * few minutes late, so a device also remembers what it posted and shows those scores until the
+ * shared list has them. Scores come from the visitor's browser, so they can be faked: treat
+ * the list as fun, not as a record.
  *
  *   window.ZLabGame.open()      show the game over the current page;
  *                               open({ view: "board" }) puts the leaderboard up front
@@ -27,10 +29,11 @@
     : new URL("assets/js/game.js", document.baseURI).href;
   const MARK_URL = new URL("../img/atombot-mark.webp", SELF).href;
   const BEST_KEY = "zlab-rare-event-best";
-  const BOARD_KEY = "zlab-rare-event-board"; /* this device's own top scores */
+  const BOARD_KEY = "zlab-rare-event-board"; /* the scores posted from this device */
   const NAME_KEY = "zlab-rare-event-name"; /* the name last posted from this device */
   const BOARD_SIZE = 10;
   const MAX_SCORE = 3000; /* more than a real run reaches; larger posted scores are ignored */
+  const AWAIT_MS = 60 * 60 * 1000; /* how long a posted score is shown here while the shared list lacks it */
 
   /* Tuning. Lengths are in "units": about one CSS pixel on a laptop, smaller on a phone. */
   const STEP = 1 / 120; /* fixed simulation step, seconds */
@@ -196,25 +199,49 @@
   const validRow = (row) => row.name.length >= 2 && Number.isFinite(row.score) && row.score > 0 && row.score <= MAX_SCORE;
   const byScore = (a, b) => b.score - a.score || a.name.localeCompare(b.name);
   const toRow = (name, score) => ({ name: cleanName(name), score: Math.round(Number(score)) });
+  const sameScore = (a) => (b) => a.name === b.name && a.score === b.score;
+
+  /*
+   * The scores posted from this device, best first. Each one remembers when it was posted (at),
+   * whether its request to the shared leaderboard left (sent), and whether the shared list has
+   * shown it since (seen).
+   */
+  let unsaved = null; /* the rows, held here once storage has refused them */
 
   function deviceRows() {
+    if (unsaved) return unsaved.slice();
     try {
       const rows = JSON.parse(localStorage.getItem(BOARD_KEY) || "[]");
-      return Array.isArray(rows) ? rows.map((r) => toRow(r && r.name, r && r.score)).filter(validRow).sort(byScore) : [];
+      if (!Array.isArray(rows)) return [];
+      return rows
+        .map((r) => Object.assign(toRow(r && r.name, r && r.score), { at: Number(r && r.at) || 0, sent: Boolean(r && r.sent), seen: Boolean(r && r.seen) }))
+        .filter(validRow)
+        .sort(byScore);
     } catch (e) {
       return [];
     }
   }
 
-  function keepOnDevice(row) {
+  /* Sent to the shared leaderboard a short while ago, and its list has not shown it yet. */
+  const awaited = (row) => row.sent && !row.seen && Math.abs(Date.now() - row.at) < AWAIT_MS;
+
+  /* Keeps the device's top scores, plus any the shared list still has to catch up with. */
+  function saveDevice(rows) {
+    const top = rows.slice().sort(byScore).slice(0, BOARD_SIZE);
+    const kept = rows.filter((row) => top.includes(row) || awaited(row));
     try {
-      const rows = deviceRows();
-      rows.push(row);
-      rows.sort(byScore);
-      localStorage.setItem(BOARD_KEY, JSON.stringify(rows.slice(0, BOARD_SIZE)));
+      localStorage.setItem(BOARD_KEY, JSON.stringify(kept));
+      unsaved = null;
     } catch (e) {
-      /* storage unavailable: the score lasts for this visit only */
+      unsaved = kept; /* storage unavailable: the scores last for this visit only */
     }
+  }
+
+  /* Adds a posted score, or replaces it if it is already kept. */
+  function keepOnDevice(row) {
+    const rows = deviceRows().filter((old) => !(old.at === row.at && sameScore(old)(row)));
+    rows.push(row);
+    saveDevice(rows);
   }
 
   const readName = () => {
@@ -265,13 +292,13 @@
     return rows;
   }
 
-  /* Kept between openings of the game on the same page. */
-  const board = { rows: [], shared: false, failed: false, loaded: false, posted: [] };
+  /* Kept between openings of the game on the same page. rows is the shared list as last loaded. */
+  const board = { rows: [], shared: false, failed: false, loaded: false };
 
   function loadBoard() {
     const config = boardConfig();
     if (!config.scores) {
-      board.rows = deviceRows();
+      board.rows = [];
       board.shared = false;
       board.failed = false;
       board.loaded = true;
@@ -292,13 +319,17 @@
           .slice(named ? 1 : 0)
           .map((cells) => toRow(cells[nameAt], cells[scoreAt]))
           .filter(validRow)
-          .sort(byScore)
-          .slice(0, 100);
+          .sort(byScore);
         board.shared = true;
         board.failed = false;
+        /* From here on the shared list speaks for the scores of this device that it shows. */
+        const own = deviceRows();
+        const arrived = own.filter((row) => !row.seen && board.rows.some(sameScore(row)));
+        for (const row of arrived) row.seen = true;
+        if (arrived.length) saveDevice(own);
       })
       .catch(() => {
-        board.rows = deviceRows();
+        board.rows = [];
         board.shared = false;
         board.failed = true;
       })
@@ -307,21 +338,35 @@
       });
   }
 
-  /* The list to show: loaded scores plus any posted from this page that are not in it yet. */
-  function boardRows() {
-    const rows = board.rows.slice();
-    for (const mine of board.posted) {
-      if (!rows.some((row) => row.name === mine.name && row.score === mine.score)) rows.push(mine);
-    }
-    return rows.sort(byScore);
+  /* Scores this device sent that the shared list does not show yet. */
+  function awaitedRows() {
+    if (!board.loaded || !board.shared) return [];
+    return deviceRows().filter((row) => awaited(row) && !board.rows.some(sameScore(row)));
   }
+
+  /* The list to show: the shared one plus this device's scores it has yet to catch up with, or the device's own. */
+  function boardRows() {
+    if (!board.loaded) return [];
+    if (!board.shared) return deviceRows();
+    return board.rows.concat(awaitedRows()).sort(byScore);
+  }
+
+  /* A page that is going away drops its unfinished requests, which looks like a failed send but is not one. */
+  let leaving = false;
+  window.addEventListener("pagehide", () => {
+    leaving = true;
+  });
+  window.addEventListener("pageshow", () => {
+    leaving = false;
+  });
 
   /* Resolves true once sent to the shared leaderboard, false if that failed, null if there is none. */
   function postScore(entry) {
-    const row = toRow(entry.name, entry.score);
+    const shared = sharesBoard();
+    /* kept before the request settles, so the score survives a refresh made right after posting */
+    const row = Object.assign(toRow(entry.name, entry.score), { at: Date.now(), sent: shared, seen: false });
     keepOnDevice(row);
-    board.posted.push(row);
-    if (!sharesBoard()) return Promise.resolve(null);
+    if (!shared) return Promise.resolve(null);
     const config = boardConfig();
     const fields = config.fields;
     const body = new URLSearchParams();
@@ -331,10 +376,18 @@
     if (fields.events) body.set(fields.events, String(entry.events));
     if (fields.streak) body.set(fields.streak, String(entry.streak));
     if (fields.seconds) body.set(fields.seconds, String(entry.seconds));
-    /* The form sends no cross-origin headers, so its reply cannot be read: a request that left is all that can be known. */
-    return fetch(config.form, { method: "POST", mode: "no-cors", body }).then(
+    /*
+     * The form sends no cross-origin headers, so its reply cannot be read: a request that left is all
+     * that can be known. keepalive lets it finish if the page is refreshed or closed meanwhile.
+     */
+    return fetch(config.form, { method: "POST", mode: "no-cors", body, keepalive: true }).then(
       () => true,
-      () => false
+      () => {
+        if (leaving) return true;
+        row.sent = false;
+        keepOnDevice(row);
+        return false;
+      }
     );
   }
 
@@ -1515,7 +1568,14 @@
 
     function renderBoard() {
       const rows = boardRows();
-      const mineAt = mine ? rows.findIndex((row) => row.name === mine.name && row.score === mine.score) : -1;
+      /* On the shared list every score posted from this device is marked; on the device's own list, the one just posted. */
+      const yours = board.shared ? deviceRows() : mine ? [mine] : [];
+      const isYours = (row) => yours.some(sameScore(row));
+      /* the row to show even when it is below the top ten: the newest one posted lately, else this device's best */
+      const lately = yours.filter((row) => Math.abs(Date.now() - row.at) < AWAIT_MS).sort((a, b) => b.at - a.at)[0];
+      const latestAt = mine || lately ? rows.findIndex(sameScore(mine || lately)) : -1;
+      const showAt = latestAt >= 0 ? latestAt : rows.findIndex(isYours);
+      const catchingUp = awaitedRows().length > 0;
       for (const el of boardEls) {
         el.querySelector("[data-board-scope]").textContent = !board.loaded ? "" : board.shared ? "all players" : "this device";
         const list = el.querySelector("[data-board-list]");
@@ -1531,15 +1591,17 @@
           }
           list.append(item);
         };
-        rows.slice(0, BOARD_SIZE).forEach((row, i) => add(row, i + 1, i === mineAt));
-        if (mineAt >= BOARD_SIZE) add(rows[mineAt], mineAt + 1, true);
+        rows.slice(0, BOARD_SIZE).forEach((row, i) => add(row, i + 1, isYours(row)));
+        if (showAt >= BOARD_SIZE) add(rows[showAt], showAt + 1, true);
         el.querySelector("[data-board-note]").textContent = !board.loaded
           ? "Loading scores"
           : board.failed
             ? "The shared leaderboard could not be reached, so these are this device's scores."
-            : rows.length
-              ? ""
-              : "No scores yet. Be the first.";
+            : catchingUp
+              ? "Your new score is saved. Other players will see it in a few minutes."
+              : rows.length
+                ? ""
+                : "No scores yet. Be the first.";
       }
     }
 
@@ -1588,7 +1650,7 @@
         if (destroyed) return;
         postStatus.textContent =
           sent === true
-            ? "Posted. It can take a few minutes to reach everyone's list."
+            ? "Posted."
             : sent === false
               ? "Saved on this device. The shared leaderboard could not be reached."
               : "Saved on this device.";

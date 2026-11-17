@@ -90,7 +90,10 @@ Things to know:
   events columns, so publishing it cannot expose an email.
 - To remove a score, delete its row in the private spreadsheet's responses tab.
 - A new score can take a few minutes to appear for other visitors, because Google refreshes
-  the published file on its own schedule.
+  the published file on its own schedule. The player who posted it sees it right away, and
+  on every later visit: the game remembers the scores posted from a device and adds them to
+  the list for up to an hour, until the published file has them. A score that was deleted,
+  or that never arrived, drops off that player's list too once the hour is up.
 - Scores are sent by the visitor's browser, so they can be faked. The game ignores posted
   scores above 3000; anything else that looks wrong has to be deleted by hand.
 
