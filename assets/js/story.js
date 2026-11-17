@@ -23,6 +23,7 @@
 
   const stage = section.querySelector(".story-stage");
   const mainCanvas = section.querySelector(".story-canvas");
+  const stepList = section.querySelector(".story-steps");
   const steps = Array.from(section.querySelectorAll(".story-step"));
   const navButtons = Array.from(section.querySelectorAll(".story-nav button"));
   const zoneOut = section.querySelector("[data-zone-out]");
@@ -1392,7 +1393,9 @@
   function frameScene(full) {
     wide = full && W >= 900;
     const boxW = wide ? W * 0.56 : W - 20;
-    const boxH = wide ? H - 226 : full ? H * 0.5 : H - 16;
+    /* narrow: the scene gets what is left above the tallest block of text, up to half the stage */
+    const above = full && !wide ? clamp(H - 78 - stepList.offsetHeight - 146, 170, H * 0.5) : 0;
+    const boxH = wide ? H - 226 : full ? above : H - 16;
     const boxTop = wide ? 100 : full ? 78 : 8;
     q = Math.min(boxW / 760, boxH / 640);
     cx = wide ? W - boxW / 2 - Math.max(24, W * 0.035) : W / 2;

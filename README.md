@@ -78,11 +78,11 @@ Then open <http://localhost:4173>.
   whatever text color surrounds it. Use `<span class="atombot-mark" aria-hidden="true"></span>`.
   The home hero and the swarm sketch draw the same mark from the small character bitmap in
   `assets/js/atombot-art.js`.
-- There is a hidden game, Rare Event: pilot the Atombot mark through a sample that cycles
-  through liquid, crystal, gas, and glass, and catch rare events. It opens when a visitor types
-  "atombot", presses the small Atombot mark in the footer, uses the button on the 404 page, or
-  opens any page with `#play` (handy for sharing). To remove it, delete `game.js`, `game.css`,
-  the loader block in `site.js`, and the `data-game` buttons in the page footers and `404.html`.
+- There is a game, Rare Event: pilot the Atombot mark through a sample that cycles through
+  liquid, crystal, gas, and glass, and catch rare events. It opens from the "Play Rare Event"
+  button in every footer, at the end of the scroll story, and on the 404 page; by typing
+  "atombot"; or by opening any page with `#play` (handy for sharing). To remove it, delete
+  `game.js`, `game.css`, the loader block in `site.js`, and the `data-game` buttons in the pages.
 - The scroll story on Home pins a stage and moves a camera through five illustrated scenes as
   the page scrolls; its text lives in `index.html` and the drawing in `story.js`. It illustrates
   ideas from the lab's robotics seminar and is not a drawing of the actual robots. With "reduce

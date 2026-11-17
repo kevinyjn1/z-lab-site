@@ -2621,16 +2621,16 @@ button.chip:hover {
   gap: 12px;
 }
 
-/* The second button opens the hidden game (assets/js/game.js); it needs JavaScript. */
-.notfound-actions [data-game] {
+/* Buttons that open the game (assets/js/game.js) need JavaScript, so they hide without it. */
+.btn[data-game] {
   display: none;
 }
 
-.js .notfound-actions [data-game] {
+.js .btn[data-game] {
   display: inline-flex;
 }
 
-.notfound-actions .atombot-mark {
+.btn .atombot-mark {
   width: 1.05em;
   color: var(--maize);
 }
@@ -2720,50 +2720,63 @@ button.chip:hover {
   color: var(--muted);
 }
 
-/* The Atombot mark beside the footer signature opens the hidden game (assets/js/game.js). */
-.footer-sign {
-  display: inline-flex;
-  align-items: center;
-}
-
+/* The game's button in the footer of every page (assets/js/game.js). */
 .egg {
   display: none;
 }
 
-@supports ((-webkit-mask-image: url("")) or (mask-image: url(""))) {
-  .js .egg {
-    position: relative;
-    display: inline-grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    margin: -6px 6px -6px -5px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--faint);
-    font-size: 15px;
-    opacity: 0.75;
-    transition: color 0.3s var(--ease), opacity 0.3s var(--ease), transform 0.7s var(--ease);
+.js .egg {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-block: -7px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.egg .atombot-mark {
+  width: 1.2em;
+  color: var(--maize);
+  transition: transform 0.7s var(--ease);
+}
+
+.egg:hover,
+.egg:focus-visible {
+  border-color: var(--maize);
+  color: var(--text);
+}
+
+.egg:hover .atombot-mark,
+.egg:focus-visible .atombot-mark {
+  transform: rotate(120deg);
+}
+
+/* The mark on the footer's game button turns once every few seconds to catch the eye. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .egg:not(:hover):not(:focus-visible) .atombot-mark {
+    animation: egg-turn 7s var(--ease) infinite;
+  }
+}
+
+@keyframes egg-turn {
+  0%,
+  82% {
+    transform: rotate(0deg);
   }
 
-  /* a comfortable touch target around the small mark */
-  .js .egg::before {
-    content: "";
-    position: absolute;
-    inset: -9px;
-  }
-
-  .js .egg:hover,
-  .js .egg:focus-visible {
-    color: var(--maize);
-    opacity: 1;
+  100% {
     transform: rotate(120deg);
   }
 }
 
-/* Reveal on scroll (only when JS is running and motion is welcome). */
 /* Scroll story (Home): a pinned stage whose scenes play as the page scrolls. --- */
 
 .story {
@@ -3047,6 +3060,16 @@ button.chip:hover {
     display: none;
   }
 
+  /* three buttons in two rows, so the text stays clear of the scene */
+  .story-actions {
+    gap: 6px;
+  }
+
+  .story-actions .btn {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+
   .js .story-nav {
     right: 0;
     bottom: 62px;
@@ -3064,8 +3087,10 @@ button.chip:hover {
   .story-nav button {
     flex: 1;
     min-width: 0;
-    font-size: 0.6rem;
-    letter-spacing: 0.04em;
+    padding-right: 0;
+    font-size: 0.58rem;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
   }
 
   .js .story--still .story-step {
@@ -3079,6 +3104,7 @@ button.chip:hover {
   }
 }
 
+/* Reveal on scroll (only when JS is running and motion is welcome). */
 @media (prefers-reduced-motion: no-preference) {
   .js [data-reveal] {
     opacity: 0;
