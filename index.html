@@ -156,7 +156,63 @@
       </div>
     </section>
 
-    <section class="section section--tint" aria-label="The lab in numbers">
+    <section class="story dark-scope" id="story" aria-labelledby="story-title">
+      <div class="story-stage">
+        <canvas class="story-canvas" aria-hidden="true"></canvas>
+        <div class="story-scrim" aria-hidden="true"></div>
+        <div class="wrap story-inner">
+          <h2 class="visually-hidden" id="story-title">Robots for extreme environments, in five scenes</h2>
+          <ol class="story-steps">
+            <li class="story-step is-active" data-zone="reactor hall">
+              <span class="story-count">01 / 05 &middot; The setting</span>
+              <h3>Dangerous, dirty, and dull</h3>
+              <p>Nuclear sites are among the hardest places to work, which makes them a natural job for robots. This is the setting the lab designs for.</p>
+              <p class="story-hint">Scroll to walk through it</p>
+            </li>
+            <li class="story-step" data-zone="hot cell">
+              <span class="story-count">02 / 05 &middot; Soft robots</span>
+              <h3>Soft robots for hard problems</h3>
+              <p>A soft arm bends along its whole length instead of pivoting at rigid joints. Counterintuitively, soft robots can be more radiation resistant than many traditional robots in some cases.</p>
+              <p class="story-hint story-hint--mouse">Move your cursor over the scene: the arm follows</p>
+            </li>
+            <li class="story-step" data-zone="open floor">
+              <span class="story-count">03 / 05 &middot; Swarm robots</span>
+              <h3>Many simple robots, one swarm</h3>
+              <p>Atombot's CookieBots move by vibration, which keeps them cheap and low enough to slip under furniture. Lose one or two and the swarm carries on.</p>
+            </li>
+            <li class="story-step" data-zone="stairwell">
+              <span class="story-count">04 / 05 &middot; Wheel-leg robots</span>
+              <h3>Legs with wheels</h3>
+              <p>A four-legged robot with wheels rolls where the floor is flat and steps where it is not. Atombot is building one as a more practical robot unit.</p>
+            </li>
+            <li class="story-step" data-zone="staging area">
+              <span class="story-count">05 / 05 &middot; The mission</span>
+              <h3>Three robots, one mission</h3>
+              <p>From fundamental to applied, the work serves a sustainable, resilient, and secure energy infrastructure.</p>
+              <div class="story-actions">
+                <a class="btn btn--small" href="research.html#machine">Explore Machine research <span class="arrow" aria-hidden="true">&rarr;</span></a>
+                <a class="btn btn--ghost btn--small" href="https://www.youtube.com/watch?v=_GpB51rHsZg">Watch the seminar <span aria-hidden="true">&#8599;</span></a>
+              </div>
+            </li>
+          </ol>
+          <nav class="story-nav" aria-label="Scenes">
+            <button type="button" aria-label="Scene 1, the setting">Setting</button>
+            <button type="button" aria-label="Scene 2, soft robots">Soft arm</button>
+            <button type="button" aria-label="Scene 3, swarm robots">Swarm</button>
+            <button type="button" aria-label="Scene 4, wheel-leg robots">Wheel-leg</button>
+            <button type="button" aria-label="Scene 5, the mission">Mission</button>
+          </nav>
+          <a class="story-skip" href="#numbers">Skip the story <span aria-hidden="true">&darr;</span></a>
+          <div class="hero-hud story-hud" aria-hidden="true">
+            <span class="hud-item hud-state">zone <b data-zone-out>reactor hall</b></span>
+            <span class="hud-item">radiation <span class="hud-bar"><i data-field></i></span></span>
+          </div>
+          <p class="story-note">An illustration of ideas from the lab's robotics seminar, not actual designs.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tint" id="numbers" aria-label="The lab in numbers">
       <div class="wrap">
         <div class="stats">
           <div class="stat" data-reveal>
@@ -312,6 +368,7 @@
   <script src="assets/js/fx.js" defer></script>
   <script src="assets/js/atombot-art.js" defer></script>
   <script src="assets/js/hero.js" defer></script>
+  <script src="assets/js/story.js" defer></script>
   <script src="assets/js/home.js" defer></script>
 </body>
 </html>

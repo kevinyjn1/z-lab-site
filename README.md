@@ -10,7 +10,7 @@ open `index.html`, or copy the folder to any web server.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Home, with the 3D particle hero (liquid, then the Atombot mark, an atom, and a lattice Z) |
+| `index.html` | Home, with the 3D particle hero (liquid, then the Atombot mark, an atom, and a lattice Z) and a scroll story of the lab's robots |
 | `research.html` | The two research domains, with two interactive sketches |
 | `people.html` | PI, current members, alums |
 | `publications.html` | Searchable, filterable publication list with a papers-per-year chart |
@@ -45,6 +45,7 @@ assets/js/site.js        navigation, theme toggle, scroll reveal, shared helpers
 assets/js/fx.js          decorative motion: progress bar, word reveals, tilt, header lattice
 assets/js/hero.js        home page particle scene
 assets/js/atombot-art.js the Atombot mark as a bitmap, shared by the hero and the swarm sketch
+assets/js/story.js       home page scroll story: reactor hall, soft arm, CookieBot swarm, wheel-leg robot
 assets/js/landscape.js   research page: metadynamics sketch
 assets/js/swarm.js       research page: robot swarm sketch
 assets/js/home.js        home page numbers and recent publications
@@ -82,5 +83,9 @@ Then open <http://localhost:4173>.
   "atombot", presses the small Atombot mark in the footer, uses the button on the 404 page, or
   opens any page with `#play` (handy for sharing). To remove it, delete `game.js`, `game.css`,
   the loader block in `site.js`, and the `data-game` buttons in the page footers and `404.html`.
+- The scroll story on Home pins a stage and moves a camera through five illustrated scenes as
+  the page scrolls; its text lives in `index.html` and the drawing in `story.js`. It illustrates
+  ideas from the lab's robotics seminar and is not a drawing of the actual robots. With "reduce
+  motion" on, nothing is pinned and each scene is a still next to its text.
 - All motion respects the "reduce motion" system setting, and the hero has a pause button.
 - Fonts (Instrument Serif, Geist, Geist Mono) load from Google Fonts with system fallbacks.
