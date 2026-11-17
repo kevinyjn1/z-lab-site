@@ -10,7 +10,7 @@ open `index.html`, or copy the folder to any web server.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Home, with the 3D particle hero (liquid, then an atom, then a lattice Z) |
+| `index.html` | Home, with the 3D particle hero (liquid, then the Atombot mark, an atom, and a lattice Z) |
 | `research.html` | The two research domains, with two interactive sketches |
 | `people.html` | PI, current members, alums |
 | `publications.html` | Searchable, filterable publication list with a papers-per-year chart |
@@ -44,6 +44,7 @@ assets/js/theme-init.js  picks light or dark before first paint
 assets/js/site.js        navigation, theme toggle, scroll reveal, shared helpers
 assets/js/fx.js          decorative motion: progress bar, word reveals, tilt, header lattice
 assets/js/hero.js        home page particle scene
+assets/js/atombot-art.js the Atombot mark as a bitmap, shared by the hero and the swarm sketch
 assets/js/landscape.js   research page: metadynamics sketch
 assets/js/swarm.js       research page: robot swarm sketch
 assets/js/home.js        home page numbers and recent publications
@@ -72,6 +73,7 @@ Then open <http://localhost:4173>.
   `index.html` and set `cvBase` to `"cv/"`.
 - The Atombot mark (`assets/img/atombot-mark.webp`) is applied as a CSS mask, so one file takes
   whatever text color surrounds it. Use `<span class="atombot-mark" aria-hidden="true"></span>`.
-  The swarm sketch draws the same mark from a small character bitmap at the top of `swarm.js`.
+  The home hero and the swarm sketch draw the same mark from the small character bitmap in
+  `assets/js/atombot-art.js`.
 - All motion respects the "reduce motion" system setting, and the hero has a pause button.
 - Fonts (Instrument Serif, Geist, Geist Mono) load from Google Fonts with system fallbacks.

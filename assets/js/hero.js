@@ -1,11 +1,15 @@
 /*
  * Home page hero: one 3D particle system, two readings.
  *
- * Matter:  the particles drift like a liquid in a chaotic (ABC) flow, then
- *          condense into an atom: a nucleus with three streaming orbits.
+ * Machine: the particles drift like a liquid in a chaotic (ABC) flow, then paint
+ *          the Atombot mark, each of its three brush strokes from head to tail.
+ * Matter:  each stroke unrolls into one orbit of an atom: a nucleus with three
+ *          streaming orbits.
  * Machine: the same particles then behave like a robot swarm and self-assemble,
  *          site by site along the pen stroke, into a close-packed three-layer
  *          lattice shaped like a Z. The lattice holds, melts, and the cycle repeats.
+ *
+ * The Atombot bitmap comes from atombot-art.js, which must load first.
  *
  * The camera orbits gently and follows the pointer, the pointer pushes nearby
  * particles, and scrolling "heats" the scene so the structure melts as the hero
@@ -46,10 +50,13 @@
 
   const PHASES = [
     { name: "liquid", label: "liquid", secs: 3.2 },
-    { name: "atom", label: "atom", secs: 8.2 },
+    { name: "atombot", label: "atombot", secs: 7.2 },
+    { name: "atom", label: "atom", secs: 7.8 },
     { name: "lattice", label: "lattice", secs: 10.5 },
     { name: "melt", label: "melting", secs: 2.3 },
   ];
+  const LATTICE = PHASES.findIndex((p) => p.name === "lattice");
+  const MARK = window.ZLabAtombot; /* ink cells of the Atombot mark, see atombot-art.js */
 
   /* Three orbits: circles tilted 70 degrees, fanned 60 degrees apart like the atom symbol. */
   const RINGS = [0, 1, 2].map((r) => {
@@ -63,14 +70,17 @@
   let n = 0;
   let nBound = 0;
   let spacing = 20;
+  let markSpacing = 20;
   let form = { cx: 0, cy: 0, h: 0 };
   let box = null;
   let px, py, pz, vx, vy, vz; /* world position and velocity; the origin is the formation center */
   let zx, zy, zz, dZ; /* lattice site and when the particle leaves for it */
-  let aRing, aPhase, aRad, aOff, ax, ay, az, dAtom; /* orbit (or nucleus) slot in the atom */
-  let ord, mix, size, bound;
+  let aRing, aPhase, aRad, aOff, ax, ay, az, dAtom; /* orbit (or nucleus) slot in the atom, and when the particle leaves for it */
+  let bx, by, bz, bMix, dBot; /* slot in the Atombot mark, its color, and when the particle leaves for it */
+  let ord, mix, link, size, bound; /* link: how firmly the particle sits in a bonded structure (mark or lattice) */
   let sx, sy, sd, ss; /* projected screen position, depth, and scale */
-  let bondA, bondB;
+  let bondA, bondB; /* neighbor pairs in the lattice */
+  let markA, markB; /* neighbor pairs in the Atombot mark */
   let gridHead, gridNext, gridCols, gridRows, gridCell;
   let sprites = [];
 
@@ -217,7 +227,8 @@
     px = f32(); py = f32(); pz = f32(); vx = f32(); vy = f32(); vz = f32();
     zx = f32(); zy = f32(); zz = f32(); dZ = f32();
     aPhase = f32(); aRad = f32(); aOff = f32(); ax = f32(); ay = f32(); az = f32(); dAtom = f32();
-    ord = f32(); mix = f32(); size = f32();
+    bx = f32(); by = f32(); bz = f32(); bMix = f32(); dBot = f32();
+    ord = f32(); mix = f32(); link = f32(); size = f32();
     sx = f32(); sy = f32(); sd = f32(); ss = f32();
     aRing = new Int8Array(n);
     bound = new Uint8Array(n);
@@ -235,7 +246,6 @@
       zy[i] = sites[i][1];
       zz[i] = sites[i][2];
       dZ[i] = sites[i][3] * 2.3 + Math.random() * 0.25;
-      dAtom[i] = Math.random() * 1.5;
       if (i < nBound * 0.13) {
         /* nucleus: a point inside a small sphere */
         aRing[i] = -1;
@@ -255,23 +265,28 @@
       }
     }
 
-    /* Bonds between neighboring lattice sites, found once. */
-    const pairsA = [];
-    const pairsB = [];
-    const reach2 = (spacing * 1.12) ** 2;
-    for (let i = 0; i < nBound; i++) {
-      for (let j = i + 1; j < nBound; j++) {
-        const dx = zx[i] - zx[j];
-        const dy = zy[i] - zy[j];
-        const dz = zz[i] - zz[j];
-        if (dx * dx + dy * dy + dz * dz < reach2) {
-          pairsA.push(i);
-          pairsB.push(j);
+    layoutMark(Math.min(zh * 0.94, W - 2 * gutter + 16));
+
+    /* Bonds between neighboring sites, found once. */
+    const neighbors = (x, y, z, reach) => {
+      const a = [];
+      const b = [];
+      const reach2 = reach * reach;
+      for (let i = 0; i < nBound; i++) {
+        for (let j = i + 1; j < nBound; j++) {
+          const dx = x[i] - x[j];
+          const dy = y[i] - y[j];
+          const dz = z[i] - z[j];
+          if (dx * dx + dy * dy + dz * dz < reach2) {
+            a.push(i);
+            b.push(j);
+          }
         }
       }
-    }
-    bondA = Uint16Array.from(pairsA);
-    bondB = Uint16Array.from(pairsB);
+      return [Uint16Array.from(a), Uint16Array.from(b)];
+    };
+    [bondA, bondB] = neighbors(zx, zy, zz, spacing * 1.12);
+    [markA, markB] = neighbors(bx, by, bz, markSpacing * 1.3);
 
     gridCell = Math.max(18, spacing * 1.15);
     gridCols = Math.ceil(W / gridCell) + 3;
@@ -284,8 +299,74 @@
     project();
   }
 
+  /*
+   * The Atombot mark, `width` px wide: three layers of ink cells, thinned to one slot
+   * per bound particle. Stroke k feeds orbit k of the atom, in order along the stroke,
+   * so each brush stroke later unrolls into one ring instead of scattering.
+   */
+  function layoutMark(width) {
+    const cell = width / MARK.cols;
+    const layers = 3;
+    markSpacing = cell * Math.sqrt((MARK.cells.length * layers) / nBound);
+    const spots = [];
+    for (let l = 0; l < layers; l++) {
+      const shift = l % 2 ? cell * 0.5 : 0;
+      for (const [u, v, stroke, along] of MARK.cells) {
+        spots.push([u * width + shift, v * width + shift, (l - (layers - 1) / 2) * markSpacing * 0.8, stroke, along]);
+      }
+    }
+
+    /* Farthest-point thinning keeps the chosen slots evenly spread through the ink. */
+    const m = spots.length;
+    const far = new Float32Array(m).fill(Infinity);
+    const chosen = [[], [], []];
+    let next = 0;
+    for (let picked = 0; picked < nBound; picked++) {
+      const p = spots[next];
+      chosen[p[3]].push(p);
+      far[next] = -1;
+      let best = -1;
+      for (let c = 0; c < m; c++) {
+        if (far[c] < 0) continue;
+        const d = (spots[c][0] - p[0]) ** 2 + (spots[c][1] - p[1]) ** 2 + (spots[c][2] - p[2]) ** 2;
+        if (d < far[c]) far[c] = d;
+        if (best < 0 || far[c] > far[best]) best = c;
+      }
+      next = best;
+    }
+
+    const rings = [[], [], []];
+    const spare = []; /* nucleus particles, plus any ring particles their stroke cannot seat */
+    for (let i = 0; i < nBound; i++) (aRing[i] < 0 ? spare : rings[aRing[i]]).push(i);
+    const seat = (i, p) => {
+      bx[i] = p[0];
+      by[i] = p[1];
+      bz[i] = p[2];
+      bMix[i] = p[4];
+      dBot[i] = 0.15 + p[4] * 1.7 + Math.random() * 0.3;
+      dAtom[i] = 0.2 + (1 - p[4]) * 1.3 + Math.random() * 0.3;
+    };
+    const left = [];
+    for (let k = 0; k < 3; k++) {
+      const slots = chosen[k].sort((a, b) => a[4] - b[4]);
+      const riders = rings[k].sort((a, b) => aPhase[a] - aPhase[b]);
+      const taken = new Uint8Array(slots.length);
+      const seated = Math.min(slots.length, riders.length);
+      for (let r = 0; r < seated; r++) {
+        const at = Math.floor(((r + 0.5) * slots.length) / seated);
+        taken[at] = 1;
+        seat(riders[r], slots[at]);
+      }
+      for (let r = seated; r < riders.length; r++) spare.push(riders[r]);
+      slots.forEach((p, at) => {
+        if (!taken[at]) left.push(p);
+      });
+    }
+    spare.forEach((i, at) => seat(i, left[at]));
+  }
+
   function snapToLattice() {
-    phaseIdx = 2;
+    phaseIdx = LATTICE;
     phaseT = 6;
     yaw = -0.34;
     pitch = 0.1;
@@ -297,6 +378,7 @@
       pz[i] = zz[i];
       ord[i] = 1;
       mix[i] = 1;
+      link[i] = 1;
     }
     meanOrder = 1;
     meanMix = 1;
@@ -349,6 +431,7 @@
       return;
     }
     const t = now * 0.001;
+    const inMark = phase.name === "atombot";
     const inAtom = phase.name === "atom";
     const inLattice = phase.name === "lattice";
     const melting = phase.name === "melt";
@@ -384,13 +467,21 @@
       let uy = 0;
       let uz = 0;
       let wantMix = 0;
-      if (bound[i] && (inAtom || inLattice)) {
-        k = inAtom ? smooth((phaseT - dAtom[i]) / 1.3) : 1;
-        if (inLattice && phaseT >= dZ[i]) {
+      let wantLink = 0;
+      if (bound[i] && (inMark || inAtom || inLattice)) {
+        k = inMark ? smooth((phaseT - dBot[i]) / 1.2) : 1;
+        if (inMark || (inAtom && phaseT < dAtom[i])) {
+          gx = bx[i];
+          gy = by[i];
+          gz = bz[i];
+          wantMix = bMix[i];
+          wantLink = 1;
+        } else if (inLattice && phaseT >= dZ[i]) {
           gx = zx[i];
           gy = zy[i];
           gz = zz[i];
           wantMix = 1;
+          wantLink = 1;
         } else if (aRing[i] === -1) {
           gx = ax[i];
           gy = ay[i];
@@ -429,6 +520,7 @@
         const near = 1 - clamp(dist / reach, 0, 1);
         ord[i] += (k * near - ord[i]) * 0.14 * dt;
         mix[i] += (wantMix * near - mix[i]) * 0.09 * dt;
+        link[i] += (wantLink * near - link[i]) * 0.09 * dt;
       } else {
         if (melting && bound[i]) {
           let hx = (ax[i] - x) * 0.012;
@@ -450,6 +542,7 @@
         }
         ord[i] += (0 - ord[i]) * 0.1 * dt;
         mix[i] += (0 - mix[i]) * 0.07 * dt;
+        link[i] += (0 - link[i]) * 0.07 * dt;
       }
 
       /* Thermal jitter: strong in the liquid, faint in a structure, stronger again when scrolled. */
@@ -565,17 +658,21 @@
     ctx.strokeStyle = "rgba(255,203,5,0.22)";
     ctx.stroke(liquidBonds);
 
-    /* Lattice: bonds appear as neighboring sites lock in. */
-    const latticeBonds = new Path2D();
-    for (let b = 0; b < bondA.length; b++) {
-      const i = bondA[b];
-      const j = bondB[b];
-      if (mix[i] < 0.6 || mix[j] < 0.6) continue;
-      latticeBonds.moveTo(sx[i], sy[i]);
-      latticeBonds.lineTo(sx[j], sy[j]);
+    /* Structure: bonds appear as neighboring sites lock in, in the mark and later in the lattice. */
+    const name = PHASES[phaseIdx].name;
+    const inMark = name === "atombot" || name === "atom";
+    const pairA = inMark ? markA : bondA;
+    const pairB = inMark ? markB : bondB;
+    const structureBonds = new Path2D();
+    for (let b = 0; b < pairA.length; b++) {
+      const i = pairA[b];
+      const j = pairB[b];
+      if (link[i] < 0.6 || link[j] < 0.6) continue;
+      structureBonds.moveTo(sx[i], sy[i]);
+      structureBonds.lineTo(sx[j], sy[j]);
     }
     ctx.strokeStyle = "rgba(124,200,255,0.2)";
-    ctx.stroke(latticeBonds);
+    ctx.stroke(structureBonds);
 
     /* Particles: glowing sprites, larger and brighter when near the camera or locked in. */
     for (let i = 0; i < n; i++) {
