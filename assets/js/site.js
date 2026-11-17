@@ -1,12 +1,16 @@
 /*
  * Shared behavior for every page: navigation state, mobile menu, theme toggle,
- * scroll reveal, and a few helpers used by the page scripts (window.ZLab).
+ * scroll reveal, the loader for the hidden game, and a few helpers used by the
+ * page scripts (window.ZLab).
  */
 (() => {
   "use strict";
 
   const root = document.documentElement;
   const nav = document.getElementById("site-nav");
+  const here = document.currentScript && document.currentScript.src
+    ? document.currentScript.src
+    : new URL("assets/js/site.js", document.baseURI).href;
 
   /* Navigation: solid background once the page scrolls; mobile menu. */
   if (nav) {
@@ -90,6 +94,62 @@
     items.forEach((el) => io.observe(el));
   };
   reveal();
+
+  /*
+   * Hidden game ("Rare Event", assets/js/game.js). Nothing is downloaded until a visitor
+   * finds it: type "atombot", press the Atombot mark in the footer, or open any page with #play.
+   */
+  let gameFiles = null;
+  const openGame = () => {
+    if (!gameFiles) {
+      gameFiles = new Promise((resolve, reject) => {
+        const css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = new URL("../css/game.css", here).href;
+        const js = document.createElement("script");
+        js.src = new URL("game.js", here).href;
+        let waiting = 2;
+        const loaded = () => {
+          if (--waiting === 0) resolve();
+        };
+        const failed = () => {
+          css.remove();
+          js.remove();
+          gameFiles = null; /* let the next attempt try again */
+          reject(new Error("game files did not load"));
+        };
+        css.addEventListener("load", loaded);
+        js.addEventListener("load", loaded);
+        css.addEventListener("error", failed);
+        js.addEventListener("error", failed);
+        document.head.append(css, js);
+      });
+    }
+    gameFiles.then(() => window.ZLabGame.open()).catch(() => {});
+  };
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-game]")) {
+      e.preventDefault();
+      openGame();
+    }
+  });
+  let typed = "";
+  document.addEventListener("keydown", (e) => {
+    const el = e.target;
+    if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+    if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+    typed = (typed + e.key.toLowerCase()).slice(-7);
+    if (typed === "atombot") {
+      typed = "";
+      openGame();
+    }
+  });
+  const openFromHash = () => {
+    if (location.hash === "#play") openGame();
+  };
+  window.addEventListener("hashchange", openFromHash);
+  openFromHash();
+  console.log("%cZ Lab%c A rare event is hidden on this site. Type \"atombot\" on any page to find it.", "font-weight:bold;color:#ffcb05;background:#00274c;padding:2px 6px;border-radius:4px", "");
 
   /* Helpers shared with the page scripts. */
   const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };

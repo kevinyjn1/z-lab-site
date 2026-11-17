@@ -1,0 +1,564 @@
+/* ==========================================================================
+   Rare Event, the hidden game. Loaded on demand by site.js together with
+   game.js; uses the tokens and buttons from style.css. Always navy, in both themes.
+   ========================================================================== */
+
+html.zgame-lock {
+  overflow: hidden;
+}
+
+.zgame {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: #030a14;
+  color: var(--text);
+  font-family: var(--font-sans);
+  outline: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  animation: zgame-in 0.45s var(--ease) both;
+}
+
+.zgame-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.zgame[data-mode="play"] .zgame-canvas {
+  cursor: none;
+}
+
+/* Top bar: readout on the left, pause and close on the right ------------- */
+
+.zgame-top {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.zgame-hud {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(4, 12, 23, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: opacity 0.4s var(--ease);
+}
+
+.zg-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zg-item b {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.zg-state b {
+  display: inline-block;
+  min-width: 9ch;
+  transition: color 0.3s var(--ease);
+}
+
+.zgame.is-cue .zg-state b {
+  color: var(--maize);
+}
+
+.zg-bar {
+  display: block;
+  width: 46px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(150, 180, 215, 0.18);
+  overflow: hidden;
+}
+
+.zg-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--sky), var(--maize));
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.zg-mult b {
+  min-width: 2ch;
+  color: var(--faint);
+  transition: color 0.3s var(--ease);
+}
+
+.zg-mult.is-up b {
+  color: var(--maize);
+}
+
+.zg-pips {
+  gap: 5px;
+}
+
+.zg-pips i,
+.zg-charges i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 203, 5, 0.45);
+  transition: background-color 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.zg-pips i.is-on,
+.zg-charges i.is-on {
+  border-color: var(--maize);
+  background: var(--maize);
+  box-shadow: 0 0 10px rgba(255, 203, 5, 0.6);
+}
+
+.zgame-tools {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.zg-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(4, 12, 23, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+
+.zg-btn:hover {
+  border-color: var(--line-strong);
+  background: rgba(20, 40, 66, 0.7);
+}
+
+.zg-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Bias hill button, in thumb reach ---------------------------------------- */
+
+.zgame-bias {
+  position: absolute;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 7px;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 1px solid rgba(255, 203, 5, 0.5);
+  border-radius: 50%;
+  background: rgba(4, 12, 23, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 6px rgba(255, 203, 5, 0.06), 0 0 0 13px rgba(255, 203, 5, 0.03);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: opacity 0.4s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.zgame-bias:hover {
+  border-color: var(--maize);
+}
+
+.zgame-bias:active {
+  transform: scale(0.94);
+}
+
+.zgame-bias.is-empty {
+  border-color: var(--line);
+  box-shadow: none;
+  color: var(--faint);
+}
+
+.zg-charges {
+  display: flex;
+  gap: 5px;
+}
+
+/* Menus hide the readout and the play controls */
+.zgame:not([data-mode="play"]):not([data-mode="pause"]) .zgame-hud,
+.zgame:not([data-mode="play"]) .zgame-bias {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zgame:not([data-mode="play"]):not([data-mode="pause"]) [data-pause],
+.zgame:not([data-mode="play"]) .zgame-bias {
+  visibility: hidden;
+}
+
+/* State change banner ------------------------------------------------------ */
+
+.zgame-cue {
+  position: absolute;
+  top: clamp(84px, 15vh, 150px);
+  left: 0;
+  right: 0;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding-inline: 16px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+
+.zgame-cue.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+.zgame-cue em {
+  font-family: var(--font-serif);
+  font-size: clamp(2.3rem, 1.4rem + 4vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-shadow: 0 2px 30px rgba(3, 10, 20, 0.9);
+}
+
+.zgame-cue span {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-shadow: 0 1px 12px rgba(3, 10, 20, 0.95);
+}
+
+.zgame-cue span:empty {
+  display: none;
+}
+
+/* Start, pause, and result panels ------------------------------------------ */
+
+.zgame-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(580px, calc(100% - 28px));
+  max-height: calc(100% - 28px);
+  overflow-y: auto;
+  padding: clamp(24px, 4.4vw, 44px);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: rgba(5, 14, 26, 0.8);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transform: translate(-50%, -50%);
+  animation: zgame-panel-in 0.55s var(--ease) both;
+  -webkit-user-select: text;
+  user-select: text;
+  touch-action: pan-y;
+}
+
+.zgame-panel[hidden] {
+  display: none;
+}
+
+.zgame-panel--small {
+  width: min(400px, calc(100% - 28px));
+}
+
+.zg-logo.atombot-mark {
+  display: block;
+  width: 46px;
+  margin-bottom: 18px;
+  color: var(--maize);
+  filter: drop-shadow(0 0 14px rgba(255, 203, 5, 0.45));
+}
+
+.zg-title {
+  margin: 10px 0 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.9rem, 1.9rem + 4.4vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.zg-title em {
+  font-style: italic;
+  color: var(--maize);
+}
+
+.zg-lead {
+  margin: 16px 0 0;
+  max-width: 46ch;
+  font-size: 1.04rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.zg-how {
+  display: grid;
+  gap: 11px;
+  margin: 22px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+  font-size: 0.93rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.zg-how li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.zg-how b {
+  font-weight: 550;
+  color: var(--text);
+}
+
+.zg-dot {
+  width: 12px;
+  height: 12px;
+  margin: 5px 0 0 3px;
+  border-radius: 50%;
+}
+
+.zg-dot--atom {
+  background: radial-gradient(circle, #fff 0 18%, var(--sky) 40%);
+  box-shadow: 0 0 12px rgba(124, 200, 255, 0.7);
+}
+
+.zg-dot--event {
+  border-radius: 0;
+  background: #fff4bf;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 5px rgba(255, 203, 5, 0.9));
+  transform: scale(1.25);
+}
+
+.zg-dot--hill {
+  border: 1px solid var(--maize);
+  box-shadow: 0 0 0 3px rgba(255, 203, 5, 0.16), inset 0 0 0 3px rgba(255, 203, 5, 0.2);
+}
+
+.zg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 20px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
+
+.zg-controls b {
+  margin-right: 6px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Touch screens get the touch instructions instead of the mouse and keyboard ones. */
+.zg-controls--touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .zg-controls--keys {
+    display: none;
+  }
+
+  .zg-controls--touch {
+    display: flex;
+  }
+}
+
+.zg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.zg-actions .btn {
+  cursor: pointer;
+}
+
+.zg-actions .btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.zg-best {
+  margin: 16px 0 0;
+  min-height: 1.2em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.zg-best:empty {
+  display: none;
+}
+
+.zg-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 24px 0 0;
+  border-block: 1px solid var(--line);
+}
+
+.zg-stats div {
+  padding: 16px 0 14px 16px;
+  border-left: 1px solid var(--line);
+}
+
+.zg-stats div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.zg-stats dt {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.zg-stats dd {
+  margin: 6px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.6rem);
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.zg-stats div:first-child dd {
+  color: var(--maize);
+}
+
+/* Small screens ------------------------------------------------------------- */
+
+@media (max-width: 560px) {
+  .zgame-hud {
+    gap: 12px;
+    padding: 0 14px;
+    font-size: 0.68rem;
+  }
+
+  .zg-n,
+  .zg-bar {
+    display: none;
+  }
+
+  .zg-state {
+    font-size: 0;
+    gap: 0;
+  }
+
+  .zg-state b {
+    font-size: 0.68rem;
+  }
+
+  .zg-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .zg-stats div:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .zg-stats div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+
+  .zg-how {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-height: 560px) {
+  .zg-logo.atombot-mark,
+  .zg-how {
+    display: none;
+  }
+}
+
+/* Motion --------------------------------------------------------------------- */
+
+@keyframes zgame-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes zgame-panel-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 14px));
+  }
+}
+
+@keyframes zgame-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .zg-logo.atombot-mark {
+    animation: zgame-spin 16s linear infinite;
+  }
+}

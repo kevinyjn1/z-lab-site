@@ -2559,6 +2559,27 @@ button.chip:hover {
   font-size: var(--fs-lead);
 }
 
+.notfound-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* The second button opens the hidden game (assets/js/game.js); it needs JavaScript. */
+.notfound-actions [data-game] {
+  display: none;
+}
+
+.js .notfound-actions [data-game] {
+  display: inline-flex;
+}
+
+.notfound-actions .atombot-mark {
+  width: 1.05em;
+  color: var(--maize);
+}
+
 /* 11. Footer, motion, print ----------------------------------------------- */
 
 .site-footer {
@@ -2642,6 +2663,49 @@ button.chip:hover {
 
 .footer-bottom a {
   color: var(--muted);
+}
+
+/* The Atombot mark beside the footer signature opens the hidden game (assets/js/game.js). */
+.footer-sign {
+  display: inline-flex;
+  align-items: center;
+}
+
+.egg {
+  display: none;
+}
+
+@supports ((-webkit-mask-image: url("")) or (mask-image: url(""))) {
+  .js .egg {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin: -6px 6px -6px -5px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--faint);
+    font-size: 15px;
+    opacity: 0.75;
+    transition: color 0.3s var(--ease), opacity 0.3s var(--ease), transform 0.7s var(--ease);
+  }
+
+  /* a comfortable touch target around the small mark */
+  .js .egg::before {
+    content: "";
+    position: absolute;
+    inset: -9px;
+  }
+
+  .js .egg:hover,
+  .js .egg:focus-visible {
+    color: var(--maize);
+    opacity: 1;
+    transform: rotate(120deg);
+  }
 }
 
 /* Reveal on scroll (only when JS is running and motion is welcome). */

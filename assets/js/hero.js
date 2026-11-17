@@ -699,7 +699,7 @@
 
   function schedule() {
     if (rafId) return;
-    if (inView && !userPaused && !document.hidden) rafId = requestAnimationFrame(tick);
+    if (inView && !userPaused && !document.hidden && !document.documentElement.classList.contains("zgame-lock")) rafId = requestAnimationFrame(tick);
     else lastTime = 0;
   }
 
@@ -746,6 +746,7 @@
     }).observe(hero);
   }
   document.addEventListener("visibilitychange", schedule);
+  document.addEventListener("zlab:game", schedule); /* rest while the hidden game covers the page */
 
   let resizeTimer = 0;
   let lastW = 0;

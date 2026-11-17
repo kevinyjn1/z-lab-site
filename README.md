@@ -50,6 +50,8 @@ assets/js/swarm.js       research page: robot swarm sketch
 assets/js/home.js        home page numbers and recent publications
 assets/js/people.js      renders the People page from data/people.js
 assets/js/publications.js renders the Publications page from data/publications.js
+assets/js/game.js        "Rare Event", the hidden game; loaded only when a visitor finds it
+assets/css/game.css      styles for the hidden game
 data/                    people and publications
 ```
 
@@ -75,5 +77,10 @@ Then open <http://localhost:4173>.
   whatever text color surrounds it. Use `<span class="atombot-mark" aria-hidden="true"></span>`.
   The home hero and the swarm sketch draw the same mark from the small character bitmap in
   `assets/js/atombot-art.js`.
+- There is a hidden game, Rare Event: pilot the Atombot mark through a sample that cycles
+  through liquid, crystal, gas, and glass, and catch rare events. It opens when a visitor types
+  "atombot", presses the small Atombot mark in the footer, uses the button on the 404 page, or
+  opens any page with `#play` (handy for sharing). To remove it, delete `game.js`, `game.css`,
+  the loader block in `site.js`, and the `data-game` buttons in the page footers and `404.html`.
 - All motion respects the "reduce motion" system setting, and the hero has a pause button.
 - Fonts (Instrument Serif, Geist, Geist Mono) load from Google Fonts with system fallbacks.

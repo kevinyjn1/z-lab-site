@@ -275,7 +275,7 @@
   }
 
   function schedule() {
-    if (!rafId && inView && !paused && !document.hidden) rafId = requestAnimationFrame(tick);
+    if (!rafId && inView && !paused && !document.hidden && !document.documentElement.classList.contains("zgame-lock")) rafId = requestAnimationFrame(tick);
   }
 
   function setPaused(value) {
@@ -324,6 +324,7 @@
     inView = true;
   }
   document.addEventListener("visibilitychange", schedule);
+  document.addEventListener("zlab:game", schedule); /* rest while the hidden game covers the page */
   document.addEventListener("themechange", () => {
     readColors();
     draw();
