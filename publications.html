@@ -79,13 +79,41 @@
       </div>
 
       <div class="wrap">
-        <div class="year-chart" data-reveal>
-          <div class="year-chart-head">
-            <span>Publications per year</span>
-            <button type="button" id="year-clear" hidden>Show all years</button>
-          </div>
-          <div class="year-bars" id="year-bars" role="group" aria-label="Filter by year"></div>
-          <div class="year-axis" id="year-axis" aria-hidden="true"></div>
+        <div class="figs" data-reveal>
+          <figure class="fig" id="fig-years">
+            <figcaption class="fig-head">
+              <div>
+                <h2 class="fig-title">Papers per year</h2>
+                <p class="fig-sub" data-sub></p>
+              </div>
+              <button class="fig-action" type="button" data-clear hidden>Show all years</button>
+            </figcaption>
+            <div class="cols" data-plot></div>
+            <div class="fig-foot">
+              <details class="fig-table">
+                <summary>View as table</summary>
+                <div data-table></div>
+              </details>
+              <p class="fig-hint">Select a year or a journal to filter the list.</p>
+            </div>
+          </figure>
+          <figure class="fig" id="fig-venues">
+            <figcaption class="fig-head">
+              <div>
+                <h2 class="fig-title">Where the work appears</h2>
+                <p class="fig-sub" data-sub></p>
+              </div>
+              <button class="fig-action" type="button" data-clear hidden>Show all journals</button>
+            </figcaption>
+            <ol class="ranks" data-plot aria-label="Journals and venues with the most papers. Choose one to filter the list."></ol>
+            <div class="fig-foot">
+              <details class="fig-table">
+                <summary>View as table</summary>
+                <div data-table></div>
+              </details>
+              <p class="fig-hint" data-foot></p>
+            </div>
+          </figure>
         </div>
 
         <div class="try">

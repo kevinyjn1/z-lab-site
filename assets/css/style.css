@@ -25,6 +25,10 @@
   --matter: #ffcb05;
   --machine: #7cc8ff;
   --accent-text: #ffcb05;
+  --viz: #b88d00;
+  --viz-hi: #ffcb05;
+  --viz-ghost: rgba(150, 180, 215, 0.17);
+  --viz-quiet: rgba(150, 180, 215, 0.44);
   --shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
 }
 
@@ -41,6 +45,10 @@
   --matter: #7a5b00;
   --machine: #0a5c9e;
   --accent-text: #7a5b00;
+  --viz: #a87c00;
+  --viz-hi: #7a5b00;
+  --viz-ghost: rgba(12, 32, 60, 0.13);
+  --viz-quiet: rgba(12, 32, 60, 0.36);
   --shadow: 0 24px 60px -28px rgba(10, 30, 60, 0.28);
 }
 
@@ -1229,7 +1237,13 @@ em.matter,
   gap: clamp(16px, 3vw, 40px);
 }
 
+/* Each tile shares its three rows (number, label, figure) with its neighbors, so the figures line up. */
 .stat {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-content: start;
   padding-top: 18px;
   border-top: 1px solid var(--line-strong);
 }
@@ -1240,7 +1254,6 @@ em.matter,
   font-size: clamp(3.2rem, 2rem + 4.6vw, 5.6rem);
   line-height: 1;
   letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
@@ -1251,6 +1264,61 @@ em.matter,
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+/* The small figure under each number */
+.stat-viz {
+  margin-top: clamp(20px, 2.4vw, 30px);
+}
+
+.spark {
+  position: relative;
+  padding-top: 24px;
+}
+
+.spark-note {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--text);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.spark-bars {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: 2px;
+  height: 64px;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.spark-bars i {
+  height: calc(var(--n) / var(--top) * 100%);
+  min-height: 1px;
+  border-radius: 2px 2px 0 0;
+  background: var(--viz-quiet);
+  transition: height 0.7s var(--ease) var(--d, 0ms);
+}
+
+.spark-bars i.is-on {
+  background: var(--viz-hi);
+}
+
+.spark-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1;
+  color: var(--faint);
 }
 
 /* Recent publications on Home */
@@ -2190,115 +2258,455 @@ a.chip:hover {
   white-space: nowrap;
 }
 
-.year-chart {
-  margin-block: clamp(28px, 4vw, 44px);
-  padding: clamp(18px, 2.4vw, 28px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
+/*
+ * Figures: charts drawn from the lab's own data.
+ * One series color (--viz, checked for both themes), a brighter step for the
+ * mark being read (--viz-hi), and a quiet tint that keeps the full count in
+ * view while a filter is on (--viz-ghost). No value depends on hovering: the
+ * peak is labeled, and every figure has a table underneath.
+ */
+.figs {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+  gap: clamp(28px, 4.4vw, 64px);
+  margin-block: clamp(30px, 4vw, 48px);
 }
 
-.year-chart-head {
+/* The figures are built from the data files by script; without it there is nothing to show. */
+html:not(.js) .figs,
+html:not(.js) .stat-viz {
+  display: none;
+}
+
+.fig {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.fig-head {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 16px;
-  margin-bottom: 18px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+}
+
+.fig-title {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.fig-sub {
+  margin-top: 2px;
+  font-size: 0.88rem;
+  line-height: 1.45;
   color: var(--muted);
 }
 
-.year-chart-head button {
-  padding: 0;
+.fig-action {
+  flex: none;
+  padding: 2px 0;
   border: 0;
   background: none;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
+  font-size: 0.86rem;
+  font-weight: 550;
+  line-height: 1.35;
   color: var(--accent-text);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  white-space: nowrap;
 }
 
-.year-bars {
+.fig-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px 20px;
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--faint);
+}
+
+.fig-hint {
+  margin-left: auto;
+  text-align: right;
+}
+
+.fig-table {
+  min-width: 0;
+}
+
+.fig-table summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 4px;
+  list-style: none;
+}
+
+.fig-table summary::-webkit-details-marker {
+  display: none;
+}
+
+.fig-table summary:hover {
+  color: var(--text);
+}
+
+.fig-table[open] {
+  flex-basis: 100%;
+}
+
+/* Side by side, the two footers share a line until a table opens under one of them. */
+.figs:has(.fig-table[open]) .fig-foot {
+  margin-top: 0;
+}
+
+.fig-table table {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 12px;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.fig-table th,
+.fig-table td {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 400;
+  text-align: right;
+}
+
+.fig-table th:first-child {
+  padding-right: 16px;
+  text-align: left;
+}
+
+.fig-table thead th {
+  border-bottom-color: var(--line-strong);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* Columns over time */
+.cols {
+  --plot-h: 300px; /* divides evenly by 3 and by 4, so every gridline lands on a whole pixel */
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+  margin-top: 30px;
+}
+
+.cols-ticks {
+  position: relative;
+  min-width: 1.3em;
+  height: var(--plot-h);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--faint);
+}
+
+.cols-ticks span {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--v) / var(--top) * 100%);
+  transform: translateY(50%);
+}
+
+.cols-plot {
+  box-sizing: content-box;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  align-items: end;
-  gap: clamp(2px, 0.5vw, 6px);
-  height: 132px;
+  height: var(--plot-h);
+  border-bottom: 1px solid var(--line-strong);
+  background: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px calc(100% / var(--steps)));
 }
 
-.year-bar {
+.col {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: stretch;
   height: 100%;
   padding: 0;
   border: 0;
+  border-radius: 0;
   background: none;
 }
 
-.year-bar .bar {
-  display: block;
-  min-height: 2px;
-  border-radius: 4px 4px 1px 1px;
-  background: color-mix(in srgb, var(--text) 26%, transparent);
-  transition: height 0.45s var(--ease), background-color 0.2s var(--ease);
+.col[aria-disabled="true"] {
+  cursor: default;
 }
 
-.year-bar:hover .bar {
-  background: color-mix(in srgb, var(--text) 55%, transparent);
+.col-ghost,
+.col-fill {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(24px, 62%);
+  border-radius: 3px 3px 0 0;
+  transform: translateX(-50%);
+  transition: height 0.5s var(--ease), background-color 0.2s var(--ease), opacity 0.2s var(--ease);
 }
 
-.year-bar[aria-pressed="true"] .bar {
-  background: var(--maize);
+.col-ghost {
+  height: calc(var(--total) / var(--top) * 100%);
+  background: var(--viz-ghost);
 }
 
-.year-bar .n {
-  display: block;
-  margin-bottom: 5px;
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  line-height: 1;
-  text-align: center;
-  color: var(--muted);
-  opacity: 0;
-  transition: opacity 0.2s var(--ease);
+.col-fill {
+  height: calc(var(--n) / var(--top) * 100%);
+  background: var(--viz);
 }
 
-.year-bar:hover .n,
-.year-bar:focus-visible .n,
-.year-bar[aria-pressed="true"] .n {
+.col:focus-visible .col-fill,
+.col[aria-pressed="true"] .col-fill {
+  background: var(--viz-hi);
+}
+
+.cols-plot.has-pick .col:not([aria-pressed="true"]) .col-fill {
+  opacity: 0.4;
+}
+
+/* Hover only where there is a pointer that hovers: a tap must not leave a column lit. */
+@media (hover: hover) {
+  .col:hover:not([aria-disabled="true"]) .col-fill {
+    background: var(--viz-hi);
+    opacity: 1;
+  }
+}
+
+.cols-plot.has-pick .col:focus-visible .col-fill {
   opacity: 1;
 }
 
-.year-axis {
+.col-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--n) / var(--top) * 100% + 7px);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text);
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: bottom 0.5s var(--ease), opacity 0.2s var(--ease);
+  pointer-events: none;
+}
+
+.col.is-peak .col-label,
+.col[aria-pressed="true"] .col-label {
+  opacity: 1;
+}
+
+/* The tooltip carries the number while a column is being read. */
+.cols-plot.is-reading .col-label {
+  opacity: 0;
+}
+
+.cols-axis {
+  grid-column: 2;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  gap: clamp(2px, 0.5vw, 6px);
-  margin-top: 8px;
+  margin-top: 9px;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
   color: var(--faint);
-  text-align: center;
 }
 
-.year-axis span {
+.cols-axis span {
   display: flex;
   justify-content: center;
   visibility: hidden;
   white-space: nowrap;
 }
 
-.year-axis span.show {
+.cols-axis span.show {
   visibility: visible;
+}
+
+.cols-axis span.is-pick {
+  color: var(--text);
+}
+
+.fig-tip {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 3px;
+  padding: 8px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+
+.fig-tip[hidden] {
+  display: none;
+}
+
+.fig-tip b {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fig-tip span {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* Ranked bars: a name, a figure, and a thin bar per row */
+.ranks {
+  display: grid;
+  margin: 18px 0 0;
+}
+
+.rank {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 14px;
+  align-items: baseline;
+  width: 100%;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  text-align: left;
+}
+
+.rank[aria-disabled="true"] {
+  cursor: default;
+}
+
+.rank-name {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--text);
+  transition: color 0.2s var(--ease);
+}
+
+.rank-val {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text);
+}
+
+.rank-track {
+  position: relative;
+  grid-column: 1 / -1;
+  height: 6px;
+}
+
+.rank-ghost,
+.rank-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 0 3px 3px 0;
+  transition: width 0.5s var(--ease), background-color 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+.rank-ghost {
+  width: calc(var(--total) / var(--top) * 100%);
+  background: var(--viz-ghost);
+}
+
+.rank-fill {
+  width: calc(var(--n) / var(--top) * 100%);
+  background: var(--viz);
+}
+
+.rank:focus-visible .rank-fill,
+.rank[aria-pressed="true"] .rank-fill {
+  background: var(--viz-hi);
+}
+
+.rank[aria-disabled="true"] .rank-name,
+.rank[aria-disabled="true"] .rank-val {
+  color: var(--faint);
+}
+
+.ranks.has-pick .rank:not([aria-pressed="true"]) .rank-fill {
+  opacity: 0.4;
+}
+
+@media (hover: hover) {
+  button.rank:hover:not([aria-disabled="true"]) .rank-fill {
+    background: var(--viz-hi);
+    opacity: 1;
+  }
+}
+
+.ranks.has-pick .rank:focus-visible .rank-fill {
+  opacity: 1;
+}
+
+/* The compact, read-only version under a number on Home: the leader wears the accent. */
+.ranks--mini {
+  margin: 0;
+}
+
+.ranks--mini .rank {
+  gap: 5px 12px;
+  padding: 0 0 12px;
+}
+
+.ranks--mini .rank:last-child {
+  padding-bottom: 0;
+}
+
+.ranks--mini .rank-name {
+  font-size: 0.86rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.ranks--mini .is-top .rank-name {
+  color: var(--text);
+}
+
+.ranks--mini .rank-val {
+  font-size: 0.74rem;
+}
+
+.ranks--mini .rank-track {
+  height: 4px;
+}
+
+.ranks--mini .rank-fill {
+  border-radius: 0 2px 2px 0;
+  background: var(--viz-quiet);
+}
+
+.ranks--mini .is-top .rank-fill {
+  background: var(--viz-hi);
 }
 
 .try {
@@ -3162,8 +3570,53 @@ button.chip:hover {
     animation-delay: var(--t, 0s);
   }
 
-  .js .year-chart:not(.is-in) .year-bar .bar {
-    height: 2px !important;
+  /* Data marks grow from the baseline the first time a figure scrolls in. */
+  .js [data-reveal]:not(.is-in) .col-ghost,
+  .js [data-reveal]:not(.is-in) .col-fill {
+    height: 0;
+  }
+
+  .js [data-reveal]:not(.is-in) .rank-ghost,
+  .js [data-reveal]:not(.is-in) .rank-fill {
+    width: 0;
+  }
+
+  .js [data-reveal]:not(.is-in) .col-label {
+    opacity: 0;
+  }
+
+  .js [data-reveal]:not(.is-in) .spark-bars i {
+    height: 0;
+  }
+
+  /*
+   * One orchestrated entrance: the marks rise in order. On the Publications page
+   * the order is dropped once it has played (.is-settled), so filters answer at once.
+   */
+  .figs:not(.is-settled) .col-ghost,
+  .figs:not(.is-settled) .col-fill {
+    transition-delay: calc(var(--i, 0) * 24ms);
+  }
+
+  .figs:not(.is-settled) .col-label {
+    transition-delay: 0.75s;
+  }
+
+  .figs:not(.is-settled) .rank-ghost,
+  .figs:not(.is-settled) .rank-fill {
+    transition-delay: calc(var(--i, 0) * 60ms + 240ms);
+  }
+
+  .ranks--mini .rank-fill {
+    transition-delay: calc(var(--i, 0) * 80ms + 160ms);
+  }
+
+  .js [data-reveal]:not(.is-in) .spark-note {
+    opacity: 0;
+  }
+
+  .spark-note {
+    transition: opacity 0.4s var(--ease) 0.7s;
   }
 
   @view-transition {
@@ -3225,12 +3678,23 @@ button.chip:hover {
 }
 
 @media (max-width: 1099px) {
+  /* Below this the journal names would wrap beside the year chart, so the figures stack. */
+  .figs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .roster {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 1023px) {
+  /* Four tiles across would wrap their labels below this width. */
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 40px;
+  }
+
   .footer-top {
     grid-template-columns: 1fr;
   }
@@ -3264,7 +3728,6 @@ button.chip:hover {
   }
 
   .stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 32px;
   }
 
@@ -3304,6 +3767,11 @@ button.chip:hover {
 }
 
 @media (max-width: 699px) {
+  .cols {
+    --plot-h: 144px;
+    column-gap: 8px;
+  }
+
   .topic-grid,
   .facts,
   .pi-cols {
@@ -3423,7 +3891,7 @@ button.chip:hover {
   .site-nav,
   .site-footer,
   .pub-tools,
-  .year-chart,
+  .figs,
   .hero-canvas,
   .hero-hud,
   .marquee,

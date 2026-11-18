@@ -10,10 +10,10 @@ open `index.html`, or copy the folder to any web server.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Home, with the 3D particle hero (liquid, then the Atombot mark, an atom, and a lattice Z) and a scroll story of the lab's robots |
+| `index.html` | Home, with the 3D particle hero (liquid, then the Atombot mark, an atom, and a lattice Z), a scroll story of the lab's robots, and the lab in numbers |
 | `research.html` | The two research domains, with two interactive sketches |
 | `people.html` | PI, current members, alums |
-| `publications.html` | Searchable, filterable publication list with a papers-per-year chart |
+| `publications.html` | Searchable, filterable publication list with two figures that double as filters: papers per year, and the journals with the most papers |
 | `code.html` | Software |
 | `teaching.html` | Courses |
 | `calendar.html` | The two embedded Google calendars |
@@ -46,9 +46,9 @@ assets/js/fx.js          decorative motion: progress bar, word reveals, tilt, he
 assets/js/hero.js        home page particle scene
 assets/js/atombot-art.js the Atombot mark as a bitmap, shared by the hero and the swarm sketch
 assets/js/story.js       home page scroll story: reactor hall, soft arm, CookieBot swarm, wheel-leg robot
-assets/js/landscape.js   research page: metadynamics sketch
+assets/js/landscape.js   research page: metadynamics sketch (energy landscape, bias layers, walker trace)
 assets/js/swarm.js       research page: robot swarm sketch
-assets/js/home.js        home page numbers and recent publications
+assets/js/home.js        home page numbers, the small figure under each, and recent publications
 assets/js/people.js      renders the People page from data/people.js
 assets/js/publications.js renders the Publications page from data/publications.js
 assets/js/game.js        "Rare Event", the hidden game; loaded only when a visitor finds it
@@ -57,6 +57,33 @@ data/                    people, publications, and the game's leaderboard settin
 ```
 
 The two interactive sketches are illustrative toy models, not research code or data.
+
+## Figures
+
+The charts (Publications, and the numbers on Home) are drawn from `data/publications.js` and
+`data/people.js`, so they update with the data. They follow one small set of rules, kept in
+`style.css` under "Figures":
+
+- **One message each.** The line under a figure's title says what it shows in plain words
+  ("97 since 2006, most in 2021"), and it is rewritten when a filter changes the numbers.
+- **One series color.** `--viz` is the color of the marks, `--viz-hi` the mark being read or
+  selected, `--viz-ghost` the full count shown faintly behind a filtered one, and `--viz-quiet`
+  the marks that are context. Each has a dark and a light value; change them in the two theme
+  blocks at the top of `style.css` and nowhere else. On Home the largest value in each small
+  figure wears the accent and the rest stay quiet.
+- **Labels are sparing and text is never colored like the data.** Only the peak, the selected
+  mark, and ranked rows carry a number. Everything else is on the axis, in the tooltip, and
+  in the "View as table" under each figure, so no value depends on hovering.
+- **The scale never moves.** A filter does not rescale a figure; the faint mark keeps the
+  full count in view behind the papers that match.
+- **Thin marks, hairline rules, no boxes.** Bars are at most 24 px wide with 3 px rounded
+  ends, gridlines are solid 1 px lines, and a figure sits under a single rule instead of
+  inside a card. The plot height (`--plot-h`) is a multiple of 12 so every gridline lands on
+  a whole pixel.
+
+On the Publications page a year or a journal can be chosen in its figure. Each figure counts
+the papers that pass every filter except its own, so the choice can be changed in place, and
+the choice is kept in the address (`?year=2021&venue=...`).
 
 ## Leaderboard for Rare Event
 

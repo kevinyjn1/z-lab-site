@@ -6,6 +6,10 @@
  * Gaussian hills of bias are deposited wherever the walker currently is, so the
  * wells it has visited fill up and it can cross barriers it would otherwise
  * almost never cross. When every basin is filled a new landscape is drawn.
+ *
+ * The figure has two panels on one horizontal axis: the landscape, with the
+ * bias drawn in layers as it builds up, and under it a strip that traces where
+ * the walker has been, newest at the top. Energies are labeled in units of kT.
  */
 (() => {
   "use strict";
@@ -33,7 +37,12 @@
   const HILL_EVERY = 3;
   const FULL_LEVEL = 0.9;
   const Y_MAX = 1.14;
-  const PAD = { left: 36, right: 14, top: 16, bottom: 32 };
+  const PAD = { left: 58, right: 16, top: 36, bottom: 26 };
+  const MID_ROW = 26; /* the basin letters, between the two panels */
+  const TICK_KT = 20; /* a gridline every 20 kT */
+  const TRAIL_N = 420; /* frames of history in the strip */
+  const LAYER_EVERY = 60; /* hills between two layer lines, to begin with */
+  const LAYER_MAX = 24;
 
   const V = new Float32Array(NB);
   const B = new Float32Array(NB);
@@ -48,6 +57,12 @@
   let W = 0;
   let H = 0;
   let colors = {};
+  let layers = []; /* snapshots of the bias, drawn as lines inside the fill */
+  let layerEvery = LAYER_EVERY;
+  let hoverU = null; /* where the pointer is reading the landscape */
+  const trail = new Float32Array(TRAIL_N); /* ring buffer of positions; NaN breaks the line */
+  let trailHead = 0;
+  let trailLen = 0;
   let rafId = 0;
   let inView = false;
   let paused = reduceMotion.matches;
@@ -99,11 +114,23 @@
     /* Rescale so the deepest point sits just above the axis. */
     const scale = (1 - 0.07) / (1 - lo);
     for (let i = 0; i < NB; i++) V[i] = 1 - (1 - V[i]) * scale;
+    /* Where each basin actually bottoms out, once the ripples are in. */
+    wells.forEach((well) => {
+      let at = Math.round(well.c / DX);
+      for (let i = Math.round((well.c - well.w) / DX); i <= Math.round((well.c + well.w) / DX); i++) {
+        if (i > 0 && i < NB && V[i] < V[at]) at = i;
+      }
+      well.min = at * DX;
+    });
     resetBias();
   }
 
   function resetBias() {
     B.fill(0);
+    layers = [];
+    layerEvery = LAYER_EVERY;
+    trailHead = 0;
+    trailLen = 0;
     hills = 0;
     stepCount = 0;
     full = false;
@@ -135,6 +162,20 @@
       B[i] += HILL_HEIGHT * Math.exp(-(d * d) / (2 * HILL_WIDTH * HILL_WIDTH));
     }
     hills++;
+    if (hills % layerEvery === 0) {
+      layers.push(B.slice());
+      if (layers.length > LAYER_MAX) {
+        /* Keep every other layer and space the next ones twice as far apart. */
+        layers = layers.filter((_, k) => k % 2 === 1);
+        layerEvery *= 2;
+      }
+    }
+  }
+
+  function remember(u) {
+    trail[trailHead] = u;
+    trailHead = (trailHead + 1) % TRAIL_N;
+    trailLen = Math.min(TRAIL_N, trailLen + 1);
   }
 
   function advance() {
@@ -143,6 +184,7 @@
       pos = Math.min(0.985, Math.max(0.015, pos));
       if (++stepCount % HILL_EVERY === 0) addHill(pos);
     }
+    remember(pos);
     wells.forEach((well, k) => {
       if (Math.abs(pos - well.c) < well.w * 0.8) visited[k] = true;
     });
@@ -162,8 +204,8 @@
   function readColors() {
     const light = document.documentElement.dataset.theme === "light";
     colors = light
-      ? { land: "#e6e0cf", ridge: "#0a1a2f", bias: "#ffcb05", biasEdge: "#c79a00", walker: "#0a1a2f", walkerRing: "#ffffff", axis: "rgba(10,26,47,0.55)", label: "#46586e" }
-      : { land: "#14263d", ridge: "#b9c8da", bias: "#ffcb05", biasEdge: "#ffe27a", walker: "#ffffff", walkerRing: "#040c17", axis: "rgba(163,180,200,0.6)", label: "#a3b4c8" };
+      ? { land: "#e6e0cf", ridge: "#0a1a2f", bias: "#ffcb05", biasEdge: "#c79a00", layer: "rgba(27,21,0,0.3)", walker: "#0a1a2f", walkerRing: "#ffffff", grid: "rgba(12,32,60,0.13)", base: "rgba(12,32,60,0.3)", label: "#46586e", faint: "#8a96a8", text: "#0a1a2f", trail: "10,26,47" }
+      : { land: "#14263d", ridge: "#b9c8da", bias: "#ffcb05", biasEdge: "#ffe27a", layer: "rgba(27,21,0,0.34)", walker: "#ffffff", walkerRing: "#040c17", grid: "rgba(150,180,215,0.16)", base: "rgba(150,180,215,0.32)", label: "#a3b4c8", faint: "#5d7089", text: "#e7edf4", trail: "231,237,244" };
   }
 
   function resize() {
@@ -176,12 +218,80 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
+  /* Whole-pixel rows, so every hairline is crisp. */
+  const stripH = () => Math.round(Math.min(96, Math.max(54, H * 0.17)));
+  const stripBottom = () => Math.round(H - PAD.bottom);
+  const stripTop = () => stripBottom() - stripH();
+  const floorY = () => stripTop() - MID_ROW;
   const X = (u) => PAD.left + u * (W - PAD.left - PAD.right);
-  const Y = (e) => H - PAD.bottom - (Math.min(e, Y_MAX) / Y_MAX) * (H - PAD.top - PAD.bottom);
+  const Y = (e) => floorY() - (Math.min(e, Y_MAX) / Y_MAX) * (floorY() - PAD.top);
+
+  function hairline(x0, y0, x1, y1, color) {
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = color;
+    ctx.stroke();
+  }
+
+  function setFont(spacing) {
+    ctx.font = '500 10px "Geist Mono", ui-monospace, Menlo, monospace';
+    if ("letterSpacing" in ctx) ctx.letterSpacing = spacing || "0px";
+  }
+
+  /* One row above the plot naming the three things drawn in it. */
+  function drawLegend() {
+    setFont("0.3px");
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    const y = 15;
+    let x = PAD.left;
+    const item = (name, swatch) => {
+      swatch(x, y);
+      ctx.fillStyle = colors.label;
+      ctx.fillText(name, x + 20, y + 0.5);
+      x += 20 + ctx.measureText(name).width + 18;
+    };
+    item("landscape", (sx, sy) => {
+      ctx.fillStyle = colors.land;
+      ctx.fillRect(sx, sy - 1, 14, 6);
+      hairline(sx, sy - 1.5, sx + 14, sy - 1.5, colors.ridge);
+    });
+    item("added bias", (sx, sy) => {
+      ctx.fillStyle = colors.bias;
+      ctx.fillRect(sx + 2, sy - 5, 10, 10);
+    });
+    item("walker", (sx, sy) => {
+      ctx.beginPath();
+      ctx.arc(sx + 7, sy, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = colors.walker;
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = colors.walkerRing;
+      ctx.stroke();
+    });
+  }
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    const floor = H - PAD.bottom;
+    const floor = floorY();
+    const top = stripTop();
+    const bottom = stripBottom();
+    const left = PAD.left;
+    const right = W - PAD.right;
+
+    /* Energy grid, in units of kT. The landscape is drawn over it. */
+    setFont();
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    const topTick = Math.floor(1 / (TICK_KT * KT)) * TICK_KT;
+    for (let kt = 0; kt <= topTick; kt += TICK_KT) {
+      const y = Math.round(Y(kt * KT)) + 0.5;
+      if (kt > 0) hairline(left, y, right, y, colors.grid);
+      ctx.fillStyle = colors.faint;
+      ctx.fillText(kt === topTick ? kt + " kT" : String(kt), left - 8, y);
+    }
 
     /* Bias: the region between the bare landscape and the filled surface. */
     ctx.beginPath();
@@ -191,6 +301,27 @@
     ctx.closePath();
     ctx.fillStyle = colors.bias;
     ctx.fill();
+
+    /* Earlier surfaces of the bias, so the fill shows how it built up. */
+    ctx.lineWidth = 1;
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = colors.layer;
+    layers.forEach((layer, k) => {
+      /* Only where the bias kept growing afterwards, so no line is drawn twice. */
+      const next = layers[k + 1] || B;
+      ctx.beginPath();
+      let pen = false;
+      for (let i = 0; i < NB; i++) {
+        if (layer[i] > 0.004 && next[i] - layer[i] > 0.006) {
+          if (pen) ctx.lineTo(X(i * DX), Y(V[i] + layer[i]));
+          else ctx.moveTo(X(i * DX), Y(V[i] + layer[i]));
+          pen = true;
+        } else {
+          pen = false;
+        }
+      }
+      ctx.stroke();
+    });
 
     ctx.beginPath();
     let pen = false;
@@ -226,6 +357,54 @@
     ctx.strokeStyle = colors.ridge;
     ctx.stroke();
 
+    hairline(left, floor + 0.5, right, floor + 0.5, colors.base);
+
+    /* Basins: a letter under each, and a guide down through the strip. */
+    setFont();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    wells.forEach((well, k) => {
+      const x = Math.round(X(well.min)) + 0.5;
+      hairline(x, floor, x, floor + 5, colors.base);
+      hairline(x, top, x, bottom, colors.grid);
+      ctx.fillStyle = visited[k] ? colors.text : colors.faint;
+      ctx.fillText(String.fromCharCode(65 + k), x, floor + MID_ROW / 2 + 1);
+    });
+
+    /* The strip: where the walker has been, newest at the top. */
+    hairline(left, top + 0.5, right, top + 0.5, colors.grid);
+    hairline(left, bottom + 0.5, right, bottom + 0.5, colors.base);
+    ctx.textAlign = "right";
+    ctx.fillStyle = colors.faint;
+    ctx.fillText("now", left - 8, top + 6);
+    ctx.fillText("earlier", left - 8, bottom - 5);
+    if (trailLen > 1) {
+      const fade = ctx.createLinearGradient(0, top, 0, bottom);
+      fade.addColorStop(0, "rgba(" + colors.trail + ",0.95)");
+      fade.addColorStop(1, "rgba(" + colors.trail + ",0.12)");
+      ctx.beginPath();
+      let down = false;
+      for (let k = 0; k < trailLen; k++) {
+        const u = trail[(trailHead - 1 - k + TRAIL_N * 2) % TRAIL_N];
+        if (Number.isNaN(u)) {
+          down = false;
+          continue;
+        }
+        const y = top + 3 + (k / (TRAIL_N - 1)) * (bottom - top - 5);
+        if (down) ctx.lineTo(X(u), y);
+        else ctx.moveTo(X(u), y);
+        down = true;
+      }
+      ctx.lineWidth = 1.25;
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = fade;
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(X(pos), top + 3, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = colors.walker;
+    ctx.fill();
+
     /* Walker */
     const wx = X(pos);
     const wy = Y(energyAt(pos)) - 8;
@@ -237,26 +416,32 @@
     ctx.strokeStyle = colors.walkerRing;
     ctx.stroke();
 
-    /* Axes and labels */
-    ctx.lineWidth = 1.25;
-    ctx.strokeStyle = colors.axis;
-    ctx.beginPath();
-    ctx.moveTo(PAD.left, PAD.top - 4);
-    ctx.lineTo(PAD.left, floor);
-    ctx.lineTo(W - PAD.right + 4, floor);
-    ctx.stroke();
+    /* Reading the landscape under the pointer. */
+    if (hoverU !== null) {
+      const x = Math.round(X(hoverU)) + 0.5;
+      const i = Math.min(NB - 1, Math.max(0, Math.round(hoverU / DX)));
+      hairline(x, PAD.top, x, floor, colors.base);
+      ctx.beginPath();
+      ctx.arc(x, Y(V[i] + B[i]), 3, 0, Math.PI * 2);
+      ctx.fillStyle = colors.text;
+      ctx.fill();
+      const bias = Math.round(B[i] / KT);
+      const reading = Math.round(V[i] / KT) + " kT" + (bias > 0 ? " + " + bias + " kT bias" : "");
+      setFont();
+      ctx.textBaseline = "middle";
+      const flip = x + 12 + ctx.measureText(reading).width > right;
+      ctx.textAlign = flip ? "right" : "left";
+      ctx.fillStyle = colors.text;
+      ctx.fillText(reading, x + (flip ? -8 : 8), PAD.top + 8);
+    }
 
-    ctx.fillStyle = colors.label;
-    ctx.font = '500 10px "Geist Mono", ui-monospace, Menlo, monospace';
+    drawLegend();
+
+    setFont("0.6px");
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    if ("letterSpacing" in ctx) ctx.letterSpacing = "1.2px";
-    ctx.fillText("GENERALIZED COORDINATE", (PAD.left + W - PAD.right) / 2, H - PAD.bottom / 2 + 2);
-    ctx.save();
-    ctx.translate(PAD.left / 2 - 1, (PAD.top + floor) / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText("POTENTIAL ENERGY", 0, 0);
-    ctx.restore();
+    ctx.fillStyle = colors.label;
+    ctx.fillText("generalized coordinate", (left + right) / 2, H - PAD.bottom / 2 + 2);
   }
 
   function tick(now) {
@@ -304,11 +489,23 @@
       schedule();
     });
   }
-  canvas.addEventListener("pointerdown", (e) => {
+  const coordinateAt = (e) => {
     const rect = canvas.getBoundingClientRect();
-    const u = (e.clientX - rect.left - PAD.left) / (rect.width - PAD.left - PAD.right);
-    pos = Math.min(0.985, Math.max(0.015, u));
+    return (e.clientX - rect.left - PAD.left) / (rect.width - PAD.left - PAD.right);
+  };
+  canvas.addEventListener("pointerdown", (e) => {
+    pos = Math.min(0.985, Math.max(0.015, coordinateAt(e)));
+    remember(NaN); /* a jump, not a path: lift the pen */
     draw();
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    const u = coordinateAt(e);
+    hoverU = e.pointerType !== "touch" && u >= 0 && u <= 1 ? u : null;
+    if (!rafId) draw();
+  });
+  canvas.addEventListener("pointerleave", () => {
+    hoverU = null;
+    if (!rafId) draw();
   });
 
   new ResizeObserver(() => {
