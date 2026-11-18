@@ -16,7 +16,8 @@
     if (text !== undefined) node.textContent = text;
     return node;
   };
-  const list = (parts) => (parts.length > 1 ? parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1] : parts.join(""));
+  const list = (parts) =>
+    parts.length > 2 ? parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1] : parts.join(" and ");
   const setText = (id, text) => {
     const node = document.getElementById(id);
     if (node) node.textContent = text;

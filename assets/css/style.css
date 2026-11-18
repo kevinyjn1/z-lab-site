@@ -494,10 +494,13 @@ h3 {
 
 .table .num {
   padding-right: 28px;
-  font-family: var(--mono);
-  font-size: 1rem;
   text-align: right;
   white-space: nowrap;
+}
+
+.table td.num {
+  font-family: var(--mono);
+  font-size: 1rem;
 }
 
 .table-note {
@@ -1447,7 +1450,7 @@ html:not(.js) .stat-viz {
 /* The numbers, set as a table, beside Fig. 2. */
 .numbers {
   display: grid;
-  grid-template-columns: minmax(0, 720fr) minmax(0, 416fr);
+  grid-template-columns: minmax(0, 770fr) minmax(0, 366fr);
   gap: clamp(32px, 5vw, 64px);
   align-items: start;
 }
@@ -1585,6 +1588,130 @@ html:not(.js) .stat-viz {
 
 .contact-list dd {
   white-space: nowrap;
+}
+
+/* 6c. Research ------------------------------------------------------------- */
+
+/* The themes of a domain, as a short definition list in two columns. */
+.themes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px clamp(28px, 4.5vw, 64px);
+  margin: 0 0 clamp(20px, 3vw, 36px);
+  font-size: 1.06rem;
+  line-height: 1.5;
+}
+
+.themes dt {
+  font-weight: 700;
+}
+
+.themes dd {
+  margin-top: 2px;
+  color: var(--ink-2);
+}
+
+/* A unit: what the lab found, on the left, and a figure built from those papers, on the right. */
+main {
+  counter-reset: fig;
+}
+
+.unit {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(28px, 4.5vw, 64px);
+  align-items: start;
+  padding-block: clamp(30px, 4vw, 48px);
+  border-top: 1px solid var(--rule);
+}
+
+.unit-text > * + * {
+  margin-top: 0.8em;
+}
+
+.unit-text h3 {
+  font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+}
+
+.unit-text cite {
+  font-style: italic;
+}
+
+.unit-fig {
+  counter-increment: fig;
+  min-width: 0;
+}
+
+.unit-fig canvas {
+  display: block;
+  width: 100%;
+  touch-action: pan-y;
+}
+
+.fig-no::before {
+  content: "Fig. " counter(fig) ".";
+}
+
+.unit-fig--photo {
+  counter-increment: none;
+}
+
+.unit-fig--photo img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--ink);
+}
+
+.unit-fig .fig-table {
+  margin-top: 10px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+}
+
+.unit-fig .fig-table table {
+  max-width: 320px;
+}
+
+.unit-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+}
+
+/* Controls under a figure: a row of plain parts. */
+.fig-controls {
+  flex-wrap: wrap;
+}
+
+.fig-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.fig-readout b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* What kind of figure this is: a re-plot, a model, or an illustration. */
+.fig-kind {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.overview img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--ink);
 }
 
 /* 7. Other pages ---------------------------------------------------------- */
@@ -1942,11 +2069,16 @@ html:not(.js) .stat-viz {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Home: the figures drop under the text they belong to. */
+  /* Home and Research: the figures drop under the text they belong to. */
   .front,
   .numbers,
-  .contact {
+  .contact,
+  .unit {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .unit-text {
+    max-width: 38em;
   }
 
   .numbers figure {
@@ -2027,6 +2159,10 @@ html:not(.js) .stat-viz {
 
   .toc em {
     display: none;
+  }
+
+  .themes {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .toc li {

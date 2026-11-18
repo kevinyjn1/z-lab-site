@@ -37,203 +37,105 @@
   </header>
 
   <main id="main">
-    <header class="page-head dark-scope">
-      <div class="wrap">
-        <p class="eyebrow" data-reveal>Research</p>
-        <h1 data-split data-reveal style="--d: 120ms"><em class="matter-word">Matter</em> in extremes, <span class="machine-word">Machine</span> for extremes</h1>
-        <p class="lead" data-reveal style="--d: 420ms">The Z Lab's research can be summarized into two words: Matter and Machine.</p>
-      </div>
+    <header class="title sheet">
+      <h1><span class="sec-no">1</span>Research</h1>
+      <p class="lede">The Z Lab's research can be summarized into two words: Matter and Machine.</p>
+      <nav class="jump" aria-label="On this page">
+        <a href="#matter">1.1 Matter</a>
+        <a href="#machine">1.2 Machine</a>
+        <a href="#overview">1.3 At a glance</a>
+      </nav>
     </header>
 
-    <section class="section">
-      <div class="wrap research-intro">
-        <div class="prose" data-reveal>
-          <p>In the <em class="matter-word">Matter</em> domain, we synergistically integrate statistical physics, molecular simulations, artificial intelligence, and neutron scattering experiments to extend our understanding of rare/extreme events and long timescale phenomena in complex materials. Particular emphasis is given to the physics and chemistry of liquids, glasses, and complex fluids, especially at interfaces, under extreme conditions, or when driven away from equilibrium.</p>
-          <p>Concurrently, on the <span class="machine-word">Machine</span> front, we build robots for extreme environments, including swarm robots, wheel-leg hybrid robots, and soft robots.</p>
-          <p>These two research areas, spanning from fundamental to applied, serve as integral pillars in the lab's overarching mission to foster a sustainable, resilient, and secure energy infrastructure.</p>
-        </div>
-        <nav class="jump" aria-label="On this page" data-reveal style="--d: 120ms">
-          <a href="#matter"><span>Matter</span><span>4 themes</span></a>
-          <a href="#machine"><span>Machine</span><span>4 themes</span></a>
-          <a href="#overview"><span>At a glance</span><span>Figure</span></a>
-        </nav>
+    <section class="section sheet">
+      <div class="prose">
+        <p>In the Matter domain, we synergistically integrate statistical physics, molecular simulations, artificial intelligence, and neutron scattering experiments to extend our understanding of rare/extreme events and long timescale phenomena in complex materials. Particular emphasis is given to the physics and chemistry of liquids, glasses, and complex fluids, especially at interfaces, under extreme conditions, or when driven away from equilibrium.</p>
+        <p>Concurrently, on the Machine front, we build robots for extreme environments, including swarm robots, wheel-leg hybrid robots, and soft robots.</p>
+        <p>These two research areas, spanning from fundamental to applied, serve as integral pillars in the lab's overarching mission to foster a sustainable, resilient, and secure energy infrastructure.</p>
       </div>
     </section>
 
-    <section class="section section--tint domain domain--matter" id="matter">
-      <div class="wrap">
-        <div class="domain-head" data-reveal>
-          <h2 class="domain-title" data-split>Matter</h2>
-          <p class="lead">Liquids, glasses, and complex fluids, especially at interfaces, under extreme conditions, or when driven away from equilibrium.</p>
-        </div>
-
-        <div class="topic-grid">
-          <article class="topic" data-reveal>
-            <span class="topic-num">M / 01</span>
-            <h3>Liquids, glasses, and complex fluids</h3>
-            <p>Physics and chemistry of liquids, glasses, and complex fluids, especially under interfacial, extreme, and non-equilibrium conditions.</p>
-            <ul class="chips" aria-label="Systems studied">
-              <li class="chip">Water</li>
-              <li class="chip">Metallic liquids</li>
-              <li class="chip">Molten salts</li>
-              <li class="chip">Ionic liquids</li>
-              <li class="chip">Electrolyte solutions</li>
-            </ul>
-          </article>
-          <article class="topic" data-reveal style="--d: 80ms">
-            <span class="topic-num">M / 02</span>
-            <h3>Theory, simulation, and AI</h3>
-            <p>Non-equilibrium statistical mechanics, molecular fluid mechanics, accelerated molecular simulations, and understandable AI methods.</p>
-            <a class="text-link" href="code.html">Software from the lab <span class="arrow" aria-hidden="true">&rarr;</span></a>
-          </article>
-          <article class="topic" data-reveal>
-            <span class="topic-num">M / 03</span>
-            <h3>Neutron scattering</h3>
-            <p>Neutron scattering, sources, and instrumentation, including the EXPANSE and CHESS spectrometers for the Second Target Station of the Spallation Neutron Source.</p>
-            <a class="text-link" href="publications.html?q=neutron">Related publications <span class="arrow" aria-hidden="true">&rarr;</span></a>
-          </article>
-          <article class="topic" data-reveal style="--d: 80ms">
-            <span class="topic-num">M / 04</span>
-            <h3>Rare events and long timescales</h3>
-            <p>Rare/extreme events and long timescale phenomena in complex materials.</p>
-          </article>
-        </div>
-
-        <div class="demo" data-landscape data-reveal>
-          <div class="demo-stage">
-            <canvas role="img" aria-label="Animation of a walker on a rugged one-dimensional potential energy landscape with four basins, A to D, and barriers tens of kT high. Bias is added where the walker has been, filling the wells until it can cross into the next basin. A strip underneath traces the walker's position over time."></canvas>
-          </div>
-          <div class="demo-body">
-            <p class="eyebrow">Interactive sketch</p>
-            <h3>Why rare events are hard, and one way around them</h3>
-            <p>A system spends almost all of its time rattling inside energy wells. Crossing a barrier is a rare event, far too slow to wait for in a direct simulation. Accelerated sampling methods such as metadynamics add a little bias wherever the system has already been, filling the wells until it spills over into new territory.</p>
-            <div class="demo-readout">
-              <span>Hills added <b data-hills>0</b></span>
-              <span>Basins explored <b data-basins>0 / 4</b></span>
-            </div>
-            <div class="demo-controls">
-              <button class="btn btn--small" type="button" data-play aria-pressed="true">Pause</button>
-              <button class="btn btn--ghost btn--small" type="button" data-restart>Restart</button>
-              <button class="btn btn--ghost btn--small" type="button" data-new>New landscape</button>
-            </div>
-            <p class="demo-note">A toy model for illustration, not research data. The strip under the landscape traces where the walker has been. Click the landscape to move the walker.</p>
-          </div>
-        </div>
+    <section class="section sheet" id="matter">
+      <div class="section-head">
+        <h2><span class="sec-no">1.1</span>Matter</h2>
+        <p>Liquids, glasses, and complex fluids, especially at interfaces, under extreme conditions, or when driven away from equilibrium.</p>
       </div>
-    </section>
+      <dl class="themes">
+        <div><dt>Liquids, glasses, and complex fluids</dt><dd>Physics and chemistry of liquids, glasses, and complex fluids, especially under interfacial, extreme, and non-equilibrium conditions: water, metallic liquids, molten salts, ionic liquids, electrolyte solutions.</dd></div>
+        <div><dt>Theory, simulation, and AI</dt><dd>Non-equilibrium statistical mechanics, molecular fluid mechanics, accelerated molecular simulations, and understandable AI methods. See the lab's <a href="code.html">software</a>.</dd></div>
+        <div><dt>Neutron scattering</dt><dd>Neutron scattering, sources, and instrumentation, including the EXPANSE and CHESS spectrometers for the Second Target Station of the Spallation Neutron Source.</dd></div>
+        <div><dt>Rare events and long timescales</dt><dd>Rare/extreme events and long timescale phenomena in complex materials.</dd></div>
+      </dl>
 
-    <section class="section domain domain--machine" id="machine">
-      <div class="wrap">
-        <div class="domain-head" data-reveal>
-          <h2 class="domain-title" data-split>Machine</h2>
-          <p class="lead">Robots for extreme environments, including swarm robots, wheel-leg hybrid robots, and soft robots.</p>
+      <!-- unit:flood -->
+
+      <article class="unit" id="water">
+        <div class="unit-text">
+          <h3>The water that never froze</h3>
+          <p>Ordinary water freezes long before it can be cooled far enough to test a prediction from simulations: that below its famous density maximum, liquid water's density should stop falling and turn upward again. Confining heavy water in silica pores only 15 &Aring; wide keeps it liquid down to 160 K, and a neutron diffraction peak then reads out its density. It passes through a minimum at 210 K, the first experimental report of one (<a href="https://doi.org/10.1073/pnas.0701352104">Liu et al., <cite>Proc. Natl. Acad. Sci. U.S.A.</cite> 2007</a>).</p>
+          <p>Ordinary water in the same pores does the same at 200 K (<a href="https://doi.org/10.1063/1.4817186">Liu et al., <cite>J. Chem. Phys.</cite> 2013</a>), while in water-repelling carbon pores the minimum is absent (<a href="https://doi.org/10.1021/jp900641y">Zhang et al., <cite>J. Phys. Chem. B</cite> 2009</a>; <a href="https://doi.org/10.1063/1.4929843">Liu et al., <cite>J. Chem. Phys.</cite> 2015</a>).</p>
         </div>
-
-        <div class="topic-grid">
-          <article class="topic" data-reveal>
-            <span class="topic-num">A / 01</span>
-            <h3>Robots in extreme environments</h3>
-            <p>Robots for mission-critical work in extreme environments. The <span class="nowrap">near-term</span> focus is the energy sector and homeland security.</p>
-          </article>
-          <article class="topic" data-reveal style="--d: 80ms">
-            <span class="topic-num">A / 02</span>
-            <h3>Swarm robots and collective intelligence</h3>
-            <p>Many simple robots that coordinate to complete tasks no single robot could handle. Atombot Hydrogen builds a miniature swarm platform for studying emergent behavior in <span class="nowrap">many-robot</span> systems.</p>
-            <a class="text-link" href="#swarm">Watch a swarm take shape <span class="arrow" aria-hidden="true">&rarr;</span></a>
-          </article>
-          <article class="topic" data-reveal>
-            <span class="topic-num">A / 03</span>
-            <h3>Wheel-leg hybrid robots</h3>
-            <p>Atombot Helium works toward a more practical robot unit: the team builds a legged robot <span class="nowrap">in-house</span> and trains locomotion for <span class="nowrap">wheel-legged</span> robots.</p>
-            <a class="text-link" href="#atombot">Meet the Atombot team <span class="arrow" aria-hidden="true">&rarr;</span></a>
-          </article>
-          <article class="topic" data-reveal style="--d: 80ms">
-            <span class="topic-num">A / 04</span>
-            <h3>Soft robots and human-compatible machines</h3>
-            <p>An untethered soft robotic arm (US Patent No. 16/807,490), and Kraken, a MOOSE-based multiphysics simulation and control platform for soft robots.</p>
-            <div class="topic-links">
-              <a class="text-link" href="https://z-laboratory.github.io/Kraken/">Kraken documentation <span aria-hidden="true">&#8599;</span></a>
-              <a class="text-link" href="publications.html?q=soft+robot">Related publications <span class="arrow" aria-hidden="true">&rarr;</span></a>
-            </div>
-          </article>
-        </div>
-
-        <div class="demo demo--flip" id="swarm" data-swarm data-reveal>
-          <div class="demo-stage">
-            <canvas role="img" aria-label="Animation of a swarm of small robots that flock, then arrange themselves into a ring, a hexagonal lattice, the letter Z, and the Atombot mark."></canvas>
-          </div>
-          <div class="demo-body">
-            <p class="eyebrow">Interactive sketch</p>
-            <h3>Many simple robots, one shape</h3>
-            <p>Each ring is a robot following a few local rules: keep a little distance from its neighbors, steer around obstacles, and head for a slot in a shared formation. No robot sees the whole picture, yet together they flock, close into a ring, pack into a lattice, spell a letter, or draw the Atombot mark.</p>
-            <div class="demo-readout">
-              <span>Formation <b data-mode>Flock</b></span>
-              <span>In place <b data-formed>free</b></span>
-            </div>
-            <div class="demo-controls">
-              <div class="segmented" role="group" aria-label="Formation">
-                <button type="button" data-formation="flock" aria-pressed="true">Flock</button>
-                <button type="button" data-formation="ring" aria-pressed="false">Ring</button>
-                <button type="button" data-formation="lattice" aria-pressed="false">Lattice</button>
-                <button type="button" data-formation="z" aria-pressed="false">Z</button>
-                <button type="button" data-formation="atombot" aria-pressed="false">Atombot</button>
-              </div>
-            </div>
-            <p class="demo-note">A toy model for illustration, not the lab's control software. Move your cursor through the swarm to push it around.</p>
-          </div>
-        </div>
-
-        <div class="feature feature--atombot" id="atombot" data-reveal>
-          <div class="feature-body">
-            <div>
-              <p class="eyebrow">The team</p>
-              <h3 class="with-mark"><span class="atombot-mark" aria-hidden="true"></span>Atombot</h3>
-            </div>
-            <p>Atombot is the lab's student robotics team: about 50 undergraduate, master's, and PhD students, working with the Multidisciplinary Design Program. It runs two projects, Hydrogen and Helium, and building hardware is the main focus.</p>
-            <div class="feature-actions">
-              <a class="btn btn--small" href="https://mdp.engin.umich.edu/research_teams/atombot-27/">Join through MDP <span aria-hidden="true">&#8599;</span></a>
-              <a class="btn btn--ghost btn--small" href="people.html#atombot-alums">Alums <span class="arrow" aria-hidden="true">&rarr;</span></a>
-              <a class="btn btn--ghost btn--small" href="calendar.html#atombot-calendar">Calendar <span class="arrow" aria-hidden="true">&rarr;</span></a>
+        <figure class="unit-fig" data-fig="water-density">
+          <div class="plate">
+            <canvas role="img" aria-label="Density of heavy water confined in 15 angstrom silica pores against temperature, 14 measured points from 290 kelvin down to 160 kelvin. The density falls from 1.106 grams per cubic centimeter at 290 kelvin to a minimum of 1.041 at 210 kelvin, then rises to 1.061 at 160 kelvin. Bulk water has frozen by about 235 kelvin."></canvas>
+            <div class="fig-controls">
+              <label class="range"><span data-readout>210 K: 1.041 g/cm&sup3;</span><input type="range" data-pick min="0" max="13" step="1" value="5" aria-label="Temperature of the measured point to read"><span class="range-ends"><i>160 K</i><i>290 K</i></span></label>
             </div>
           </div>
-          <figure class="feature-photo">
-            <a href="assets/img/atombot-kickoff.webp" aria-label="Open the Atombot kickoff photo at full size">
-              <img src="assets/img/atombot-kickoff-800.webp" srcset="assets/img/atombot-kickoff-800.webp 800w, assets/img/atombot-kickoff.webp 1600w" sizes="(max-width: 899px) 92vw, 640px" width="1600" height="883" loading="lazy" decoding="async" alt="A large group of Atombot team members standing together below a projection screen that shows the Atombot mark and the words Atombot, Z Lab.">
-            </a>
-            <figcaption>Atombot project kickoff, with support from the Multidisciplinary Design Program.</figcaption>
-          </figure>
-        </div>
-
-        <dl class="facts" data-reveal>
-          <div class="fact">
-            <dt>Hydrogen</dt>
-            <dd>A miniature swarm platform: small robots built in numbers to study how collective behavior emerges.</dd>
-          </div>
-          <div class="fact">
-            <dt>Helium</dt>
-            <dd>Legged and <span class="nowrap">wheel-legged</span> robots: a quadruped built <span class="nowrap">in-house</span>, and locomotion learned in simulation, then tested on real robots.</dd>
-          </div>
-          <div class="fact">
-            <dt>How it runs</dt>
-            <dd>A weekly all-hands meeting, plus small task groups that each have a lead.</dd>
-          </div>
-        </dl>
-      </div>
-    </section>
-
-    <section class="section section--tint" id="overview">
-      <div class="wrap">
-        <div class="section-head" data-reveal>
-          <p class="eyebrow">At a glance</p>
-          <h2 data-split>The whole lab on one slide</h2>
-        </div>
-        <figure class="figure" data-reveal>
-          <a href="assets/img/overview.webp" aria-label="Open the overview figure at full size">
-            <img src="assets/img/overview.webp" width="1600" height="900" loading="lazy" decoding="async" alt="Overview slide titled Z Lab, Matter and Machine. The Matter half covers rare events and long timescale phenomena (statistical mechanics and molecular fluid mechanics theories, accelerated molecular simulations, understandable AI), the physics and chemistry of liquids, glasses, and complex fluids (water, metallic, ionic, molten salts), and neutron scattering, sources, and instrumentation (Spallation Neutron Source Second Target Station, EXPANSE expanded angle neutron spin echo). The Machine half covers robots in extreme environments, soft robots and human-compatible machines (an untethered soft robotic arm and the Kraken simulation platform), swarm robots and collective intelligence, and wheel-leg hybrid robots (Atombot).">
-          </a>
-          <figcaption>Z Lab overview: Matter on the left, Machine on the right.</figcaption>
+          <figcaption class="caption"><b class="fig-no"></b> Density of heavy water in 15 &Aring; silica pores, measured by small-angle neutron scattering. The 14 points are the published values (Table 1 of <a href="https://doi.org/10.1073/pnas.0701352104">Liu et al. 2007</a>), re-plotted without smoothing; the paper places the maximum at 284 &plusmn; 5 K and the minimum at 210 &plusmn; 5 K.</figcaption>
+          <details class="fig-table"><summary>View as table</summary><div data-table></div></details>
         </figure>
+      </article>
+
+      <!-- unit:fragile -->
+      <!-- unit:salt -->
+      <!-- unit:clocks -->
+      <!-- unit:metal -->
+      <!-- unit:scale -->
+    </section>
+
+    <section class="section sheet" id="machine">
+      <div class="section-head">
+        <h2><span class="sec-no">1.2</span>Machine</h2>
+        <p>Robots for extreme environments, including swarm robots, wheel-leg hybrid robots, and soft robots.</p>
       </div>
+      <dl class="themes">
+        <div><dt>Robots in extreme environments</dt><dd>Robots for mission-critical work in extreme environments. The near-term focus is the energy sector and homeland security.</dd></div>
+        <div><dt>Soft robots and human-compatible machines</dt><dd>An untethered soft robotic arm, and <a href="https://z-laboratory.github.io/Kraken/">Kraken</a>, a MOOSE-based multiphysics simulation and control platform for soft robots.</dd></div>
+        <div><dt>Swarm robots and collective intelligence</dt><dd>Many simple robots that coordinate to complete tasks no single robot could handle. Atombot Hydrogen builds a miniature swarm platform for studying emergent behavior in many-robot systems.</dd></div>
+        <div><dt>Wheel-leg hybrid robots</dt><dd>Atombot Helium works toward a more practical robot unit: an advanced wheel-legged robot.</dd></div>
+      </dl>
+
+      <!-- unit:arm -->
+      <!-- unit:soft -->
+      <!-- unit:swarm -->
+      <!-- unit:wheelleg -->
+
+      <article class="unit unit--team" id="atombot">
+        <div class="unit-text">
+          <h3>Atombot</h3>
+          <p>Atombot is the lab's student robotics team: about 50 undergraduate, master's, and PhD students, working with the Multidisciplinary Design Program. It runs two projects, Hydrogen and Helium, and building hardware is the main focus.</p>
+          <p class="unit-links"><a href="https://mdp.engin.umich.edu/research_teams/atombot-27/">Join through MDP</a><a href="people.html#atombot-alums">Alums</a><a href="calendar.html#atombot-calendar">Calendar</a></p>
+        </div>
+        <figure class="unit-fig unit-fig--photo">
+          <a href="assets/img/atombot-kickoff.webp" aria-label="Open the Atombot kickoff photo at full size">
+            <img src="assets/img/atombot-kickoff-800.webp" srcset="assets/img/atombot-kickoff-800.webp 800w, assets/img/atombot-kickoff.webp 1600w" sizes="(max-width: 1099px) 92vw, 660px" width="1600" height="883" loading="lazy" decoding="async" alt="A large group of Atombot team members standing together below a projection screen that shows the Atombot mark and the words Atombot, Z Lab.">
+          </a>
+          <figcaption class="caption">Atombot project kickoff, with support from the Multidisciplinary Design Program.</figcaption>
+        </figure>
+      </article>
+    </section>
+
+    <section class="section sheet" id="overview">
+      <div class="section-head">
+        <h2><span class="sec-no">1.3</span>At a glance</h2>
+        <p>The lab's own overview: Matter on the left, Machine on the right.</p>
+      </div>
+      <figure class="overview">
+        <a href="assets/img/overview.webp" aria-label="Open the overview figure at full size">
+          <img src="assets/img/overview.webp" width="1600" height="900" loading="lazy" decoding="async" alt="Overview slide titled Z Lab, Matter and Machine. The Matter half covers rare events and long timescale phenomena, the physics and chemistry of liquids, glasses, and complex fluids (water, metallic, ionic, molten salts), and neutron scattering, sources, and instrumentation. The Machine half covers robots in extreme environments, soft robots and human-compatible machines with an untethered soft robotic arm and the Kraken simulation platform, swarm robots and collective intelligence, and wheel-leg hybrid robots.">
+        </a>
+      </figure>
     </section>
   </main>
 
@@ -275,8 +177,7 @@
   </footer>
 
   <script src="assets/js/site.js" defer></script>
-  <script src="assets/js/landscape.js" defer></script>
-  <script src="assets/js/atombot-art.js" defer></script>
-  <script src="assets/js/swarm.js" defer></script>
+  <script src="assets/js/figkit.js" defer></script>
+  <script src="assets/js/figs/water-density.js" defer></script>
 </body>
 </html>
