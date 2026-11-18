@@ -37,277 +37,78 @@
   </header>
 
   <main id="main">
-    <section class="hero dark-scope" aria-labelledby="hero-title">
-      <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
-      <div class="wrap hero-content">
-        <p class="eyebrow" data-reveal>Z Lab &middot; University of Michigan</p>
-        <h1 class="hero-title" id="hero-title" data-split data-reveal style="--d: 140ms">
-          <span class="line"><em class="matter-word">Matter</em> in extremes.</span>
-          <span class="line"><span class="machine-word">Machine</span> for extremes.</span>
-        </h1>
-        <p class="lead" data-reveal style="--d: 520ms">We combine statistical physics, molecular simulations, artificial intelligence, and neutron scattering to understand rare events in complex materials, and we build robots for extreme environments.</p>
-        <div class="hero-actions" data-reveal style="--d: 640ms">
-          <a class="btn" href="research.html">Explore the research <span class="arrow" aria-hidden="true">&rarr;</span></a>
-          <a class="btn btn--ghost" href="people.html">Meet the team</a>
+    <div class="sheet front">
+      <div class="front-text">
+        <h1>Matter <i>in extremes,</i><br>machine <i>for extremes</i></h1>
+        <p class="by">The Z Lab &middot; University of Michigan &middot; 2006 to today</p>
+        <div class="abstract">
+          <p class="label">Abstract</p>
+          <p>We combine statistical physics, molecular simulations, artificial intelligence, and neutron scattering to understand <mark>rare events</mark> in complex materials, and we build <mark>robots for extreme environments</mark>.</p>
+          <p class="abstract-more">From fundamental to applied, both pillars serve one mission: a sustainable, resilient, and secure energy infrastructure.</p>
         </div>
+        <ol class="toc" aria-label="Sections">
+          <li><span>1</span><a href="research.html">Research</a><i></i><em>matter and machine</em></li>
+          <li><span>2</span><a href="people.html">People</a><i></i><em id="toc-people">the team</em></li>
+          <li><span>3</span><a href="publications.html">Publications</a><i></i><em id="toc-pubs">2006 to today</em></li>
+          <li><span>4</span><a href="code.html">Software</a><i></i><em>LiquidLib, Kraken, and more</em></li>
+          <li><span>5</span><a href="teaching.html">Teaching</a><i></i><em>courses</em></li>
+          <li><span>6</span><a href="calendar.html">Calendar</a><i></i><em>two lab calendars</em></li>
+        </ol>
       </div>
-      <div class="hero-hud" id="hero-hud">
-        <span class="hud-item hud-n" aria-hidden="true">N <b id="hud-n">0</b></span>
-        <span class="hud-item hud-state" aria-hidden="true">state <b id="hud-state">liquid</b></span>
-        <span class="hud-item hud-order" aria-hidden="true">order <span class="hud-bar"><i id="hud-order"></i></span></span>
-        <button class="icon-btn" id="hero-pause" type="button" aria-label="Pause animation">
-          <svg class="icon-pause" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx="1"/><rect x="7" y="1.5" width="3" height="9" rx="1"/></svg>
-          <svg class="icon-play" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M3 1.6v8.8a.6.6 0 0 0 .9.5l7-4.4a.6.6 0 0 0 0-1L3.9 1.1a.6.6 0 0 0-.9.5Z"/></svg>
-        </button>
+
+      <figure class="front-fig" data-liquid>
+        <div class="plate">
+          <canvas role="img" aria-label="A simulated liquid of 256 particles in a square box, beside two curves measured from it as it runs: the pair distribution function g(r), with a tall first peak near one particle diameter, and the static structure factor S(k), with its main peak near k sigma of 7."></canvas>
+          <div class="fig-controls">
+            <label class="range"><span data-temp-out>T* = 0.72</span><input type="range" data-temp min="0.25" max="1.5" step="0.01" value="0.72" aria-label="Temperature in reduced units"><span class="range-ends"><i>cooler</i><i>hotter</i></span></label>
+            <button class="btn btn--small" type="button" data-play aria-pressed="true">Pause</button>
+          </div>
+        </div>
+        <figcaption class="caption"><b>Fig. 1.</b> A liquid of 256 particles, simulated in your browser, and two things a scattering experiment reads from it: the pair distribution function <i>g</i>(<i>r</i>) and the static structure factor <i>S</i>(<i>k</i>). Cool it and the peaks sharpen as the particles order. A two-dimensional Lennard-Jones model for illustration; both functions are computed as defined in the lab's LiquidLib (<a href="https://doi.org/10.1016/j.cpc.2018.03.005">Walter et al., <cite>Comput. Phys. Commun.</cite> 2018</a>).</figcaption>
+      </figure>
+    </div>
+
+    <section class="section sheet numbers" id="numbers">
+      <div>
+        <h2>The lab in numbers</h2>
+        <table class="table">
+          <thead><tr><th scope="col">Quantity</th><th scope="col" class="num">Value</th><th scope="col">Detail</th></tr></thead>
+          <tbody id="numbers-body">
+            <tr><td>Publications since 2006</td><td class="num">97</td><td></td></tr>
+            <tr><td>Journals and venues</td><td class="num">45</td><td></td></tr>
+            <tr><td>Current members</td><td class="num">37</td><td></td></tr>
+            <tr><td>Grad and postdoc alums</td><td class="num">20</td><td></td></tr>
+          </tbody>
+        </table>
+        <p class="table-note">Counted from the same lists as the <a href="people.html">People</a> and <a href="publications.html">Publications</a> pages.</p>
+      </div>
+      <figure>
+        <svg class="drawing" viewBox="20 40 330 350" role="img" aria-label="Line drawing of a two-module soft robotic arm seen from above: a base plate, then two modules in line, each a pair of ridged bellows between end plates, joined by rungs that carry three small markers. The arm bends to the right."><rect x="112" y="338" width="116" height="20" fill="#fff" stroke="#12161c" stroke-width="1.6"/><path d="M132 358v16h76v-16" fill="none" stroke="#12161c" stroke-width="1.6"/><ellipse cx="147.1" cy="323.8" rx="13.5" ry="5.6" transform="rotate(0.7 147.1 323.8)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="147.4" cy="311.5" rx="13.5" ry="5.6" transform="rotate(2.0 147.4 311.5)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="148.0" cy="299.2" rx="13.5" ry="5.6" transform="rotate(3.3 148.0 299.2)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="148.8" cy="286.9" rx="13.5" ry="5.6" transform="rotate(4.6 148.8 286.9)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="150.0" cy="274.7" rx="13.5" ry="5.6" transform="rotate(5.9 150.0 274.7)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="151.4" cy="262.4" rx="13.5" ry="5.6" transform="rotate(7.2 151.4 262.4)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="153.1" cy="250.2" rx="13.5" ry="5.6" transform="rotate(8.5 153.1 250.2)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="155.1" cy="238.1" rx="13.5" ry="5.6" transform="rotate(9.8 155.1 238.1)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="157.4" cy="225.9" rx="13.5" ry="5.6" transform="rotate(11.1 157.4 225.9)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="159.9" cy="213.9" rx="13.5" ry="5.6" transform="rotate(12.4 159.9 213.9)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="193.0" cy="324.4" rx="13.5" ry="5.6" transform="rotate(0.7 193.0 324.4)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="193.3" cy="313.1" rx="13.5" ry="5.6" transform="rotate(2.0 193.3 313.1)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="193.9" cy="301.8" rx="13.5" ry="5.6" transform="rotate(3.3 193.9 301.8)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="194.7" cy="290.6" rx="13.5" ry="5.6" transform="rotate(4.6 194.7 290.6)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="195.7" cy="279.3" rx="13.5" ry="5.6" transform="rotate(5.9 195.7 279.3)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="197.0" cy="268.1" rx="13.5" ry="5.6" transform="rotate(7.2 197.0 268.1)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="198.6" cy="257.0" rx="13.5" ry="5.6" transform="rotate(8.5 198.6 257.0)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="200.4" cy="245.8" rx="13.5" ry="5.6" transform="rotate(9.8 200.4 245.8)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="202.5" cy="234.8" rx="13.5" ry="5.6" transform="rotate(11.1 202.5 234.8)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="204.8" cy="223.7" rx="13.5" ry="5.6" transform="rotate(12.4 204.8 223.7)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><path d="M155.6 305.7L185.6 307.1" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M155.6 305.7L185.6 307.1" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="162.6" cy="306.0" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="170.6" cy="306.4" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="178.6" cy="306.8" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><path d="M157.3 281.5L187.2 284.2" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M157.3 281.5L187.2 284.2" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="164.3" cy="282.1" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="172.3" cy="282.9" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="180.2" cy="283.6" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><path d="M160.2 257.4L189.9 261.5" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M160.2 257.4L189.9 261.5" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="167.1" cy="258.3" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="175.0" cy="259.4" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="182.9" cy="260.5" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><path d="M164.1 233.4L193.6 238.8" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M164.1 233.4L193.6 238.8" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="170.9" cy="234.7" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="178.8" cy="236.1" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="186.7" cy="237.6" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><rect x="128.0" y="323.5" width="84" height="13" rx="6.5" transform="rotate(0.0 170.0 330.0)" fill="#fff" stroke="#12161c" stroke-width="1.6"/><rect x="141.7" y="206.5" width="84" height="13" rx="6.5" transform="rotate(13.0 183.7 213.0)" fill="#fff" stroke="#12161c" stroke-width="1.6"/><ellipse cx="166.4" cy="186.1" rx="13.5" ry="5.6" transform="rotate(14.3 166.4 186.1)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="169.9" cy="173.7" rx="13.5" ry="5.6" transform="rotate(16.9 169.9 173.7)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="174.0" cy="161.5" rx="13.5" ry="5.6" transform="rotate(19.5 174.0 161.5)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="178.6" cy="149.5" rx="13.5" ry="5.6" transform="rotate(22.1 178.6 149.5)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="183.8" cy="137.8" rx="13.5" ry="5.6" transform="rotate(24.7 183.8 137.8)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="189.5" cy="126.3" rx="13.5" ry="5.6" transform="rotate(27.3 189.5 126.3)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="195.7" cy="115.0" rx="13.5" ry="5.6" transform="rotate(29.9 195.7 115.0)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="202.4" cy="104.1" rx="13.5" ry="5.6" transform="rotate(32.5 202.4 104.1)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="209.6" cy="93.4" rx="13.5" ry="5.6" transform="rotate(35.1 209.6 93.4)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="217.3" cy="83.1" rx="13.5" ry="5.6" transform="rotate(37.7 217.3 83.1)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="211.0" cy="197.4" rx="13.5" ry="5.6" transform="rotate(14.3 211.0 197.4)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="213.9" cy="187.1" rx="13.5" ry="5.6" transform="rotate(16.9 213.9 187.1)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="217.4" cy="176.9" rx="13.5" ry="5.6" transform="rotate(19.5 217.4 176.9)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="221.2" cy="166.8" rx="13.5" ry="5.6" transform="rotate(22.1 221.2 166.8)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="225.6" cy="157.0" rx="13.5" ry="5.6" transform="rotate(24.7 225.6 157.0)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="230.3" cy="147.4" rx="13.5" ry="5.6" transform="rotate(27.3 230.3 147.4)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="235.5" cy="138.0" rx="13.5" ry="5.6" transform="rotate(29.9 235.5 138.0)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="241.2" cy="128.8" rx="13.5" ry="5.6" transform="rotate(32.5 241.2 128.8)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="247.2" cy="119.9" rx="13.5" ry="5.6" transform="rotate(35.1 247.2 119.9)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><ellipse cx="253.7" cy="111.3" rx="13.5" ry="5.6" transform="rotate(37.7 253.7 111.3)" fill="#fff" stroke="#12161c" stroke-width="1.5"/><path d="M179.5 170.1L208.0 179.5" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M179.5 170.1L208.0 179.5" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="186.1" cy="172.3" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="193.7" cy="174.8" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="201.3" cy="177.3" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><path d="M188.5 146.8L216.0 158.7" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M188.5 146.8L216.0 158.7" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="194.9" cy="149.6" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="202.2" cy="152.8" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="209.6" cy="155.9" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><path d="M199.5 124.4L225.9 138.8" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M199.5 124.4L225.9 138.8" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="205.7" cy="127.8" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="212.7" cy="131.6" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="219.7" cy="135.4" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><path d="M212.6 103.2L237.5 119.9" stroke="#12161c" stroke-width="5.5" stroke-linecap="round"/><path d="M212.6 103.2L237.5 119.9" stroke="#fff" stroke-width="2.9" stroke-linecap="round"/><circle cx="218.4" cy="107.1" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="225.0" cy="111.5" r="2.7" fill="#ffcb05" stroke="#12161c" stroke-width="1.1"/><circle cx="231.7" cy="116.0" r="2.7" fill="#fff" stroke="#12161c" stroke-width="1.1"/><rect x="145.3" y="191.0" width="84" height="13" rx="6.5" transform="rotate(13.0 187.3 197.5)" fill="#fff" stroke="#12161c" stroke-width="1.6"/><rect x="197.1" y="86.1" width="84" height="13" rx="6.5" transform="rotate(39.0 239.1 92.6)" fill="#fff" stroke="#12161c" stroke-width="1.6"/><path d="M128.0 348.0L70 372" stroke="#12161c" stroke-width="1"/><circle cx="128.0" cy="348.0" r="2" fill="#12161c"/><text x="64" y="377" text-anchor="end">10</text><path d="M139.4 262.4L62 250" stroke="#12161c" stroke-width="1"/><circle cx="139.4" cy="262.4" r="2" fill="#12161c"/><text x="56" y="255" text-anchor="end">12</text><path d="M206.2 152.8L300 150" stroke="#12161c" stroke-width="1"/><circle cx="206.2" cy="152.8" r="2" fill="#12161c"/><text x="306" y="155" text-anchor="start">14</text><path d="M269.1 95.6L318 86" stroke="#12161c" stroke-width="1"/><circle cx="269.1" cy="95.6" r="2" fill="#12161c"/><text x="324" y="91" text-anchor="start">16</text></svg>
+        <figcaption class="caption"><b>Fig. 2.</b> The lab's modular underwater soft arm, seen from above. Each module is a pair of water-filled silicone bellows (12) between end plates (16) on a base (10); filling one bellows more than the other bends the module. A camera tracks the markers on the rungs (14). Drawn after <a href="https://doi.org/10.1109/RoboSoft55895.2023.10122035">Null et al., <cite>RoboSoft</cite> 2023</a> and <a href="https://doi.org/10.1109/lra.2023.3333662">Null et al., <cite>IEEE Robot. Autom. Lett.</cite> 2024</a>.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section sheet">
+      <div class="section-head section-head--row">
+        <h2>Recent publications</h2>
+        <a href="publications.html">All publications</a>
+      </div>
+      <div class="pub-rows" id="recent-pubs">
+        <noscript><p>See the full list on the <a href="publications.html">publications page</a>.</p></noscript>
       </div>
     </section>
 
-    <section class="marquee" aria-label="What we study and what we build">
-      <p class="visually-hidden">We study water, metallic liquids, molten salts, ionic liquids, electrolyte solutions, glasses, complex fluids, neutron scattering, rare events. We build and study swarm robots, wheel-leg hybrid robots, soft robots, collective intelligence, extreme environments, human-compatible machines, and the Atombot team's robots.</p>
-      <div class="marquee-row marquee-row--matter" style="--dur: 58s" aria-hidden="true">
-        <div class="marquee-track"><span>Water</span><i></i><span>Metallic liquids</span><i></i><span>Molten salts</span><i></i><span>Ionic liquids</span><i></i><span>Electrolyte solutions</span><i></i><span>Glasses</span><i></i><span>Complex fluids</span><i></i><span>Neutron scattering</span><i></i><span>Rare events</span><i></i></div>
-        <div class="marquee-track" aria-hidden="true"><span>Water</span><i></i><span>Metallic liquids</span><i></i><span>Molten salts</span><i></i><span>Ionic liquids</span><i></i><span>Electrolyte solutions</span><i></i><span>Glasses</span><i></i><span>Complex fluids</span><i></i><span>Neutron scattering</span><i></i><span>Rare events</span><i></i></div>
+    <section class="section sheet contact" id="contact">
+      <div>
+        <h2>Contact</h2>
+        <p class="contact-lede">The lab is part of the University of Michigan College of Engineering in Ann Arbor.</p>
       </div>
-      <div class="marquee-row marquee-row--machine" style="--dur: 50s" aria-hidden="true">
-        <div class="marquee-track"><span>Swarm robots</span><i></i><span>Wheel-leg hybrid robots</span><i></i><span>Soft robots</span><i></i><span>Collective intelligence</span><i></i><span>Extreme environments</span><i></i><span>Human-compatible machines</span><i></i><span class="with-mark"><span class="atombot-mark" aria-hidden="true"></span>Atombot</span><i></i></div>
-        <div class="marquee-track" aria-hidden="true"><span>Swarm robots</span><i></i><span>Wheel-leg hybrid robots</span><i></i><span>Soft robots</span><i></i><span>Collective intelligence</span><i></i><span>Extreme environments</span><i></i><span>Human-compatible machines</span><i></i><span class="with-mark"><span class="atombot-mark" aria-hidden="true"></span>Atombot</span><i></i></div>
-      </div>
-    </section>
-
-    <section class="section" id="about">
-      <div class="wrap">
-        <div class="intro-grid">
-          <div data-reveal>
-            <p class="eyebrow">What we do</p>
-            <h2 data-split>Our research in two words: <em class="matter-word">Matter</em> and <span class="machine-word">Machine</span>.</h2>
-          </div>
-          <div class="prose" data-reveal style="--d: 120ms">
-            <p>In the <strong>Matter</strong> domain, we synergistically integrate statistical physics, molecular simulations, artificial intelligence, and neutron scattering experiments to extend our understanding of rare/extreme events and long timescale phenomena in complex materials.</p>
-            <p>Concurrently, on the <strong>Machine</strong> front, we build robots for extreme environments, including swarm robots, wheel-leg hybrid robots, and soft robots.</p>
-          </div>
-        </div>
-
-        <div class="pillars">
-          <div class="pillar-slot" data-reveal>
-          <a class="pillar pillar--matter" href="research.html#matter" data-tilt>
-            <svg class="pillar-art" viewBox="0 0 400 400" fill="none" stroke="#1b1500" aria-hidden="true">
-              <circle cx="200" cy="200" r="26" stroke-width="11" opacity=".4"/>
-              <circle cx="200" cy="200" r="60" stroke-width="3" opacity=".26"/>
-              <circle cx="200" cy="200" r="92" stroke-width="15" opacity=".1"/>
-              <circle cx="200" cy="200" r="128" stroke-width="2" opacity=".24"/>
-              <circle cx="200" cy="200" r="158" stroke-width="8" opacity=".08"/>
-              <circle cx="200" cy="200" r="190" stroke-width="1.5" opacity=".18"/>
-              <circle class="wave" cx="200" cy="200" r="196" stroke-width="3" style="--k: 0"/>
-              <circle class="wave" cx="200" cy="200" r="196" stroke-width="3" style="--k: 1"/>
-              <circle class="wave" cx="200" cy="200" r="196" stroke-width="3" style="--k: 2"/>
-            </svg>
-            <span class="pillar-label">Domain 01</span>
-            <h3>Matter</h3>
-            <p class="pillar-tagline">Liquids, glasses, and complex fluids at interfaces, under extreme conditions, or driven away from equilibrium.</p>
-            <ul class="pillar-list">
-              <li>Physics and chemistry of liquids, glasses, and complex fluids</li>
-              <li>Statistical mechanics, accelerated molecular simulations, and understandable AI</li>
-              <li>Neutron scattering, sources, and instrumentation</li>
-              <li>Rare/extreme events and long timescale phenomena</li>
-            </ul>
-            <span class="pillar-more">Explore Matter <span class="arrow" aria-hidden="true">&rarr;</span></span>
-          </a>
-          </div>
-
-          <div class="pillar-slot" data-reveal style="--d: 120ms">
-          <a class="pillar pillar--machine" href="research.html#machine" data-tilt>
-            <svg class="pillar-art" viewBox="0 0 460 420" fill="none" aria-hidden="true">
-              <g stroke="#7cc8ff" stroke-width="1.4" opacity=".22"><path d="M12.0 16.0L70.0 16.0"/><path d="M12.0 16.0L41.0 66.2"/><path d="M70.0 16.0L128.0 16.0"/><path d="M70.0 16.0L99.0 66.2"/><path d="M70.0 16.0L41.0 66.2"/><path d="M128.0 16.0L186.0 16.0"/><path d="M128.0 16.0L99.0 66.2"/><path d="M186.0 16.0L244.0 16.0"/><path d="M186.0 16.0L215.0 66.2"/><path d="M244.0 16.0L302.0 16.0"/><path d="M244.0 16.0L215.0 66.2"/><path d="M302.0 16.0L331.0 66.2"/><path d="M418.0 16.0L389.0 66.2"/><path d="M41.0 66.2L99.0 66.2"/><path d="M41.0 66.2L70.0 116.5"/><path d="M41.0 66.2L12.0 116.5"/><path d="M99.0 66.2L128.0 116.5"/><path d="M99.0 66.2L70.0 116.5"/><path d="M215.0 66.2L186.0 116.5"/><path d="M331.0 66.2L389.0 66.2"/><path d="M331.0 66.2L360.0 116.5"/><path d="M389.0 66.2L360.0 116.5"/><path d="M12.0 116.5L70.0 116.5"/><path d="M70.0 116.5L128.0 116.5"/><path d="M70.0 116.5L99.0 166.7"/><path d="M128.0 116.5L186.0 116.5"/><path d="M128.0 116.5L99.0 166.7"/><path d="M186.0 116.5L215.0 166.7"/><path d="M360.0 116.5L389.0 166.7"/><path d="M360.0 116.5L331.0 166.7"/><path d="M99.0 166.7L128.0 216.9"/><path d="M99.0 166.7L70.0 216.9"/><path d="M215.0 166.7L273.0 166.7"/><path d="M215.0 166.7L244.0 216.9"/><path d="M215.0 166.7L186.0 216.9"/><path d="M273.0 166.7L331.0 166.7"/><path d="M273.0 166.7L302.0 216.9"/><path d="M273.0 166.7L244.0 216.9"/><path d="M331.0 166.7L389.0 166.7"/><path d="M331.0 166.7L360.0 216.9"/><path d="M331.0 166.7L302.0 216.9"/><path d="M389.0 166.7L447.0 166.7"/><path d="M389.0 166.7L418.0 216.9"/><path d="M389.0 166.7L360.0 216.9"/><path d="M447.0 166.7L418.0 216.9"/><path d="M12.0 216.9L70.0 216.9"/><path d="M12.0 216.9L41.0 267.1"/><path d="M70.0 216.9L128.0 216.9"/><path d="M70.0 216.9L99.0 267.1"/><path d="M70.0 216.9L41.0 267.1"/><path d="M128.0 216.9L186.0 216.9"/><path d="M128.0 216.9L157.0 267.1"/><path d="M128.0 216.9L99.0 267.1"/><path d="M186.0 216.9L244.0 216.9"/><path d="M186.0 216.9L157.0 267.1"/><path d="M244.0 216.9L302.0 216.9"/><path d="M244.0 216.9L273.0 267.1"/><path d="M302.0 216.9L360.0 216.9"/><path d="M302.0 216.9L331.0 267.1"/><path d="M302.0 216.9L273.0 267.1"/><path d="M360.0 216.9L418.0 216.9"/><path d="M360.0 216.9L389.0 267.1"/><path d="M360.0 216.9L331.0 267.1"/><path d="M418.0 216.9L447.0 267.1"/><path d="M418.0 216.9L389.0 267.1"/><path d="M41.0 267.1L99.0 267.1"/><path d="M41.0 267.1L70.0 317.4"/><path d="M41.0 267.1L12.0 317.4"/><path d="M99.0 267.1L157.0 267.1"/><path d="M99.0 267.1L70.0 317.4"/><path d="M157.0 267.1L186.0 317.4"/><path d="M273.0 267.1L331.0 267.1"/><path d="M273.0 267.1L302.0 317.4"/><path d="M273.0 267.1L244.0 317.4"/><path d="M331.0 267.1L389.0 267.1"/><path d="M331.0 267.1L360.0 317.4"/><path d="M331.0 267.1L302.0 317.4"/><path d="M389.0 267.1L447.0 267.1"/><path d="M389.0 267.1L418.0 317.4"/><path d="M389.0 267.1L360.0 317.4"/><path d="M447.0 267.1L418.0 317.4"/><path d="M12.0 317.4L70.0 317.4"/><path d="M70.0 317.4L99.0 367.6"/><path d="M186.0 317.4L244.0 317.4"/><path d="M186.0 317.4L215.0 367.6"/><path d="M186.0 317.4L157.0 367.6"/><path d="M244.0 317.4L302.0 317.4"/><path d="M244.0 317.4L215.0 367.6"/><path d="M302.0 317.4L360.0 317.4"/><path d="M302.0 317.4L331.0 367.6"/><path d="M360.0 317.4L418.0 317.4"/><path d="M360.0 317.4L389.0 367.6"/><path d="M360.0 317.4L331.0 367.6"/><path d="M418.0 317.4L447.0 367.6"/><path d="M418.0 317.4L389.0 367.6"/><path d="M99.0 367.6L157.0 367.6"/><path d="M157.0 367.6L215.0 367.6"/><path d="M331.0 367.6L389.0 367.6"/><path d="M389.0 367.6L447.0 367.6"/></g>
-              <circle cx="12.0" cy="16.0" r="4.6" fill="#ffcb05" style="--o: 0.18; --t: -0.79s"/><circle cx="70.0" cy="16.0" r="4.6" fill="#ffcb05" style="--o: 0.25; --t: -0.19s"/><circle cx="128.0" cy="16.0" r="3.8" fill="#7cc8ff" style="--o: 0.40; --t: -0.57s"/><circle cx="186.0" cy="16.0" r="3.8" fill="#7cc8ff" style="--o: 0.51; --t: -1.43s"/><circle cx="244.0" cy="16.0" r="3.8" fill="#7cc8ff" style="--o: 0.55; --t: -2.34s"/><circle cx="302.0" cy="16.0" r="3.8" fill="#7cc8ff" style="--o: 0.52; --t: -2.06s"/><circle cx="418.0" cy="16.0" r="4.6" fill="#ffcb05" style="--o: 0.28; --t: -1.35s"/><circle cx="41.0" cy="66.2" r="3.8" fill="#7cc8ff" style="--o: 0.25; --t: -0.86s"/><circle cx="99.0" cy="66.2" r="3.8" fill="#7cc8ff" style="--o: 0.42; --t: -2.57s"/><circle cx="215.0" cy="66.2" r="3.8" fill="#7cc8ff" style="--o: 0.70; --t: -2.83s"/><circle cx="331.0" cy="66.2" r="3.8" fill="#7cc8ff" style="--o: 0.61; --t: -1.26s"/><circle cx="389.0" cy="66.2" r="3.8" fill="#7cc8ff" style="--o: 0.46; --t: -2.05s"/><circle cx="12.0" cy="116.5" r="4.6" fill="#ffcb05" style="--o: 0.20; --t: -3.17s"/><circle cx="70.0" cy="116.5" r="3.8" fill="#7cc8ff" style="--o: 0.39; --t: -0.83s"/><circle cx="128.0" cy="116.5" r="3.8" fill="#7cc8ff" style="--o: 0.58; --t: -1.05s"/><circle cx="186.0" cy="116.5" r="3.8" fill="#7cc8ff" style="--o: 0.76; --t: -0.23s"/><circle cx="360.0" cy="116.5" r="4.6" fill="#ffcb05" style="--o: 0.62; --t: -1.86s"/><circle cx="99.0" cy="166.7" r="3.8" fill="#7cc8ff" style="--o: 0.49; --t: -1.92s"/><circle cx="215.0" cy="166.7" r="3.8" fill="#7cc8ff" style="--o: 0.87; --t: -1.45s"/><circle cx="273.0" cy="166.7" r="3.8" fill="#7cc8ff" style="--o: 0.91; --t: -1.55s"/><circle cx="331.0" cy="166.7" r="3.8" fill="#7cc8ff" style="--o: 0.72; --t: -2.77s"/><circle cx="389.0" cy="166.7" r="3.8" fill="#7cc8ff" style="--o: 0.53; --t: -0.49s"/><circle cx="447.0" cy="166.7" r="3.8" fill="#7cc8ff" style="--o: 0.34; --t: -2.62s"/><circle cx="12.0" cy="216.9" r="3.8" fill="#7cc8ff" style="--o: 0.18; --t: -0.61s"/><circle cx="70.0" cy="216.9" r="3.8" fill="#7cc8ff" style="--o: 0.36; --t: -3.01s"/><circle cx="128.0" cy="216.9" r="3.8" fill="#7cc8ff" style="--o: 0.54; --t: -3.04s"/><circle cx="186.0" cy="216.9" r="3.8" fill="#7cc8ff" style="--o: 0.69; --t: -1.93s"/><circle cx="244.0" cy="216.9" r="3.8" fill="#7cc8ff" style="--o: 0.78; --t: -0.33s"/><circle cx="302.0" cy="216.9" r="4.6" fill="#ffcb05" style="--o: 0.72; --t: -3.08s"/><circle cx="360.0" cy="216.9" r="3.8" fill="#7cc8ff" style="--o: 0.57; --t: -2.25s"/><circle cx="418.0" cy="216.9" r="3.8" fill="#7cc8ff" style="--o: 0.40; --t: -2.64s"/><circle cx="41.0" cy="267.1" r="3.8" fill="#7cc8ff" style="--o: 0.20; --t: -0.94s"/><circle cx="99.0" cy="267.1" r="3.8" fill="#7cc8ff" style="--o: 0.36; --t: -2.31s"/><circle cx="157.0" cy="267.1" r="4.6" fill="#ffcb05" style="--o: 0.50; --t: -0.73s"/><circle cx="273.0" cy="267.1" r="3.8" fill="#7cc8ff" style="--o: 0.60; --t: -2.73s"/><circle cx="331.0" cy="267.1" r="3.8" fill="#7cc8ff" style="--o: 0.53; --t: -0.90s"/><circle cx="389.0" cy="267.1" r="3.8" fill="#7cc8ff" style="--o: 0.39; --t: -0.65s"/><circle cx="447.0" cy="267.1" r="4.6" fill="#ffcb05" style="--o: 0.24; --t: -0.86s"/><circle cx="12.0" cy="317.4" r="3.8" fill="#7cc8ff" style="--o: 0.18; --t: -0.19s"/><circle cx="70.0" cy="317.4" r="3.8" fill="#7cc8ff" style="--o: 0.18; --t: -1.18s"/><circle cx="186.0" cy="317.4" r="3.8" fill="#7cc8ff" style="--o: 0.40; --t: -0.42s"/><circle cx="244.0" cy="317.4" r="3.8" fill="#7cc8ff" style="--o: 0.44; --t: -2.85s"/><circle cx="302.0" cy="317.4" r="3.8" fill="#7cc8ff" style="--o: 0.42; --t: -2.10s"/><circle cx="360.0" cy="317.4" r="3.8" fill="#7cc8ff" style="--o: 0.33; --t: -1.87s"/><circle cx="418.0" cy="317.4" r="3.8" fill="#7cc8ff" style="--o: 0.21; --t: -0.11s"/><circle cx="99.0" cy="367.6" r="4.6" fill="#ffcb05" style="--o: 0.18; --t: -2.91s"/><circle cx="157.0" cy="367.6" r="3.8" fill="#7cc8ff" style="--o: 0.21; --t: -3.08s"/><circle cx="215.0" cy="367.6" r="4.6" fill="#ffcb05" style="--o: 0.27; --t: -2.04s"/><circle cx="331.0" cy="367.6" r="3.8" fill="#7cc8ff" style="--o: 0.23; --t: -2.34s"/><circle cx="389.0" cy="367.6" r="3.8" fill="#7cc8ff" style="--o: 0.18; --t: -3.20s"/><circle cx="447.0" cy="367.6" r="4.6" fill="#ffcb05" style="--o: 0.18; --t: -1.75s"/>
-            </svg>
-            <span class="pillar-label">Domain 02</span>
-            <h3>Machine</h3>
-            <p class="pillar-tagline">Robots built for extreme environments.</p>
-            <ul class="pillar-list">
-              <li>Robots in extreme environments</li>
-              <li>Swarm robots and collective intelligence</li>
-              <li>Wheel-leg hybrid robots</li>
-              <li>Soft robots and human-compatible machines</li>
-            </ul>
-            <span class="pillar-more">Explore Machine <span class="arrow" aria-hidden="true">&rarr;</span></span>
-          </a>
-          </div>
-        </div>
-
-        <div class="mission" data-reveal>
-          <p class="eyebrow">Our mission</p>
-          <p class="mission-text" data-split>From fundamental to applied, both pillars serve one mission: a <em>sustainable, resilient, and secure</em> energy infrastructure.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="story dark-scope" id="story" aria-labelledby="story-title">
-      <div class="story-stage">
-        <canvas class="story-canvas" aria-hidden="true"></canvas>
-        <div class="story-scrim" aria-hidden="true"></div>
-        <div class="wrap story-inner">
-          <h2 class="visually-hidden" id="story-title">Robots for extreme environments, in five scenes</h2>
-          <ol class="story-steps">
-            <li class="story-step is-active" data-zone="reactor hall">
-              <span class="story-count">01 / 05 &middot; The setting</span>
-              <h3>Dangerous, dirty, and dull</h3>
-              <p>Nuclear sites are among the hardest places to work, which makes them a natural job for robots. This is the setting the lab designs for.</p>
-              <p class="story-hint">Scroll to walk through it</p>
-            </li>
-            <li class="story-step" data-zone="hot cell">
-              <span class="story-count">02 / 05 &middot; Soft robots</span>
-              <h3>Soft robots for hard problems</h3>
-              <p>A soft arm bends along its whole length instead of pivoting at rigid joints. Counterintuitively, soft robots can be more radiation resistant than many traditional robots in some cases.</p>
-              <p class="story-hint story-hint--mouse">Move your cursor over the scene: the arm follows</p>
-            </li>
-            <li class="story-step" data-zone="open floor">
-              <span class="story-count">03 / 05 &middot; Swarm robots</span>
-              <h3>Many simple robots, one swarm</h3>
-              <p>Atombot's CookieBots move by vibration, which keeps them cheap and low enough to slip under furniture. Lose one or two and the swarm carries on.</p>
-            </li>
-            <li class="story-step" data-zone="stairwell">
-              <span class="story-count">04 / 05 &middot; Wheel-leg robots</span>
-              <h3>Legs with wheels</h3>
-              <p>A four-legged robot with wheels rolls where the floor is flat and steps where it is not. Atombot is building one as a more practical robot unit.</p>
-            </li>
-            <li class="story-step" data-zone="staging area">
-              <span class="story-count">05 / 05 &middot; The mission</span>
-              <h3>Three robots, one mission</h3>
-              <p>From fundamental to applied, the work serves a sustainable, resilient, and secure energy infrastructure.</p>
-              <div class="story-actions">
-                <a class="btn btn--small" href="research.html#machine">Explore Machine research <span class="arrow" aria-hidden="true">&rarr;</span></a>
-                <a class="btn btn--ghost btn--small" href="https://www.youtube.com/watch?v=_GpB51rHsZg">Watch the seminar <span aria-hidden="true">&#8599;</span></a>
-                <button class="btn btn--ghost btn--small" type="button" data-game><span class="atombot-mark" aria-hidden="true"></span>Play Rare Event</button>
-              </div>
-            </li>
-          </ol>
-          <nav class="story-nav" aria-label="Scenes">
-            <button type="button" aria-label="Scene 1, the setting">Setting</button>
-            <button type="button" aria-label="Scene 2, soft robots">Soft arm</button>
-            <button type="button" aria-label="Scene 3, swarm robots">Swarm</button>
-            <button type="button" aria-label="Scene 4, wheel-leg robots">Wheel-leg</button>
-            <button type="button" aria-label="Scene 5, the mission">Mission</button>
-          </nav>
-          <a class="story-skip" href="#numbers">Skip the story <span aria-hidden="true">&darr;</span></a>
-          <div class="hero-hud story-hud" aria-hidden="true">
-            <span class="hud-item hud-state">zone <b data-zone-out>reactor hall</b></span>
-            <span class="hud-item">radiation <span class="hud-bar"><i data-field></i></span></span>
-          </div>
-          <p class="story-note">An illustration of ideas from the lab's robotics seminar, not actual designs.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--tint" id="numbers" aria-label="The lab in numbers">
-      <div class="wrap">
-        <div class="stats">
-          <div class="stat" data-reveal>
-            <span class="stat-num" id="stat-pubs">97</span>
-            <span class="stat-label">Publications since 2006</span>
-            <div class="stat-viz" id="viz-pubs"></div>
-          </div>
-          <div class="stat" data-reveal style="--d: 80ms">
-            <span class="stat-num" id="stat-venues">45</span>
-            <span class="stat-label">Journals and venues</span>
-            <div class="stat-viz" id="viz-venues"></div>
-          </div>
-          <div class="stat" data-reveal style="--d: 160ms">
-            <span class="stat-num" id="stat-members">37</span>
-            <span class="stat-label">Current members</span>
-            <div class="stat-viz" id="viz-members"></div>
-          </div>
-          <div class="stat" data-reveal style="--d: 240ms">
-            <span class="stat-num" id="stat-alumni">20</span>
-            <span class="stat-label">Grad and postdoc alums</span>
-            <div class="stat-viz" id="viz-alumni"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <div class="section-head section-head--row" data-reveal>
-          <div>
-            <p class="eyebrow">Latest work</p>
-            <h2 style="margin-top: 18px" data-split>Recent publications</h2>
-          </div>
-          <a class="text-link" href="publications.html">All publications <span class="arrow" aria-hidden="true">&rarr;</span></a>
-        </div>
-        <div class="pub-rows" id="recent-pubs" data-reveal>
-          <noscript><p style="padding: 24px 0">See the full list on the <a href="publications.html">publications page</a>.</p></noscript>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <div class="section-head section-head--row" data-reveal>
-          <div>
-            <p class="eyebrow">Open tools</p>
-            <h2 style="margin-top: 18px" data-split>Software from the lab</h2>
-          </div>
-          <a class="text-link" href="code.html">All software <span class="arrow" aria-hidden="true">&rarr;</span></a>
-        </div>
-        <div class="card-grid">
-          <article class="card software-card" data-reveal>
-            <span class="tag">C++</span>
-            <h3>LiquidLib</h3>
-            <p>A C++ library for computing statistical quantities of liquids and liquid-like matter from atomic trajectories, with applications to neutron scattering experiments.</p>
-            <div class="card-foot">
-              <a class="btn btn--ghost btn--small" href="https://z-laboratory.github.io/LiquidLib/">Documentation <span aria-hidden="true">&#8599;</span></a>
-            </div>
-          </article>
-          <article class="card software-card" data-reveal style="--d: 100ms">
-            <span class="tag">MOOSE</span>
-            <h3>Kraken</h3>
-            <p>A MOOSE-based multiphysics simulation platform for soft materials and robots.</p>
-            <div class="card-foot">
-              <a class="btn btn--ghost btn--small" href="https://z-laboratory.github.io/Kraken/">Documentation <span aria-hidden="true">&#8599;</span></a>
-            </div>
-          </article>
-          <article class="card card--more" data-reveal style="--d: 200ms">
-            <span class="tag">And more</span>
-            <ul class="plain">
-              <li>Ascent Dynamics</li>
-              <li>All-atom metadynamics</li>
-              <li>REMA Toolkit</li>
-              <li>ST2 Water Model</li>
-            </ul>
-            <div class="card-foot">
-              <a class="text-link" href="code.html">See all software <span class="arrow" aria-hidden="true">&rarr;</span></a>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--tint" id="contact">
-      <div class="wrap contact">
-        <div data-reveal>
-          <p class="eyebrow">Find us</p>
-          <h2 data-split>Get in touch.</h2>
-          <p class="lead" style="margin-top: 18px">The lab is part of the University of Michigan College of Engineering in Ann Arbor.</p>
-        </div>
-        <dl class="contact-list" data-reveal style="--d: 120ms">
-          <div>
-            <dt>Lab</dt>
-            <dd>2927 Cooley Bldg<br>2355 Bonisteel Blvd<br>Ann Arbor, MI 48109</dd>
-          </div>
-          <div>
-            <dt>Email</dt>
-            <dd>yzyz AT umich DOT edu</dd>
-          </div>
-          <div>
-            <dt>Office</dt>
-            <dd>+1 (734) 647-4338</dd>
-          </div>
-          <div>
-            <dt>Online</dt>
-            <dd><a href="https://github.com/Z-Laboratory">GitHub</a> &nbsp;&middot;&nbsp; <a href="https://scholar.google.com/citations?user=OIf2HXwAAAAJ&amp;hl=en">Google Scholar</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/notnotyz/">LinkedIn</a></dd>
-          </div>
-        </dl>
-      </div>
+      <dl class="contact-list">
+        <div><dt>Lab</dt><dd>2927 Cooley Bldg<br>2355 Bonisteel Blvd<br>Ann Arbor, MI 48109</dd></div>
+        <div><dt>Email</dt><dd>yzyz AT umich DOT edu</dd></div>
+        <div><dt>Office</dt><dd>+1 (734) 647-4338</dd></div>
+        <div><dt>Online</dt><dd><a href="https://github.com/Z-Laboratory">GitHub</a><br><a href="https://scholar.google.com/citations?user=OIf2HXwAAAAJ&amp;hl=en">Google Scholar</a><br><a href="https://www.linkedin.com/in/notnotyz/">LinkedIn</a></dd></div>
+      </dl>
     </section>
   </main>
 
@@ -351,9 +152,7 @@
   <script src="data/publications.js" defer></script>
   <script src="data/people.js" defer></script>
   <script src="assets/js/site.js" defer></script>
-  <script src="assets/js/atombot-art.js" defer></script>
-  <script src="assets/js/hero.js" defer></script>
-  <script src="assets/js/story.js" defer></script>
+  <script src="assets/js/liquid.js" defer></script>
   <script src="assets/js/home.js" defer></script>
 </body>
 </html>
