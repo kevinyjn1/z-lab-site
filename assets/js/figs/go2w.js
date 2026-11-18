@@ -154,7 +154,7 @@
 
   /* ---- the view --------------------------------------------------------------------- */
 
-  const view = { azimuth: 0.55, elevation: 0.2, centerZ: 0.5, halfHeight: 0.62 };
+  const view = { azimuth: 0.55, elevation: 0.2, centerZ: 0.58, halfHeight: 0.68 }; /* from just under the floor to above the top of the flip */
   const MID_FLIP = T.lift + AIR * 0.42; /* the still picture when nothing moves */
   let now = MID_FLIP;
   let size = { w: 1, h: 1 };
@@ -169,7 +169,7 @@
     const c = [0, 0, view.centerZ];
     const dot = (p, q) => p[0] * q[0] + p[1] * q[1] + p[2] * q[2];
     const viewM = new Float32Array([r[0], u[0], d[0], 0, r[1], u[1], d[1], 0, r[2], u[2], d[2], 0, -dot(r, c), -dot(u, c), -dot(d, c), 1]);
-    const hh = Math.max(view.halfHeight, (0.66 * size.h) / size.w); /* a narrow picture zooms out until the robot's whole path fits */
+    const hh = Math.max(view.halfHeight, (0.68 * size.h) / size.w); /* a narrow picture zooms out until the robot's whole path fits */
     const hw = (hh * size.w) / size.h;
     const far = 3;
     const proj = new Float32Array([1 / hw, 0, 0, 0, 0, 1 / hh, 0, 0, 0, 0, -1 / far, 0, 0, 0, 0, 1]);
@@ -196,7 +196,7 @@
     };
     /* the floor: a disc of faint wash with a hairline edge, as wide as the picture allows */
     const reach = Math.min(0.95, cam.halfWidth * 0.9);
-    ellipse(0, 0, reach, reach * 0.63);
+    ellipse(0, 0, reach, reach * 0.55);
     ctx.fillStyle = "#f6f7f8";
     ctx.fill();
     ctx.lineWidth = 1;
@@ -208,8 +208,8 @@
     ctx.fillStyle = "rgba(18,22,28," + (0.13 - 0.07 * lift).toFixed(3) + ")";
     ctx.fill();
     /* a scale bar, half a meter along the floor */
-    const a = cam.toScreen([-0.25, -reach * 0.63, 0]);
-    const b = cam.toScreen([0.25, -reach * 0.63, 0]);
+    const a = cam.toScreen([-0.25, -reach * 0.55, 0]);
+    const b = cam.toScreen([0.25, -reach * 0.55, 0]);
     const y = h - 26;
     const x0 = 18;
     const len = Math.hypot(b[0] - a[0], b[1] - a[1]);

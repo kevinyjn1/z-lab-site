@@ -1628,6 +1628,59 @@ html:not(.js) .stat-viz {
   white-space: nowrap;
 }
 
+/* The Atombot mark, which paints itself in (assets/js/atombot-mark.js). A button, so it can be played again. */
+.atombot-mark {
+  display: block;
+  width: 168px;
+  aspect-ratio: 640 / 588;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.atombot-mark img,
+.atombot-mark canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.atombot-note {
+  margin-top: 4px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.unit-text .atombot-mark {
+  margin: 0 0 18px -6px;
+}
+
+/* Home: the student team, with its mark. */
+.team {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: center;
+}
+
+.team .atombot-mark {
+  width: clamp(132px, 16vw, 200px);
+}
+
+.team-text {
+  max-width: 36em;
+}
+
+.team-text h2 {
+  margin-bottom: 10px;
+}
+
+.team-text .unit-links {
+  margin-top: 16px;
+}
+
 /* 6c. Research ------------------------------------------------------------- */
 
 /* Research opens the way a paper does: its statement beside a list of its figures. */
@@ -2450,6 +2503,21 @@ main {
 @media (max-width: 699px) {
   body {
     font-size: 1.0625rem;
+  }
+
+  /* Home: the Atombot mark sits above its text on a phone. */
+  .team {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .team .atombot-mark {
+    width: 132px;
+    margin-left: -5px;
+  }
+
+  .unit-text .atombot-mark {
+    width: 136px;
   }
 
   .toc em {

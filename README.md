@@ -31,7 +31,7 @@ to the site:
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Home: the lab's statement as an abstract, a contents list, Fig. 1 (a liquid simulated in the browser with its pair distribution function and structure factor), the lab in numbers beside Fig. 2 (the soft arm), recent papers, contact |
+| `index.html` | Home: the lab's statement as an abstract, a contents list, Fig. 1 (a liquid simulated in the browser with its pair distribution function and structure factor), the lab in numbers beside Fig. 2 (the soft arm), Atombot with its mark, recent papers, contact |
 | `research.html` | The two research domains, each theme followed by figures built from the lab's papers (see the table below) |
 | `people.html` | PI, current members, alums |
 | `publications.html` | Searchable, filterable publication list with two figures that double as filters: papers per year, and the journals with the most papers |
@@ -119,6 +119,7 @@ assets/js/theme-init.js     marks the page as script-enabled before first paint
 assets/js/site.js           navigation menu, shared helpers, the game's loader
 assets/js/home.js           home page numbers table, contents details, recent publications
 assets/js/liquid.js         Home Fig. 1: the simulated liquid, g(r), and S(k)
+assets/js/atombot-mark.js   the Atombot mark painting itself in, on Home and in the Atombot section
 assets/js/figkit.js         shared drawing tools for the Research figures (window.ZFig)
 assets/js/figs/             one script per Research figure (clocks-data.js is generated, see tools/)
 tools/make_clocks_data.py   rebuilds clocks-data.js from the paper's Source Data spreadsheet
@@ -207,6 +208,12 @@ Then open <http://localhost:4173>.
 - CV and syllabus links point at the files on the official site (`cvBase` in
   `data/people.js`). To host them alongside these pages, copy the `cv/` folder next to
   `index.html` and set `cvBase` to `"cv/"`.
+- The Atombot mark (`assets/img/atombot-mark.webp`) is three brush strokes, electrons circling
+  an atom. On Home and in the Atombot section of Research it paints itself in: three small
+  electrons fly in and each lays one stroke behind it (`assets/js/atombot-mark.js`). It plays
+  once when it comes into view and again on a click or when a pointer comes over it; with
+  "reduce motion" on, the finished mark is simply shown. The script splits the mark's image
+  into its three strokes by geometry, so a new version of the same mark needs no other change.
 - There is a game, Rare Event: pilot the Atombot mark through a sample that cycles through
   liquid, crystal, gas, and glass, and catch rare events. It is drawn like the figures, ink
   on paper. It opens from the "Play Rare Event" button in every footer and on the 404 page;
