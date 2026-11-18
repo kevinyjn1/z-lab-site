@@ -61,6 +61,7 @@
           <li><span></span><a href="#fragile">Fragile to strong</a><em>model</em></li>
           <li><span></span><a href="#salt">A pinch of fission product in a reactor salt</a><em>model, re-plot</em></li>
           <li><span></span><a href="#clocks">Two clocks in a glass-forming salt</a><em>model</em></li>
+          <li><span></span><a href="#charge">Softer when charged</a><em>model</em></li>
           <li><span></span><a href="#metal">Where the straight line ends</a><em>model</em></li>
           <li><span></span><a href="#scale">From 100 atoms to 100,000</a><em>re-plot</em></li>
           <li><span></span><a href="#arm">Be the controller: steer the underwater arm</a><em>model</em></li>
@@ -188,6 +189,29 @@
           <details class="fig-table"><summary>View as table</summary><div data-table></div></details>
         </figure>
       </article>
+      <article class="unit" id="charge">
+        <div class="unit-text">
+          <h3>Softer when charged</h3>
+          <p>A flow battery stores more energy when its active molecules are more concentrated, but a crowded electrolyte turns viscous and stops conducting. In one such fluid, a phenothiazine in acetonitrile, the conductivity peaks near 0.7 mol/L and then falls as the viscosity climbs.</p>
+          <p>The lab's measurements and simulations show the discharged fluid stiffening sooner than the charged one. Its small lithium ions lose their solvent shell and bind the anions tightly, while the bulky charged molecule binds them only weakly (<a href="https://doi.org/10.1039/d2cp04220g">Farag et al., <cite>Phys. Chem. Chem. Phys.</cite> 2023</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="charge">
+          <div class="plate">
+            <canvas role="img" aria-label="Two plots against the concentration of the active molecule, from 0 to 1.2 moles per liter, for a flow-battery electrolyte in its discharged and charged states. Left: viscosity divided by the solvent's viscosity, from the Huggins fits of Farag and co-workers. Both curves bend upward; at 0.75 moles per liter the discharged fluid is about 3 times as viscous as the solvent and the charged fluid about 2.3 times. Right: conductivity as a share of its own peak. It rises, peaks, and falls; the predicted peak is at 0.57 moles per liter for the discharged fluid and 0.73 for the charged one. Beyond 0.75 moles per liter the curves are extrapolations."></canvas>
+            <div class="fig-controls">
+              <div class="segmented" role="group" aria-label="State of charge">
+                <button type="button" data-state="discharged" aria-pressed="true">Discharged</button>
+                <button type="button" data-state="charged" aria-pressed="false">Charged</button>
+              </div>
+              <label class="range"><span data-conc-out>0.60 mol/L</span><input type="range" data-pick min="0.05" max="1.2" step="0.01" value="0.6" aria-label="Concentration of the active molecule"><span class="range-ends"><i>0.05 mol/L</i><i>1.2 mol/L</i></span></label>
+              <p class="fig-readout" data-values></p>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> A flow-battery electrolyte (the phenothiazine MEEPT in acetonitrile) in its two states of charge. Left: viscosity from the Huggins equation with the values fitted to the measurements in Table 1 of <a href="https://doi.org/10.1039/d2cp04220g">Farag et al. 2023</a>; the fits end at 0.75 mol/L and the dashed parts are extrapolations. Right: the conductivity that follows from those fits, which is proportional to concentration divided by viscosity, drawn as a share of each curve's own peak, with the peaks the paper predicts (0.57 and 0.73 mol/L). The measured conductivity peaks near 0.7 mol/L in both states; the measured points are published only as plots and are not drawn. <span class="fig-kind">A model: the paper's fitted viscosity law and its conductivity relation, run in your browser.</span></figcaption>
+          <details class="fig-table"><summary>View the fitted parameters as a table</summary><div data-table></div></details>
+        </figure>
+      </article>
+
       <article class="unit" id="metal">
         <div class="unit-text">
           <h3>Where the straight line ends</h3>
@@ -394,6 +418,7 @@
   <script src="assets/js/figs/fragile.js" defer></script>
   <script src="assets/js/figs/salt.js" defer></script>
   <script src="assets/js/figs/clocks.js" defer></script>
+  <script src="assets/js/figs/charge.js" defer></script>
   <script src="assets/js/figs/metal.js" defer></script>
   <script src="assets/js/figs/scale.js" defer></script>
   <script src="assets/js/figs/arm.js" defer></script>

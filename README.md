@@ -48,15 +48,16 @@ File names match the current site, so existing links keep working if this replac
 | --- | --- | --- | --- |
 | Home | A liquid, its g(r) and S(k) | Model | Definitions from LiquidLib (Walter et al., Comput. Phys. Commun. 2018); the liquid is a two-dimensional Lennard-Jones model for illustration |
 | Home | The underwater soft arm | Line drawing | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
-| Research | Flood the landscape | Model | Pentane's energy landscape and the barcode summary (the lab's metadynamics papers, cited in the caption) |
+| Research | Flood the landscape | Model | Pentane's energy landscape (Eq. 1 and its constants) and the barcode summary of Mirth et al., J. Chem. Phys. 2021; the walker is textbook metadynamics |
 | Research | The water that never froze | Re-plot | Table 1 of Liu et al., Proc. Natl. Acad. Sci. U.S.A. 2007 |
 | Research | Fragile to strong | Model | Fitted laws from Chen et al., J. Chem. Phys. 2006 and Zhang et al., J. Chem. Phys. 2009 |
 | Research | A pinch of fission product in a reactor salt | Model and re-plot | Table 3 of Rakib et al., ACS Appl. Energy Mater. 2025; Table III of Grizzi et al., Phys. Rev. Mater. 2026 |
 | Research | Two clocks in a glass-forming salt | Model | The two-step law and reported ranges of Luo et al., Nature Commun. 2022 and J. Phys. Chem. Lett. 2025 |
+| Research | Softer when charged | Model | The Huggins fits (Table 1) and conductivity relation of Farag et al., Phys. Chem. Chem. Phys. 2023 |
 | Research | Where the straight line ends | Model | The Arrhenius fit of Jaiswal et al., J. Phys. Chem. B 2016 |
-| Research | From 100 atoms to 100,000 | Re-plot | The lab's machine-learned potential papers (cited in the caption) |
+| Research | From 100 atoms to 100,000 | Re-plot | Lee et al., J. Phys. Chem. B 2021; Lee and Z, J. Chem. Phys. 2024; Murg et al., J. Appl. Phys. 2025; Grizzi et al., Phys. Rev. Mater. 2026 |
 | Research | Be the controller: steer the underwater arm | Simplified model, with the paper's limits and scores | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
-| Research | Soft is not linear | Model | The lab's Kraken papers (cited in the caption) |
+| Research | Soft is not linear | Model and re-plot | Wandke and Z, IEEE Access 2021 (the material law) and 2023 (Tables 1 to 3) |
 | Research | Lose two, keep going | Concept illustration | The PI's Michigan Robotics seminar (2025) and the Atombot page of the Multidisciplinary Design Program |
 | Research | Wheels where it is flat, legs where it is not | Concept illustration | The same two public sources; not a drawing of the lab's robot |
 | Publications | Papers per year; where the work appears | Charts | `data/publications.js` |

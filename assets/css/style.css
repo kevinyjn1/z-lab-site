@@ -1748,6 +1748,11 @@ main {
   max-width: 320px;
 }
 
+/* A table wider than a small phone scrolls inside its own box, not the page. */
+.unit-fig .fig-table > div {
+  overflow-x: auto;
+}
+
 .unit-links {
   display: flex;
   flex-wrap: wrap;
@@ -1802,12 +1807,14 @@ main {
 /* Where a figure has buttons, a slider, and a readout, the readout takes a line of its
    own and the slider keeps a usable length or drops to the next line. */
 [data-fig="salt"] .fig-controls > .fig-readout,
+[data-fig="charge"] .fig-controls > .fig-readout,
 [data-fig="metal"] .fig-controls > .fig-readout,
 [data-fig="flood"] .fig-readout {
   flex-basis: 100%;
 }
 
-[data-fig="salt"] .fig-controls > .range {
+[data-fig="salt"] .fig-controls > .range,
+[data-fig="charge"] .fig-controls > .range {
   flex-basis: 240px;
 }
 
@@ -1822,6 +1829,14 @@ main {
 /* Tables with long row labels or more than two columns need more room, and space between the columns. */
 :is([data-fig="salt"], [data-fig="fragile"], [data-fig="clocks"], [data-fig="scale"]) .fig-table table {
   max-width: 460px;
+}
+
+[data-fig="charge"] .fig-table table {
+  max-width: none;
+}
+
+[data-fig="charge"] .fig-table :is(th, td) + :is(th, td) {
+  padding-left: 10px;
 }
 
 [data-fig="arm"] .fig-table tbody th[scope="row"] {
