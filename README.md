@@ -59,11 +59,10 @@ File names match the current site, so existing links keep working if this replac
 | Research | Be the controller: steer the underwater arm | Simplified model, with the paper's limits and scores | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
 | Research | Soft is not linear | Model and re-plot | Wandke and Z, IEEE Access 2021 (the material law) and 2023 (Tables 1 to 3) |
 | Research | Lose two, keep going | Concept illustration | The PI's Michigan Robotics seminar (2025) and the Atombot page of the Multidisciplinary Design Program |
-| Research | Wheels where it is flat, legs where it is not | Concept illustration | The same two public sources; not a drawing of the lab's robot |
 | Publications | Papers per year; where the work appears | Charts | `data/publications.js` |
 
-The two concept illustrations are the only figures without a paper behind them, because the
-lab has not published on those robots yet. Replace them when it does.
+The swarm figure is a concept illustration, the only figure without a paper behind it, because
+the lab has not published on those robots yet. Replace it when it does.
 
 One figure uses a paper's own data file. `assets/js/figs/clocks-data.js` holds measured values
 copied from the Source Data file of Luo et al., Nature Communications 13, 2092 (2022),
