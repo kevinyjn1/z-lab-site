@@ -1313,6 +1313,12 @@ html:not(.js) .stat-viz {
   padding-block: clamp(40px, 5.5vw, 70px) clamp(44px, 6vw, 72px);
 }
 
+/* The title is two lines, broken where it turns from matter to machine. Its size follows
+   the column (the longer line is 8.9 times the font size) so neither line wraps. */
+.front h1 {
+  font-size: clamp(2.5rem, 4.15vw, 3.5rem);
+}
+
 .front .by {
   margin-top: 20px;
 }
@@ -1968,6 +1974,7 @@ main {
   font-size: 0.8125rem;
   font-weight: 600;
   text-align: left;
+  white-space: nowrap;
 }
 
 .alumni td {
@@ -1983,6 +1990,11 @@ main {
 .alumni td:first-child {
   font-weight: 600;
   white-space: nowrap;
+}
+
+.alumni th:last-child,
+.alumni td:last-child {
+  padding-right: 0;
 }
 
 /* A list of names set as running text, the way acknowledgments are. */
@@ -2075,6 +2087,10 @@ main {
   .contact,
   .unit {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .front h1 {
+    font-size: clamp(1.75rem, 9.7vw, 3.9rem);
   }
 
   .unit-text {
@@ -2219,6 +2235,20 @@ main {
     display: none;
   }
 
+  /* three columns have to share a phone's width: tighter gaps, and long names may wrap */
+  .alumni {
+    font-size: 0.9375rem;
+  }
+
+  .alumni th,
+  .alumni td {
+    padding-right: 12px;
+  }
+
+  .alumni td:first-child {
+    white-space: normal;
+  }
+
   .cols {
     --plot-h: 144px;
     column-gap: 8px;
@@ -2260,6 +2290,24 @@ main {
 }
 
 @media (max-width: 479px) {
+  /* Small phones (down to 320 px): the contact blocks stack, and the numbers table gives its last column room. */
+  .contact-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .numbers td:first-child {
+    padding-right: 12px;
+  }
+
+  .numbers td:last-child {
+    font-size: 0.9375rem;
+  }
+
+  .numbers .spark {
+    width: 100%;
+    max-width: 128px;
+  }
+
   .foot-row {
     grid-template-columns: 1fr;
   }
