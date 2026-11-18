@@ -67,6 +67,7 @@
           <li><span></span><a href="#arm">Be the controller: steer the underwater arm</a><em>model</em></li>
           <li><span></span><a href="#soft">Soft is not linear</a><em>model, re-plot</em></li>
           <li><span></span><a href="#swarm">Lose two, keep going</a><em>illustration</em></li>
+          <li><span></span><a href="#go2w">Wheels and legs in one machine</a><em>animation</em></li>
         </ol>
         <p class="figlist-note">Each figure comes from the lab's papers or public talks, and says whether it re-plots published values, runs a model from a paper, or illustrates an idea.</p>
       </nav>
@@ -319,7 +320,7 @@
       <article class="unit" id="swarm">
         <div class="unit-text">
           <h3>Lose two, keep going</h3>
-          <p>A swarm is many simple, cheap robots that together do what one robot cannot. In a seminar, the lab's principal investigator, Y Z, describes small units driven by vibration motors instead of wheels to keep the cost low, and a swarm that, like an ant colony, is not affected by losing one or two (<a href="https://www.youtube.com/watch?v=_GpB51rHsZg">Michigan Robotics seminar, 2025</a>, from 39:47).</p>
+          <p>A swarm is many simple, cheap robots that together do what one robot cannot. In a seminar, the lab's principal investigator, Y Z, describes small units driven by vibration motors instead of wheels to keep the cost low, and a swarm that, like an ant colony, is not affected by losing one or two (<a href="https://www.youtube.com/watch?v=_GpB51rHsZg">Michigan Robotics seminar, 2025</a>).</p>
           <p>The student team describes its miniature swarm system as a platform for studying emergent behavior in many-robot systems (<a href="https://mdp.engin.umich.edu/research_teams/atombot-27/">Atombot on the Multidisciplinary Design Program site</a>).</p>
         </div>
         <figure class="unit-fig" data-fig="swarm">
@@ -335,6 +336,31 @@
           <figcaption class="caption"><b class="fig-no"></b> A floor seen from above. Each disc is one robot: the working ones shuffle toward the marked spot and keep a little room from one another. Click or tap a robot, or press Switch one off: it stops where it is, and the rest close in and carry on. <span class="fig-kind">A concept illustration, not a recording or a design. The rules of motion are invented for the illustration, because no rules, speeds, or recordings are public.</span></figcaption>
         </figure>
       </article>
+      <article class="unit" id="go2w">
+        <div class="unit-text">
+          <h3>Wheels and legs in one machine</h3>
+          <p>Wheel-leg hybrid robots are one of the lab's research themes: wheels cover flat ground quickly and cheaply, and legs take over where wheels cannot go. The lab works with a Unitree Go2-W, a commercial quadruped with a driven wheel at the end of each leg.</p>
+          <p>The drawing is that robot, built in your browser from the manufacturer's published model. Drag it sideways to walk around it.</p>
+        </div>
+        <figure class="unit-fig" data-fig="go2w">
+          <div class="plate">
+            <div class="go2w-stage" data-stage>
+              <img class="go2w-poster" src="assets/img/go2w-flip.webp" alt="" width="1225" height="800" loading="lazy">
+              <canvas data-floor aria-hidden="true"></canvas>
+              <canvas data-robot role="img" aria-label="A line drawing of a Unitree Go2-W, a four-legged robot with a wheel at the end of each leg, seen from its front right. It rolls forward on its wheels, crouches, pushes off with its front legs and then its rear legs, turns a full backward somersault in the air with its legs tucked, lands on its wheels, and stands up again. The loop takes 3.6 seconds."></canvas>
+            </div>
+            <div class="fig-controls">
+              <button class="btn btn--small" type="button" data-play aria-pressed="true">Pause</button>
+              <label class="range"><span>time</span><input type="range" data-time min="0" max="3.6" step="0.01" value="0" aria-label="Time in the flip, in seconds"><span class="range-ends"><i>start</i><i data-time-end>3.6 s</i></span></label>
+              <label class="range"><span>view</span><input type="range" data-turn min="-75" max="75" step="1" value="32" aria-label="Viewing angle around the robot, in degrees"><span class="range-ends"><i>from behind</i><i>from the front</i></span></label>
+              <p class="fig-readout" data-values></p>
+              <p class="fig-status" data-note></p>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> A Unitree Go2-W doing a backflip. The robot is the manufacturer's own model: its joints come from the URDF Unitree publishes and its shape from simplified copies of the published meshes (<a href="https://github.com/unitreerobotics/unitree_ros">unitree_ros</a>, BSD 3-Clause, &copy; Unitree Robotics). The motion is keyframed by hand within the URDF's joint limits. On the ground the body's height follows from the leg angles, and in the air it follows the ballistic arc for its 0.58 s of flight. <span class="fig-kind">An animation of the real robot's model. The motion is an illustration: not a recording, a simulation, or the lab's controller.</span></figcaption>
+        </figure>
+      </article>
+
       <article class="unit unit--team" id="atombot">
         <div class="unit-text">
           <h3>Atombot</h3>
@@ -414,5 +440,7 @@
   <script src="assets/js/figs/arm.js" defer></script>
   <script src="assets/js/figs/soft.js" defer></script>
   <script src="assets/js/figs/swarm.js" defer></script>
+  <script src="assets/js/figs/go2w-model.js" defer></script>
+  <script src="assets/js/figs/go2w.js" defer></script>
 </body>
 </html>

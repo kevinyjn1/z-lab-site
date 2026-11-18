@@ -59,10 +59,19 @@ File names match the current site, so existing links keep working if this replac
 | Research | Be the controller: steer the underwater arm | Simplified model, with the paper's limits and scores | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
 | Research | Soft is not linear | Model and re-plot | Wandke and Z, IEEE Access 2021 (the material law) and 2023 (Tables 1 to 3) |
 | Research | Lose two, keep going | Concept illustration | The PI's Michigan Robotics seminar (2025) and the Atombot page of the Multidisciplinary Design Program |
+| Research | Wheels and legs in one machine | Animation of the real robot's model | The URDF and meshes of the Unitree Go2-W from Unitree's `unitree_ros` repository (BSD 3-Clause); the backflip is keyframed by hand |
 | Publications | Papers per year; where the work appears | Charts | `data/publications.js` |
 
 The swarm figure is a concept illustration, the only figure without a paper behind it, because
 the lab has not published on those robots yet. Replace it when it does.
+
+The wheel-leg figure draws Unitree's own model of the Go2-W live with WebGL. `tools/make_go2w_model.py`
+reads the URDF and meshes of Unitree's `go2w_description` package and writes a simplified
+copy (`assets/models/go2w.bin`, under 300 kB) and the joint tree (`assets/js/figs/go2w-model.js`).
+That package is BSD 3-Clause licensed, Copyright (c) 2016-2022 HangZhou YuShu TECHNOLOGY
+CO.,LTD. ("Unitree Robotics"); the license text is in `LICENSES/` and must stay with the
+model files. The motion is hand-written keyframes, not a recording or a controller, and the
+caption says so.
 
 One figure uses a paper's own data file. `assets/js/figs/clocks-data.js` holds measured values
 copied from the Source Data file of Luo et al., Nature Communications 13, 2092 (2022),
@@ -113,6 +122,9 @@ assets/js/liquid.js         Home Fig. 1: the simulated liquid, g(r), and S(k)
 assets/js/figkit.js         shared drawing tools for the Research figures (window.ZFig)
 assets/js/figs/             one script per Research figure (clocks-data.js is generated, see tools/)
 tools/make_clocks_data.py   rebuilds clocks-data.js from the paper's Source Data spreadsheet
+tools/make_go2w_model.py    rebuilds the Go2-W model from Unitree's go2w_description package
+assets/models/go2w.bin      the simplified Go2-W meshes (generated)
+LICENSES/                   licenses of third-party material used on the site
 assets/js/people.js         renders the People page from data/people.js
 assets/js/publications.js   renders the Publications page from data/publications.js
 assets/js/game.js           "Rare Event", the hidden game; loaded only when a visitor opens it
