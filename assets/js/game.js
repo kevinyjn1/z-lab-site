@@ -5,6 +5,9 @@
  * (liquid, crystal, gas, glass), catch rare events before they fade, and drop
  * bias hills to push the atoms away. A toy for fun, not research code or data.
  *
+ * Drawn like the figures on the site: ink on paper. Atoms are ink (filled when they
+ * move freely, hollow when frozen), and maize marks only the player and the rare events.
+ *
  * site.js loads this file, game.css, and data/leaderboard.js on demand, so a normal page
  * view pays nothing. Everything is created on open and torn down on close.
  *
@@ -34,6 +37,13 @@
   const BOARD_SIZE = 10;
   const MAX_SCORE = 3000; /* more than a real run reaches; larger posted scores are ignored */
   const AWAIT_MS = 60 * 60 * 1000; /* how long a posted score is shown here while the shared list lacks it */
+
+  /* The site's ink and its one highlight (see assets/css/style.css). */
+  const INK = "#12161c";
+  const INK_RGB = "18,22,28";
+  const MAIZE = "#ffcb05";
+  const MAIZE_RGB = "255,203,5";
+  const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
 
   /* Tuning. Lengths are in "units": about one CSS pixel on a laptop, smaller on a phone. */
   const STEP = 1 / 120; /* fixed simulation step, seconds */
@@ -73,9 +83,14 @@
   const ICON_PAUSE = '<svg class="zg-ic-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></svg>';
   const ICON_CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
+  /* The three marks of the game, as the canvas draws them. */
+  const DOT_ATOM = '<svg class="zg-dot" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="#2b333d" stroke="#12161c"/></svg>';
+  const DOT_EVENT = '<svg class="zg-dot" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.3 5.5L18 9l-5.2 2.4L10 19l-2.6-7.6L2 9l5.6-2.5z" fill="#ffcb05" stroke="#12161c" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+  const DOT_HILL = '<svg class="zg-dot" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="#12161c"><circle cx="10" cy="10" r="9" fill="#fff3c4" stroke-opacity="0.45"/><circle cx="10" cy="10" r="5.5" stroke-opacity="0.7"/><circle cx="10" cy="10" r="2"/></svg>';
+
   const BOARD_HTML =
     '<aside class="zg-board" data-board aria-label="Leaderboard">' +
-      '<p class="eyebrow zg-board-head"><span>Leaderboard</span><span class="zg-board-scope" data-board-scope></span></p>' +
+      '<p class="label zg-board-head"><span>Leaderboard</span><span class="zg-board-scope" data-board-scope></span></p>' +
       '<ol class="zg-board-list" data-board-list></ol>' +
       '<p class="zg-board-note" data-board-note>Loading scores</p>' +
     "</aside>";
@@ -102,43 +117,43 @@
     '<div class="zgame-cue" data-cue aria-hidden="true"><em></em><span></span></div>' +
     '<div class="zgame-panel zgame-panel--wide" data-panel="start">' +
       '<div class="zg-main">' +
-      '<span class="atombot-mark zg-logo" aria-hidden="true"></span>' +
-      '<p class="eyebrow">Z Lab &middot; hidden sample</p>' +
+      '<span class="zg-logo" aria-hidden="true"></span>' +
+      '<p class="label">Z Lab &middot; hidden sample</p>' +
       '<h2 class="zg-title">Rare <em>Event</em></h2>' +
       '<p class="zg-lead">Pilot Atombot through matter in extremes. Catch the rare events before they fade, and keep clear of the atoms.</p>' +
       '<ul class="zg-how">' +
-        '<li><i class="zg-dot zg-dot--atom" aria-hidden="true"></i><span><b>Atoms</b> cost one integrity each. The sample keeps changing state: liquid, crystal, gas, glass.</span></li>' +
-        '<li><i class="zg-dot zg-dot--event" aria-hidden="true"></i><span><b>Rare events</b> score. Catch several in a row to raise the multiplier.</span></li>' +
-        '<li><i class="zg-dot zg-dot--hill" aria-hidden="true"></i><span><b>Bias hills</b> push the atoms away for a few seconds. Every five events earns one.</span></li>' +
+        '<li>' + DOT_ATOM + '<span><b>Atoms</b> cost one integrity each. The sample keeps changing state: liquid, crystal, gas, glass.</span></li>' +
+        '<li>' + DOT_EVENT + '<span><b>Rare events</b> score. Catch several in a row to raise the multiplier.</span></li>' +
+        '<li>' + DOT_HILL + '<span><b>Bias hills</b> push the atoms away for a few seconds. Every five events earns one.</span></li>' +
       "</ul>" +
       '<p class="zg-controls zg-controls--keys"><span><b>Move</b> mouse or WASD</span><span><b>Bias hill</b> click or Space</span><span><b>Pause</b> P</span></p>' +
       '<p class="zg-controls zg-controls--touch"><span><b>Move</b> drag anywhere</span><span><b>Bias hill</b> second finger or the bias button</span></p>' +
       '<div class="zg-actions">' +
-        '<button class="btn" type="button" data-start>Start run <span class="arrow" aria-hidden="true">&rarr;</span></button>' +
-        '<button class="btn btn--ghost" type="button" data-close>Back to the site</button>' +
+        '<button class="btn btn--solid" type="button" data-start>Start run <span class="arrow" aria-hidden="true">&rarr;</span></button>' +
+        '<button class="btn" type="button" data-close>Back to the site</button>' +
       "</div>" +
       '<p class="zg-best" data-best></p>' +
       "</div>" +
       BOARD_HTML +
     "</div>" +
     '<div class="zgame-panel zgame-panel--small" data-panel="pause" hidden>' +
-      '<p class="eyebrow">Run on hold</p>' +
+      '<p class="label">Run on hold</p>' +
       '<h2 class="zg-title">Paused</h2>' +
       '<div class="zg-actions">' +
-        '<button class="btn" type="button" data-resume>Resume</button>' +
-        '<button class="btn btn--ghost" type="button" data-close>Back to the site</button>' +
+        '<button class="btn btn--solid" type="button" data-resume>Resume</button>' +
+        '<button class="btn" type="button" data-close>Back to the site</button>' +
       "</div>" +
     "</div>" +
     '<div class="zgame-panel zgame-panel--wide" data-panel="over" hidden>' +
       '<div class="zg-main">' +
-      '<p class="eyebrow">Run complete &middot; your rank</p>' +
+      '<p class="label">Run complete &middot; your rank</p>' +
       '<h2 class="zg-title" data-rank></h2>' +
       '<p class="zg-lead" data-rank-note></p>' +
       '<dl class="zg-stats">' +
-        "<div><dt>score</dt><dd data-score>0</dd></div>" +
-        "<div><dt>events</dt><dd data-caught>0</dd></div>" +
-        "<div><dt>best streak</dt><dd data-streak>0</dd></div>" +
-        "<div><dt>survived</dt><dd data-time>0 s</dd></div>" +
+        "<div><dt>Score</dt><dd data-score>0</dd></div>" +
+        "<div><dt>Events</dt><dd data-caught>0</dd></div>" +
+        "<div><dt>Best streak</dt><dd data-streak>0</dd></div>" +
+        '<div><dt>Survived</dt><dd><span data-time>0</span><span class="zg-unit">s</span></dd></div>' +
       "</dl>" +
       '<p class="zg-best" data-best-over></p>' +
       '<form class="zg-post" data-post novalidate>' +
@@ -154,8 +169,8 @@
         '<p class="zg-post-note" data-post-note></p>' +
       "</form>" +
       '<div class="zg-actions">' +
-        '<button class="btn" type="button" data-start>Run again <span class="arrow" aria-hidden="true">&rarr;</span></button>' +
-        '<button class="btn btn--ghost" type="button" data-close>Back to the site</button>' +
+        '<button class="btn btn--solid" type="button" data-start>Run again <span class="arrow" aria-hidden="true">&rarr;</span></button>' +
+        '<button class="btn" type="button" data-close>Back to the site</button>' +
       "</div>" +
       "</div>" +
       BOARD_HTML +
@@ -391,23 +406,6 @@
     );
   }
 
-  /* Soft round sprite, same recipe as the particles in the home page hero. */
-  function glowSprite(r, g, b, core) {
-    const c = document.createElement("canvas");
-    c.width = c.height = 64;
-    const x = c.getContext("2d");
-    const rgb = r + "," + g + "," + b;
-    const grad = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, "rgba(255,255,255," + core + ")");
-    grad.addColorStop(0.12, "rgba(" + rgb + ",1)");
-    grad.addColorStop(0.28, "rgba(" + rgb + ",0.85)");
-    grad.addColorStop(0.5, "rgba(" + rgb + ",0.16)");
-    grad.addColorStop(1, "rgba(" + rgb + ",0)");
-    x.fillStyle = grad;
-    x.fillRect(0, 0, 64, 64);
-    return c;
-  }
-
   function createGame(options) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const listeners = new AbortController();
@@ -415,7 +413,7 @@
     const returnFocus = document.activeElement;
 
     const root = document.createElement("div");
-    root.className = "zgame dark-scope" + (options && options.view === "board" ? " zgame--board" : "");
+    root.className = "zgame" + (options && options.view === "board" ? " zgame--board" : "");
     root.setAttribute("role", "dialog");
     root.setAttribute("aria-modal", "true");
     root.setAttribute("aria-label", "Rare Event, a game");
@@ -435,13 +433,7 @@
     };
     const shown = {}; /* last value written to each HUD field */
 
-    const SPR = {
-      sky: glowSprite(124, 200, 255, 1),
-      hot: glowSprite(206, 234, 255, 1),
-      cold: glowSprite(104, 136, 178, 0.7),
-      maize: glowSprite(255, 203, 5, 1),
-    };
-    let mark = null; /* the Atombot mark tinted maize, once the image has loaded */
+    let mark = null; /* the Atombot mark in ink, once the image has loaded */
     const markImg = new Image();
     markImg.decoding = "async";
     markImg.onload = () => {
@@ -451,7 +443,7 @@
       const x = c.getContext("2d");
       x.drawImage(markImg, 0, 0, c.width, c.height);
       x.globalCompositeOperation = "source-in";
-      x.fillStyle = "#ffcb05";
+      x.fillStyle = INK;
       x.fillRect(0, 0, c.width, c.height);
       mark = c;
     };
@@ -567,39 +559,20 @@
       if (mode === "play") player.invuln = Math.max(player.invuln, 1.6);
     }
 
-    function roundRect(c, x, y, w, h, r) {
-      c.beginPath();
-      c.moveTo(x + r, y);
-      c.arcTo(x + w, y, x + w, y + h, r);
-      c.arcTo(x + w, y + h, x, y + h, r);
-      c.arcTo(x, y + h, x, y, r);
-      c.arcTo(x, y, x + w, y, r);
-      c.closePath();
-    }
-
+    /* Paper, with a faint dot grid inside the sample cell, like graph paper. */
     function buildBackground() {
       bg = document.createElement("canvas");
       bg.width = canvas.width;
       bg.height = canvas.height;
       const c = bg.getContext("2d");
       c.scale(dpr, dpr);
-      const g = c.createRadialGradient(W * 0.5, H * 0.42, 0, W * 0.5, H * 0.42, Math.hypot(W, H) * 0.62);
-      g.addColorStop(0, "#0b2440");
-      g.addColorStop(0.55, "#061426");
-      g.addColorStop(1, "#030a14");
-      c.fillStyle = g;
+      c.fillStyle = "#ffffff";
       c.fillRect(0, 0, W, H);
-      c.save();
-      roundRect(c, arena.x0, arena.y0, arena.x1 - arena.x0, arena.y1 - arena.y0, 18 * u);
-      c.clip();
-      c.fillStyle = "rgba(124,200,255,0.022)";
-      c.fillRect(0, 0, W, H);
-      c.fillStyle = "rgba(150,180,215,0.085)";
+      c.fillStyle = "#d3d6da";
       const cell = 46 * u;
       for (let y = arena.y0 + cell / 2; y < arena.y1; y += cell) {
-        for (let x = arena.x0 + cell / 2; x < arena.x1; x += cell) c.fillRect(x - 0.6, y - 0.6, 1.2, 1.2);
+        for (let x = arena.x0 + cell / 2; x < arena.x1; x += cell) c.fillRect(x - 0.75, y - 0.75, 1.5, 1.5);
       }
-      c.restore();
     }
 
     /* ---- atoms ---------------------------------------------------------- */
@@ -1033,7 +1006,7 @@
       p.trail -= dt;
       if (p.trail <= 0 && speed > 70 * u) {
         p.trail = 0.028;
-        parts.push({ x: p.x + rand(-3, 3) * u, y: p.y + rand(-3, 3) * u, vx: -p.vx * 0.08, vy: -p.vy * 0.08, t: 0, life: 0.42, size: 2.3 * u, color: "#ffcb05" });
+        parts.push({ x: p.x + rand(-3, 3) * u, y: p.y + rand(-3, 3) * u, vx: -p.vx * 0.08, vy: -p.vy * 0.08, t: 0, life: 0.5, size: 3.4 * u, color: MAIZE });
       }
 
       if (p.invuln <= 0) {
@@ -1066,8 +1039,8 @@
       mult = 1;
       p.invuln = 1.8;
       hills.push({ x: p.x, y: p.y, t: 0, life: 0.55, r: 150 * u, push: 780 * u, kind: "shock" });
-      rings.push({ x: p.x, y: p.y, t: 0, life: 0.5, r0: 14 * u, r1: 150 * u, color: "255,255,255", width: 2.4 });
-      burst(p.x, p.y, "#bfe4ff", 24, 300);
+      rings.push({ x: p.x, y: p.y, t: 0, life: 0.5, r0: 14 * u, r1: 150 * u, color: INK_RGB, width: 2.4 });
+      burst(p.x, p.y, INK, 24, 300);
       if (!reduce) {
         shake = 0.32;
         flash = 1;
@@ -1076,8 +1049,8 @@
       if (integrity <= 0) {
         p.alive = false;
         dying = 1;
-        burst(p.x, p.y, "#ffcb05", 46, 420);
-        rings.push({ x: p.x, y: p.y, t: 0, life: 0.9, r0: 10 * u, r1: 260 * u, color: "255,203,5", width: 3 });
+        burst(p.x, p.y, INK, 46, 420);
+        rings.push({ x: p.x, y: p.y, t: 0, life: 0.9, r0: 10 * u, r1: 260 * u, color: INK_RGB, width: 3 });
       }
     }
 
@@ -1086,12 +1059,12 @@
       if (mode !== "play" || !p.alive) return;
       if (charges <= 0) {
         /* nothing left: a small grey fizzle instead of silence */
-        rings.push({ x: p.x, y: p.y, t: 0, life: 0.28, r0: 12 * u, r1: 36 * u, color: "163,180,200", width: 1.6 });
+        rings.push({ x: p.x, y: p.y, t: 0, life: 0.28, r0: 12 * u, r1: 36 * u, color: "169,175,183", width: 1.6 });
         return;
       }
       charges--;
       hills.push({ x: p.x, y: p.y, t: 0, life: HILL_LIFE, r: HILL_R * u, push: 520 * u, kind: "bias" });
-      rings.push({ x: p.x, y: p.y, t: 0, life: 0.45, r0: 12 * u, r1: HILL_R * u, color: "255,203,5", width: 2 });
+      rings.push({ x: p.x, y: p.y, t: 0, life: 0.45, r0: 12 * u, r1: HILL_R * u, color: INK_RGB, width: 2 });
       p.invuln = Math.max(p.invuln, 0.3);
     }
 
@@ -1134,12 +1107,12 @@
       streak++;
       bestStreak = Math.max(bestStreak, streak);
       mult = 1 + Math.min(4, Math.floor(streak / 3));
-      burst(s.x, s.y, "#ffcb05", 18, 260);
-      rings.push({ x: s.x, y: s.y, t: 0, life: 0.45, r0: 8 * u, r1: 50 * u, color: "255,203,5", width: 2 });
-      texts.push({ x: s.x, y: s.y - 16 * u, text: "+" + gain, t: 0, life: 0.95, color: "255,224,110" });
+      burst(s.x, s.y, MAIZE, 18, 260);
+      rings.push({ x: s.x, y: s.y, t: 0, life: 0.45, r0: 8 * u, r1: 50 * u, color: INK_RGB, width: 2 });
+      texts.push({ x: s.x, y: s.y - 16 * u, text: "+" + gain, t: 0, life: 0.95, color: INK_RGB });
       if (events % EVENTS_PER_CHARGE === 0 && charges < MAX_CHARGES) {
         charges++;
-        texts.push({ x: s.x, y: s.y + 22 * u, text: "bias hill +1", t: 0, life: 1.3, color: "231,237,244" });
+        texts.push({ x: s.x, y: s.y + 22 * u, text: "bias hill +1", t: 0, life: 1.3, color: "61,70,82" });
       }
     }
 
@@ -1162,7 +1135,7 @@
           catchSpark(s);
           sparks.splice(k, 1);
         } else if (s.life <= 0) {
-          burst(s.x, s.y, "#71849b", 6, 90);
+          burst(s.x, s.y, "#a9afb7", 6, 90);
           sparks.splice(k, 1);
         }
       }
@@ -1232,6 +1205,9 @@
 
     /* ---- drawing -------------------------------------------------------- */
 
+    const ink = (alpha) => "rgba(" + INK_RGB + "," + clamp(alpha, 0, 1).toFixed(3) + ")";
+    const maize = (alpha) => "rgba(" + MAIZE_RGB + "," + clamp(alpha, 0, 1).toFixed(3) + ")";
+
     function draw() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.globalCompositeOperation = "source-over";
@@ -1243,52 +1219,41 @@
       }
       const hot = clamp(heat, 0, 1);
       const cold = clamp(-heat, 0, 1);
-
-      /* the sample cell; its edge glows with the temperature */
-      const edge = hot > 0.02
-        ? Math.round(124 + 131 * hot) + "," + Math.round(200 + 3 * hot) + "," + Math.round(255 - 250 * hot)
-        : "124,200,255";
-      const pulse = cueOn && mode === "play" ? 0.5 + 0.5 * Math.sin(clock * 12) : 0;
-      ctx.lineWidth = 1.2;
-      ctx.strokeStyle = "rgba(" + edge + "," + (0.2 + 0.22 * Math.max(hot, cold) + 0.3 * pulse).toFixed(3) + ")";
-      roundRect(ctx, arena.x0, arena.y0, arena.x1 - arena.x0, arena.y1 - arena.y0, 18 * u);
-      ctx.stroke();
+      const cellW = arena.x1 - arena.x0;
+      const cellH = arena.y1 - arena.y0;
 
       if (beam.on) {
+        /* beamtime: a highlighted band, with neutrons streaming through it */
         const a = Math.min(1, beam.t / 0.5, (beam.life - beam.t) / 0.7);
-        const g = ctx.createLinearGradient(0, beam.y, 0, beam.y + beam.h);
-        g.addColorStop(0, "rgba(124,200,255,0)");
-        g.addColorStop(0.12, "rgba(124,200,255," + (0.11 * a).toFixed(3) + ")");
-        g.addColorStop(0.88, "rgba(124,200,255," + (0.11 * a).toFixed(3) + ")");
-        g.addColorStop(1, "rgba(124,200,255,0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(arena.x0, beam.y, arena.x1 - arena.x0, beam.h);
-        ctx.strokeStyle = "rgba(190,228,255," + (0.42 * a).toFixed(3) + ")";
-        ctx.lineWidth = 1.4;
+        ctx.fillStyle = maize(0.2 * a);
+        ctx.fillRect(arena.x0, beam.y, cellW, beam.h);
+        ctx.strokeStyle = ink(0.4 * a);
+        ctx.lineWidth = 1.2;
         ctx.lineCap = "round";
         ctx.beginPath();
-        const span = arena.x1 - arena.x0 + 80;
+        const span = cellW + 80;
         for (let k = 0; k < 26; k++) {
           const fx = (k * 0.6180339) % 1;
           const fy = (k * 0.7548777 + 0.13) % 1;
           const x = arena.x0 - 40 + ((fx * span + clock * (260 + 140 * fy) * u) % span);
           const y = beam.y + beam.h * (0.14 + 0.72 * fy);
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + 16 * u, y);
+          ctx.moveTo(clamp(x, arena.x0, arena.x1), y);
+          ctx.lineTo(clamp(x + 16 * u, arena.x0, arena.x1), y);
         }
         ctx.stroke();
-        ctx.fillStyle = "rgba(255,203,5," + (0.9 * a).toFixed(3) + ")";
-        ctx.font = "500 " + Math.round(11 * Math.max(u, 0.9)) + 'px "Geist Mono", ui-monospace, monospace';
+        ctx.lineCap = "butt";
+        ctx.fillStyle = ink(a);
+        ctx.font = "500 " + Math.round(11 * Math.max(u, 0.9)) + "px " + MONO;
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
-        ctx.fillText("BEAMTIME  ×2", arena.x0 + 14 * u, beam.y + 9 * u);
+        ctx.fillText("Beamtime ×2", arena.x0 + 14 * u, beam.y + 9 * u);
       }
 
       /* during the warning before a crystal, the lattice sites show where the atoms will settle */
       if (cueOn && mode === "play" && MATTER[matter].next === "crystal" && lattice) {
-        const a = ease((matterT - (MATTER[matter].secs - CUE)) / 0.6) * (0.5 + 0.12 * Math.sin(clock * 9));
-        ctx.strokeStyle = "rgba(124,200,255," + a.toFixed(3) + ")";
-        ctx.lineWidth = 1.3;
+        const a = ease((matterT - (MATTER[matter].secs - CUE)) / 0.6) * (0.4 + 0.1 * Math.sin(clock * 9));
+        ctx.strokeStyle = ink(a);
+        ctx.lineWidth = 1;
         ctx.beginPath();
         const rr = 6.5 * u;
         for (const s of lattice.sites) {
@@ -1298,30 +1263,26 @@
         ctx.stroke();
       }
 
+      /* a bias hill, drawn the way a map draws a hill: stepped tints and contour lines */
       for (const hill of hills) {
         if (hill.kind === "shock") continue;
         const left = hill.life - hill.t;
         const a = Math.min(1, hill.t / 0.2, left / 0.8);
-        const g = ctx.createRadialGradient(hill.x, hill.y, 0, hill.x, hill.y, hill.r);
-        g.addColorStop(0, "rgba(255,203,5," + (0.1 * a).toFixed(3) + ")");
-        g.addColorStop(1, "rgba(255,203,5,0)");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(hill.x, hill.y, hill.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.lineWidth = 1.2;
-        for (let k = 0; k < 4; k++) {
-          const f = 0.28 + 0.24 * k;
-          ctx.strokeStyle = "rgba(255,203,5," + (a * (0.62 - 0.13 * k)).toFixed(3) + ")";
+        for (let k = 3; k >= 0; k--) {
+          const r = hill.r * (0.28 + 0.24 * k) * (1 + 0.025 * Math.sin(clock * 5 - k * 1.3));
           ctx.beginPath();
-          ctx.arc(hill.x, hill.y, hill.r * f * (1 + 0.025 * Math.sin(clock * 5 - k * 1.3)), 0, Math.PI * 2);
+          ctx.arc(hill.x, hill.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = maize(0.1 * a);
+          ctx.fill();
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = ink(a * (0.62 - 0.14 * k));
           ctx.stroke();
         }
       }
 
       if (order > 0.02 && bonds.length) {
         const far2 = (lattice.a * 1.45) ** 2;
-        ctx.strokeStyle = "rgba(124,200,255," + (0.2 * order).toFixed(3) + ")";
+        ctx.strokeStyle = ink(0.26 * order);
         ctx.lineWidth = 1;
         ctx.beginPath();
         for (let k = 0; k < bonds.length; k += 2) {
@@ -1337,9 +1298,10 @@
         ctx.stroke();
       }
 
+      /* hot atoms leave a short stroke behind them */
       if (hot > 0.05) {
-        ctx.strokeStyle = "rgba(190,228,255," + (0.34 * hot).toFixed(3) + ")";
-        ctx.lineWidth = 2.2 * u;
+        ctx.strokeStyle = ink(0.42 * hot);
+        ctx.lineWidth = 1.4 * u;
         ctx.lineCap = "round";
         ctx.beginPath();
         for (let i = 0; i < n; i++) {
@@ -1347,6 +1309,7 @@
           ctx.lineTo(ax[i], ay[i]);
         }
         ctx.stroke();
+        ctx.lineCap = "butt";
       }
 
       /* a glass atom about to hop shows where it is going */
@@ -1356,7 +1319,7 @@
           if (hop[i] < 0) continue;
           const start = HOP_FLASH + (late[i] ? 0.16 : 0);
           const f = clamp(hop[i] / start, 0, 1);
-          ctx.strokeStyle = "rgba(255,255,255," + (0.22 + 0.5 * f).toFixed(3) + ")";
+          ctx.strokeStyle = ink(0.35 + 0.6 * f);
           ctx.setLineDash([4 * u, 5 * u]);
           ctx.beginPath();
           ctx.moveTo(ax[i], ay[i]);
@@ -1374,59 +1337,52 @@
         }
       }
 
-      ctx.globalCompositeOperation = "lighter";
-      const size = 21 * u * (1 + 0.2 * hot - 0.1 * cold);
+      /* atoms: filled ink when they move freely, hollow when frozen; one about to hop fills in */
+      const radius = 6.4 * u * (1 + 0.14 * hot - 0.06 * cold);
+      const fillOf = (f) => "rgb(" + Math.round(43 + 212 * f) + "," + Math.round(51 + 204 * f) + "," + Math.round(61 + 194 * f) + ")";
+      const restFill = fillOf(cold);
+      ctx.lineWidth = 1.3;
+      ctx.strokeStyle = INK;
       for (let i = 0; i < n; i++) {
         const a = fade[i];
         if (a < 0.02) continue;
-        const x = ax[i];
-        const y = ay[i];
         const flashing = matter === "glass" && hop[i] >= 0;
-        if (cold > 0.02 && !flashing) {
-          ctx.globalAlpha = a * cold;
-          ctx.drawImage(SPR.cold, x - size, y - size, size * 2, size * 2);
-        }
-        const sky = flashing ? 1 : (1 - cold) * (1 - 0.6 * hot);
-        if (sky > 0.02) {
-          ctx.globalAlpha = a * sky;
-          ctx.drawImage(SPR.sky, x - size, y - size, size * 2, size * 2);
-        }
-        if (hot > 0.02 || flashing) {
-          const s2 = size * 1.16;
-          ctx.globalAlpha = a * (flashing ? 0.9 : hot);
-          ctx.drawImage(SPR.hot, x - s2, y - s2, s2 * 2, s2 * 2);
-        }
+        ctx.globalAlpha = a;
+        ctx.fillStyle = flashing ? INK : restFill;
+        ctx.beginPath();
+        ctx.arc(ax[i], ay[i], flashing ? radius * 1.12 : radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
       }
+      ctx.globalAlpha = 1;
 
+      /* rare events: a maize star with an ink outline, and a ring that runs down as it fades */
+      ctx.lineJoin = "round";
       for (const s of sparks) {
         const grow = ease(s.age / 0.25);
         const beat = 1 + 0.12 * Math.sin(s.age * 6);
         const left = s.life / s.max;
-        const blink = left < 0.25 ? 0.55 + 0.45 * Math.sin(s.age * 26) : 1;
-        const gs = 27 * u * grow * beat;
-        ctx.globalCompositeOperation = "lighter";
-        ctx.globalAlpha = blink;
-        ctx.drawImage(SPR.maize, s.x - gs, s.y - gs, gs * 2, gs * 2);
-        ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = "#fff4bf";
+        ctx.globalAlpha = left < 0.25 ? 0.55 + 0.45 * Math.sin(s.age * 26) : 1;
         ctx.beginPath();
-        const R = 9.5 * u * grow * beat;
+        const R = 11 * u * grow * beat;
         for (let k = 0; k < 8; k++) {
-          const rr = k % 2 ? R * 0.3 : R;
+          const rr = k % 2 ? R * 0.4 : R;
           const a = s.rot + s.age * 1.1 + (k * Math.PI) / 4;
           ctx.lineTo(s.x + Math.cos(a) * rr, s.y + Math.sin(a) * rr);
         }
         ctx.closePath();
+        ctx.fillStyle = MAIZE;
         ctx.fill();
-        ctx.strokeStyle = "rgba(255,203,5,0.9)";
-        ctx.lineWidth = 2 * u;
-        ctx.lineCap = "round";
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+        ctx.lineWidth = 1.5 * u;
         ctx.beginPath();
-        ctx.arc(s.x, s.y, 16.5 * u * grow, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left);
+        ctx.arc(s.x, s.y, 18 * u * grow, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left);
         ctx.stroke();
       }
+      ctx.lineJoin = "miter";
 
-      ctx.globalCompositeOperation = "lighter";
       for (const q of parts) {
         ctx.globalAlpha = 1 - q.t / q.life;
         ctx.fillStyle = q.color;
@@ -1435,49 +1391,48 @@
         ctx.fill();
       }
 
+      /* the player: the one maize disc on the page, with the Atombot mark in ink */
       const p = player;
       if (p.alive) {
-        const blink = p.invuln > 0 ? (reduce ? 0.55 : 0.45 + 0.4 * Math.sin(clock * 30)) : 1;
-        const gs = 46 * u;
-        ctx.globalAlpha = 0.5 * blink;
-        ctx.drawImage(SPR.maize, p.x - gs, p.y - gs, gs * 2, gs * 2);
-        ctx.globalCompositeOperation = "source-over";
-        ctx.globalAlpha = blink;
+        ctx.globalAlpha = p.invuln > 0 ? (reduce ? 0.55 : 0.45 + 0.4 * Math.sin(clock * 30)) : 1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 18 * u, 0, Math.PI * 2);
+        ctx.fillStyle = MAIZE;
+        ctx.fill();
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.angle);
-        const mw = 42 * u;
+        const mw = 25 * u;
         if (mark) {
           const mh = (mw * mark.height) / mark.width;
           ctx.drawImage(mark, -mw / 2, -mh / 2, mw, mh);
         } else {
-          ctx.strokeStyle = "#ffcb05";
-          ctx.lineWidth = 4 * u;
+          ctx.lineWidth = 2.6 * u;
           ctx.lineCap = "round";
           for (let k = 0; k < 3; k++) {
             ctx.beginPath();
-            ctx.arc(0, 0, mw * 0.4, (k * Math.PI * 2) / 3, (k * Math.PI * 2) / 3 + 1.5);
+            ctx.arc(0, 0, mw * 0.36, (k * Math.PI * 2) / 3, (k * Math.PI * 2) / 3 + 1.5);
             ctx.stroke();
           }
         }
         ctx.restore();
-        ctx.fillStyle = "#fffbe6";
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2.8 * u, 0, Math.PI * 2);
-        ctx.fill();
-        /* integrity, readable without looking up at the HUD */
-        ctx.lineWidth = 2 * u;
+        /* integrity, readable without looking up at the readout */
+        ctx.lineWidth = 2.2 * u;
         ctx.lineCap = "round";
         for (let k = 0; k < INTEGRITY; k++) {
           const a0 = -Math.PI / 2 + (k * Math.PI * 2) / INTEGRITY + 0.2;
-          ctx.strokeStyle = k < integrity ? "rgba(255,203,5,0.85)" : "rgba(255,255,255,0.13)";
+          ctx.strokeStyle = k < integrity ? INK : "#d3d6da";
           ctx.beginPath();
-          ctx.arc(p.x, p.y, 28 * u, a0, a0 + (Math.PI * 2) / INTEGRITY - 0.4);
+          ctx.arc(p.x, p.y, 26 * u, a0, a0 + (Math.PI * 2) / INTEGRITY - 0.4);
           ctx.stroke();
         }
+        ctx.lineCap = "butt";
         if (control === "pointer" && pointerKind === "mouse" && Math.hypot(p.tx - p.x, p.ty - p.y) > 34 * u) {
-          ctx.globalAlpha = 0.4;
-          ctx.strokeStyle = "#ffcb05";
+          ctx.globalAlpha = 0.5;
+          ctx.strokeStyle = INK;
           ctx.lineWidth = 1.2;
           ctx.beginPath();
           ctx.arc(p.tx, p.ty, 6 * u, 0, Math.PI * 2);
@@ -1485,7 +1440,6 @@
         }
       }
 
-      ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
       for (const ring of rings) {
         const f = ring.t / ring.life;
@@ -1496,23 +1450,32 @@
         ctx.stroke();
       }
       if (texts.length) {
-        ctx.font = "500 " + Math.round(13 * Math.max(u, 0.85)) + 'px "Geist Mono", ui-monospace, monospace';
+        /* numbers sit on a little paper so they read over the atoms */
+        ctx.font = "500 " + Math.round(13 * Math.max(u, 0.85)) + "px " + MONO;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 4;
         for (const t of texts) {
           const f = t.t / t.life;
-          ctx.fillStyle = "rgba(" + t.color + "," + (f < 0.7 ? 1 : (1 - f) / 0.3).toFixed(3) + ")";
-          ctx.fillText(t.text, clamp(t.x, arena.x0 + 44, arena.x1 - 44), t.y - 30 * u * (1 - (1 - f) ** 2));
+          const a = f < 0.7 ? 1 : (1 - f) / 0.3;
+          const x = clamp(t.x, arena.x0 + 44, arena.x1 - 44);
+          const y = t.y - 30 * u * (1 - (1 - f) ** 2);
+          ctx.strokeStyle = "rgba(255,255,255," + a.toFixed(3) + ")";
+          ctx.strokeText(t.text, x, y);
+          ctx.fillStyle = "rgba(" + t.color + "," + a.toFixed(3) + ")";
+          ctx.fillText(t.text, x, y);
         }
+        ctx.lineJoin = "miter";
       }
+
+      /* the sample cell: an ink frame. It thickens as the next state approaches, and stamps on a hit. */
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (flash > 0) {
-        const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.28, W / 2, H / 2, Math.hypot(W, H) * 0.6);
-        g.addColorStop(0, "rgba(255,120,70,0)");
-        g.addColorStop(1, "rgba(255,120,70," + (0.3 * flash).toFixed(3) + ")");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-      }
+      const pulse = cueOn && mode === "play" ? 0.5 + 0.5 * Math.sin(clock * 12) : 0;
+      const frameW = 1 + 2 * pulse + 9 * flash;
+      ctx.lineWidth = frameW;
+      ctx.strokeStyle = INK;
+      ctx.strokeRect(arena.x0 + frameW / 2, arena.y0 + frameW / 2, cellW - frameW, cellH - frameW);
     }
 
     /* ---- HUD and panels ------------------------------------------------- */
@@ -1732,7 +1695,7 @@
       $("[data-score]").textContent = String(score);
       $("[data-caught]").textContent = String(events);
       $("[data-streak]").textContent = String(bestStreak);
-      $("[data-time]").textContent = Math.round(runTime) + " s";
+      $("[data-time]").textContent = String(Math.round(runTime));
       $("[data-best-over]").textContent = isBest && score > 0 ? "New best." : bestLine();
       $("[data-best]").textContent = bestLine();
       readyPost();

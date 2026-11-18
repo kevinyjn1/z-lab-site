@@ -1,6 +1,9 @@
 /* ==========================================================================
    Rare Event, the hidden game. Loaded on demand by site.js together with
-   game.js; uses the tokens and buttons from style.css. Always navy, in both themes.
+   game.js; uses the tokens, buttons, and labels from style.css.
+
+   Drawn like the rest of the site: ink on paper. Atoms are ink, the player
+   and the rare events are the maize marks, and every box is a plain ink rule.
    ========================================================================== */
 
 html.zgame-lock {
@@ -12,15 +15,15 @@ html.zgame-lock {
   inset: 0;
   z-index: 1000;
   overflow: hidden;
-  background: #030a14;
-  color: var(--text);
-  font-family: var(--font-sans);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
   outline: none;
   overscroll-behavior: contain;
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  animation: zgame-in 0.45s var(--ease) both;
+  animation: zgame-in 0.3s var(--ease) both;
 }
 
 .zgame-canvas {
@@ -30,10 +33,16 @@ html.zgame-lock {
   width: 100%;
   height: 100%;
   touch-action: none;
+  transition: opacity 0.3s var(--ease);
 }
 
 .zgame[data-mode="play"] .zgame-canvas {
   cursor: none;
+}
+
+/* Behind a panel the sample goes quiet, so the panel is what gets read. */
+.zgame:not([data-mode="play"]) .zgame-canvas {
+  opacity: 0.32;
 }
 
 /* Top bar: readout on the left, pause and close on the right ------------- */
@@ -55,18 +64,14 @@ html.zgame-lock {
   align-items: center;
   gap: 18px;
   min-height: 40px;
-  padding: 0 18px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(4, 12, 23, 0.6);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  color: var(--muted);
+  padding: 0 16px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-3);
   white-space: nowrap;
-  transition: opacity 0.4s var(--ease);
+  transition: opacity 0.3s var(--ease);
 }
 
 .zg-item {
@@ -77,45 +82,45 @@ html.zgame-lock {
 
 .zg-item b {
   font-weight: 500;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .zg-state b {
   display: inline-block;
   min-width: 9ch;
-  transition: color 0.3s var(--ease);
 }
 
-.zgame.is-cue .zg-state b {
-  color: var(--maize);
+/* the sample is about to change state: the word is highlighted */
+.zgame.is-cue .zg-state b,
+.zg-mult.is-up b {
+  background: linear-gradient(transparent 8%, var(--maize) 8%, var(--maize) 92%, transparent 92%);
 }
 
 .zg-bar {
   display: block;
   width: 46px;
   height: 4px;
-  border-radius: 2px;
-  background: rgba(150, 180, 215, 0.18);
+  background: var(--rule-soft);
   overflow: hidden;
 }
 
 .zg-bar i {
   display: block;
   height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--sky), var(--maize));
+  background: var(--ink);
   transform: scaleX(0);
   transform-origin: left center;
 }
 
 .zg-mult b {
   min-width: 2ch;
-  color: var(--faint);
-  transition: color 0.3s var(--ease);
+  padding: 0 3px;
+  text-align: center;
+  color: var(--ink-3);
 }
 
 .zg-mult.is-up b {
-  color: var(--maize);
+  color: var(--ink);
 }
 
 .zg-pips {
@@ -124,18 +129,16 @@ html.zgame-lock {
 
 .zg-pips i,
 .zg-charges i {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--ink);
   border-radius: 50%;
-  border: 1px solid rgba(255, 203, 5, 0.45);
-  transition: background-color 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+  background: var(--paper);
 }
 
 .zg-pips i.is-on,
 .zg-charges i.is-on {
-  border-color: var(--maize);
   background: var(--maize);
-  box-shadow: 0 0 10px rgba(255, 203, 5, 0.6);
 }
 
 .zgame-tools {
@@ -150,19 +153,18 @@ html.zgame-lock {
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: rgba(4, 12, 23, 0.6);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  color: var(--text);
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
   cursor: pointer;
-  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
 }
 
-.zg-btn:hover {
-  border-color: var(--line-strong);
-  background: rgba(20, 40, 66, 0.7);
+@media (hover: hover) {
+  .zg-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
 }
 
 .zg-btn svg {
@@ -174,43 +176,45 @@ html.zgame-lock {
 
 .zgame-bias {
   position: absolute;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
+  right: max(30px, env(safe-area-inset-right));
+  bottom: max(30px, env(safe-area-inset-bottom));
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 7px;
+  gap: 8px;
   width: 72px;
   height: 72px;
   padding: 0;
-  border: 1px solid rgba(255, 203, 5, 0.5);
-  border-radius: 50%;
-  background: rgba(4, 12, 23, 0.6);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 0 6px rgba(255, 203, 5, 0.06), 0 0 0 13px rgba(255, 203, 5, 0.03);
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
   touch-action: manipulation;
-  transition: opacity 0.4s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  transition: opacity 0.3s var(--ease), background-color 0.15s var(--ease);
 }
 
-.zgame-bias:hover {
-  border-color: var(--maize);
+@media (hover: hover) {
+  .zgame-bias:hover {
+    background: var(--wash);
+  }
 }
 
 .zgame-bias:active {
-  transform: scale(0.94);
+  background: var(--rule-soft);
 }
 
 .zgame-bias.is-empty {
-  border-color: var(--line);
-  box-shadow: none;
-  color: var(--faint);
+  border-color: var(--rule);
+  color: var(--ink-3);
+}
+
+.zgame-bias.is-empty .zg-charges i {
+  border-color: var(--rule);
 }
 
 .zg-charges {
@@ -239,13 +243,13 @@ html.zgame-lock {
   right: 0;
   display: grid;
   justify-items: center;
-  gap: 6px;
+  gap: 8px;
   padding-inline: 16px;
   text-align: center;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+  transform: translateY(6px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
 }
 
 .zgame-cue.is-on {
@@ -253,22 +257,26 @@ html.zgame-lock {
   transform: none;
 }
 
+/* The big line gets a paper halo, the way a map letters over its marks; the small one sits on a paper tag. */
 .zgame-cue em {
-  font-family: var(--font-serif);
+  font-family: var(--serif);
   font-size: clamp(2.3rem, 1.4rem + 4vw, 4rem);
-  line-height: 1;
+  line-height: 1.08;
   letter-spacing: -0.015em;
-  color: var(--text);
-  text-shadow: 0 2px 30px rgba(3, 10, 20, 0.9);
+  color: var(--ink);
+  text-shadow: 0 0 2px var(--paper), 0 0 4px var(--paper), 0 0 8px var(--paper), 0 0 14px var(--paper), 0 0 14px var(--paper);
 }
 
 .zgame-cue span {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  letter-spacing: 0.14em;
+  padding: 3px 0.5em;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
-  text-shadow: 0 1px 12px rgba(3, 10, 20, 0.95);
+  color: var(--ink-2);
 }
 
 .zgame-cue span:empty {
@@ -285,14 +293,10 @@ html.zgame-lock {
   max-height: calc(100% - 28px);
   overflow-y: auto;
   padding: clamp(24px, 4.4vw, 44px);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-lg);
-  background: rgba(5, 14, 26, 0.8);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  backdrop-filter: blur(18px) saturate(1.2);
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--ink);
+  background: var(--paper);
   transform: translate(-50%, -50%);
-  animation: zgame-panel-in 0.55s var(--ease) both;
+  animation: zgame-panel-in 0.35s var(--ease) both;
   -webkit-user-select: text;
   user-select: text;
   touch-action: pan-y;
@@ -314,83 +318,76 @@ html.zgame-lock {
   width: min(920px, calc(100% - 28px));
 }
 
-.zg-logo.atombot-mark {
+.zgame-panel .label {
+  margin: 0;
+}
+
+/* The Atombot mark, in ink. 640 by 588 is the image's own size. */
+.zg-logo {
   display: block;
-  width: 46px;
+  width: 40px;
+  aspect-ratio: 640 / 588;
   margin-bottom: 18px;
-  color: var(--maize);
-  filter: drop-shadow(0 0 14px rgba(255, 203, 5, 0.45));
+  background: var(--ink);
+  -webkit-mask: url("../img/atombot-mark.webp") center / contain no-repeat;
+  mask: url("../img/atombot-mark.webp") center / contain no-repeat;
 }
 
 .zg-title {
   margin: 10px 0 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: clamp(2.9rem, 1.9rem + 4.4vw, 4.6rem);
-  line-height: 0.95;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 1.8rem + 3.6vw, 4rem);
+  line-height: 1;
   letter-spacing: -0.02em;
 }
 
 .zg-title em {
+  padding: 0 0.1em;
+  font-weight: 400;
   font-style: italic;
-  color: var(--maize);
+  background: linear-gradient(transparent 14%, var(--maize) 14%, var(--maize) 90%, transparent 90%);
 }
 
 .zg-lead {
   margin: 16px 0 0;
   max-width: 46ch;
-  font-size: 1.04rem;
-  line-height: 1.55;
-  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--ink-2);
 }
 
 .zg-how {
   display: grid;
-  gap: 11px;
+  gap: 10px;
   margin: 22px 0 0;
   padding: 18px 0 0;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--rule);
   list-style: none;
-  font-size: 0.93rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--ink-2);
 }
 
 .zg-how li {
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
+  grid-template-columns: 20px minmax(0, 1fr);
   gap: 12px;
   align-items: start;
 }
 
 .zg-how b {
-  font-weight: 550;
-  color: var(--text);
+  font-weight: 600;
+  color: var(--ink);
 }
 
+/* The three marks of the game, drawn as they are on the canvas. */
 .zg-dot {
-  width: 12px;
-  height: 12px;
-  margin: 5px 0 0 3px;
-  border-radius: 50%;
-}
-
-.zg-dot--atom {
-  background: radial-gradient(circle, #fff 0 18%, var(--sky) 40%);
-  box-shadow: 0 0 12px rgba(124, 200, 255, 0.7);
-}
-
-.zg-dot--event {
-  border-radius: 0;
-  background: #fff4bf;
-  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-  filter: drop-shadow(0 0 5px rgba(255, 203, 5, 0.9));
-  transform: scale(1.25);
-}
-
-.zg-dot--hill {
-  border: 1px solid var(--maize);
-  box-shadow: 0 0 0 3px rgba(255, 203, 5, 0.16), inset 0 0 0 3px rgba(255, 203, 5, 0.2);
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  overflow: visible;
 }
 
 .zg-controls {
@@ -398,18 +395,16 @@ html.zgame-lock {
   flex-wrap: wrap;
   gap: 6px 22px;
   margin: 20px 0 0;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-3);
 }
 
 .zg-controls b {
   margin-right: 6px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
+  font-family: var(--sans);
+  font-weight: 600;
+  color: var(--ink);
 }
 
 /* Touch screens get the touch instructions instead of the mouse and keyboard ones. */
@@ -434,40 +429,44 @@ html.zgame-lock {
   margin-top: 26px;
 }
 
-.zg-actions .btn {
+.zg-actions .btn,
+.zg-post-row .btn {
   cursor: pointer;
 }
 
-.zg-actions .btn:disabled {
-  opacity: 0.55;
+.zg-actions .btn:disabled,
+.zg-post-row .btn:disabled {
+  border-color: var(--rule);
+  background: var(--paper);
+  color: var(--ink-3);
   cursor: default;
 }
 
 .zg-best {
   margin: 16px 0 0;
   min-height: 1.2em;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-3);
 }
 
 .zg-best:empty {
   display: none;
 }
 
+/* The run's four numbers, set like a table: a rule above and below. */
 .zg-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   margin: 24px 0 0;
-  border-block: 1px solid var(--line);
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
 }
 
 .zg-stats div {
-  padding: 16px 0 14px 16px;
-  border-left: 1px solid var(--line);
+  padding: 14px 0 14px 16px;
+  border-left: 1px solid var(--rule);
 }
 
 .zg-stats div:first-child {
@@ -476,51 +475,70 @@ html.zgame-lock {
 }
 
 .zg-stats dt {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--faint);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ink-2);
 }
 
 .zg-stats dd {
   margin: 6px 0 0;
-  font-family: var(--font-serif);
-  font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.6rem);
-  line-height: 1;
-  color: var(--text);
+  font-family: var(--mono);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  line-height: 1.1;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
+/* the unit after a number: small and quiet, so the number is what is read */
+.zg-unit {
+  margin-left: 0.3em;
+  font-family: var(--sans);
+  font-size: 0.5em;
+  color: var(--ink-2);
+}
+
 .zg-stats div:first-child dd {
-  color: var(--maize);
+  justify-self: start;
+  width: fit-content;
+  padding: 0 0.12em;
+  background: linear-gradient(transparent 12%, var(--maize) 12%, var(--maize) 90%, transparent 90%);
 }
 
 /* Leaderboard and the form that posts to it ----------------------------------- */
 
 .zg-board {
   padding-left: clamp(22px, 3.4vw, 40px);
-  border-left: 1px solid var(--line);
+  border-left: 1px solid var(--rule);
 }
 
 .zg-board-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
 }
 
 .zg-board-scope {
   margin-left: auto;
   padding-left: 10px;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
   white-space: nowrap;
-  color: var(--faint);
+  color: var(--ink-3);
 }
 
 .zg-board-list {
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   padding: 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
   list-style: none;
+}
+
+.zg-board-list:empty {
+  border: 0;
 }
 
 .zg-board-list li {
@@ -528,54 +546,48 @@ html.zgame-lock {
   grid-template-columns: 2.4ch minmax(0, 1fr) auto;
   gap: 10px;
   align-items: baseline;
-  padding: 8px 0;
-  border-top: 1px solid var(--line);
+  padding: 7px 0;
+  border-top: 1px solid var(--rule-soft);
 }
 
 .zg-board-list li:first-child {
   border-top: 0;
 }
 
-.zg-board-list li.is-you {
-  margin-inline: -10px;
-  padding-inline: 10px;
-  border-radius: 8px;
-  background: rgba(255, 203, 5, 0.1);
-  box-shadow: inset 2px 0 0 var(--maize);
-}
-
 .zg-rank {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-3);
 }
 
 .zg-name {
+  justify-self: start;
+  max-width: 100%;
   overflow: hidden;
-  font-size: 0.96rem;
+  font-size: 0.9375rem;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--text);
+  color: var(--ink);
+}
+
+/* the player's own row is the highlighted one */
+.zg-board-list li.is-you .zg-name {
+  padding: 0 0.2em;
+  background: linear-gradient(transparent 10%, var(--maize) 10%, var(--maize) 92%, transparent 92%);
 }
 
 .zg-score {
-  font-family: var(--font-serif);
-  font-size: 1.32rem;
-  line-height: 1;
+  font-family: var(--mono);
+  font-size: 0.9375rem;
   font-variant-numeric: tabular-nums;
-  color: var(--text);
-}
-
-.zg-board-list li:first-child .zg-score {
-  color: var(--maize);
+  color: var(--ink);
 }
 
 .zg-board-note {
-  margin: 14px 0 0;
-  font-size: 0.82rem;
+  margin: 12px 0 0;
+  font-size: 0.8125rem;
   line-height: 1.45;
-  color: var(--faint);
+  color: var(--ink-3);
 }
 
 .zg-board-note:empty {
@@ -594,8 +606,8 @@ html.zgame-lock {
 
 .zg-post-title {
   margin: 0;
-  font-weight: 550;
-  color: var(--text);
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .zg-fields {
@@ -615,40 +627,38 @@ html.zgame-lock {
 .zg-post label {
   display: grid;
   gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--faint);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-2);
 }
 
 .zg-post label i {
   font-style: normal;
-  letter-spacing: 0.04em;
-  text-transform: none;
+  font-weight: 400;
+  color: var(--ink-3);
 }
 
 .zg-post input {
   width: 100%;
   height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  font-family: var(--font-sans);
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--paper);
+  font-family: var(--sans);
   font-size: 1rem; /* 16px keeps phones from zooming in on focus */
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--text);
+  font-weight: 400;
+  color: var(--ink);
 }
 
 .zg-post input:focus-visible {
-  outline: 2px solid var(--maize);
-  outline-offset: 1px;
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
 }
 
 .zg-post input:disabled {
-  opacity: 0.6;
+  border-color: var(--rule);
+  color: var(--ink-3);
 }
 
 .zg-post-row {
@@ -658,26 +668,17 @@ html.zgame-lock {
   gap: 8px 14px;
 }
 
-.zg-post-row .btn {
-  cursor: pointer;
-}
-
-.zg-post-row .btn:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-
 .zg-post-status {
   margin: 0;
-  font-size: 0.86rem;
-  color: var(--text);
+  font-size: 0.875rem;
+  color: var(--ink);
 }
 
 .zg-post-note {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
-  color: var(--faint);
+  color: var(--ink-3);
 }
 
 @media (max-width: 760px) {
@@ -687,8 +688,13 @@ html.zgame-lock {
 
   .zg-board {
     padding: 20px 0 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--rule);
     border-left: 0;
+  }
+
+  /* A full panel nearly fills a phone, so the sample behind it would only show as a second frame. */
+  .zgame:not([data-mode="play"]):not([data-mode="pause"]) .zgame-canvas {
+    opacity: 0;
   }
 
   /* shorter list on a phone, but always keep the player's own row */
@@ -701,10 +707,10 @@ html.zgame-lock {
     order: -1;
     padding: 0 0 20px;
     border-top: 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--rule);
   }
 
-  .zgame--board [data-panel="start"] .zg-logo.atombot-mark,
+  .zgame--board [data-panel="start"] .zg-logo,
   .zgame--board [data-panel="start"] .zg-how,
   .zgame--board [data-panel="start"] .zg-controls {
     display: none;
@@ -722,8 +728,8 @@ html.zgame-lock {
 @media (max-width: 560px) {
   .zgame-hud {
     gap: 12px;
-    padding: 0 14px;
-    font-size: 0.68rem;
+    padding: 0 12px;
+    font-size: 0.6875rem;
   }
 
   .zg-n,
@@ -737,7 +743,7 @@ html.zgame-lock {
   }
 
   .zg-state b {
-    font-size: 0.68rem;
+    font-size: 0.6875rem;
   }
 
   .zg-stats {
@@ -750,16 +756,12 @@ html.zgame-lock {
   }
 
   .zg-stats div:nth-child(n + 3) {
-    border-top: 1px solid var(--line);
-  }
-
-  .zg-how {
-    font-size: 0.9rem;
+    border-top: 1px solid var(--rule);
   }
 }
 
 @media (max-height: 560px) {
-  .zg-logo.atombot-mark,
+  .zg-logo,
   .zg-how {
     display: none;
   }
@@ -776,18 +778,18 @@ html.zgame-lock {
 @keyframes zgame-panel-in {
   from {
     opacity: 0;
-    transform: translate(-50%, calc(-50% + 14px));
+    transform: translate(-50%, calc(-50% + 10px));
   }
 }
 
-@keyframes zgame-spin {
-  to {
-    transform: rotate(360deg);
+@media (prefers-reduced-motion: reduce) {
+  .zgame,
+  .zgame-panel {
+    animation: none;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  .zg-logo.atombot-mark {
-    animation: zgame-spin 16s linear infinite;
+  .zgame-canvas,
+  .zgame-cue {
+    transition: none;
   }
 }
