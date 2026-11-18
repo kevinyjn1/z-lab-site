@@ -14,8 +14,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&amp;display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=a8a0072358">
-  <script src="assets/js/theme-init.js?v=a8a0072358"></script>
+  <link rel="stylesheet" href="assets/css/style.css?v=5757029ee5">
+  <script src="assets/js/theme-init.js?v=5757029ee5"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -282,18 +282,18 @@
                 <span class="segmented"><button type="button" data-valve="1" data-way="fill" aria-pressed="false" aria-label="Fill the right bellows of module 1">Fill</button><button type="button" data-valve="1" data-way="drain" aria-pressed="false" aria-label="Drain the right bellows of module 1">Drain</button></span>
               </div>
               <div class="fig-run">
-                <button class="btn btn--small" type="button" data-start>Start</button>
+                <button class="btn btn--small" type="button" data-start>Show me</button>
                 <button class="btn btn--small" type="button" data-reset>Reset</button>
                 <span class="fig-run-pick"><span id="arm-goal-label">Goal</span><span class="segmented" role="group" aria-labelledby="arm-goal-label"><button type="button" data-goal="0" aria-pressed="false">Left</button><button type="button" data-goal="1" aria-pressed="false">Ahead</button><button type="button" data-goal="2" aria-pressed="true">Right</button></span></span>
               </div>
-              <p class="fig-readout"><span>time left <b data-time>50.0 s</b></span><span>tip to target <b data-dist>9.5 cm</b></span><span>outside goal <b data-outside>0.0 s</b></span></p>
-              <p class="fig-status" data-status role="status">Open a valve, or press Start. You have 50 s, as the controllers did; the valves act twice a second.</p>
+              <p class="fig-readout"><span>bench time left <b data-time>50.0 s</b></span><span>tip to target <b data-dist>9.5 cm</b></span><span>outside goal <b data-outside>0.0 s</b></span></p>
+              <p class="fig-status" data-status role="status">Press Fill to pump water into a bellows: it lengthens, and the arm bends away from it. Drain lets the water out. Or press Show me.</p>
             </div>
             <div class="fig-panel">
               <canvas data-scores role="img" aria-label="Bar chart of results on the real arm for five controllers, over 40 targets with 50 seconds each. Targets where the tip was in the goal at the end of the run: open-loop inverse kinematics 7, visual servo 15, CQL 4, TRPO 2, AutoMPC 39. Targets where the tip passed through the goal at some time: 14, 27, 14, 35, and 40."></canvas>
             </div>
           </div>
-          <figcaption class="caption"><b class="fig-no"></b> The lab's two-module underwater soft arm from above, with its eight valves in your hands. Bring the tip (black dot) into the 2 cm goal square within 50 s without taking a bellows past 118 kPa: the goal size, time limit, and pressure limit of <a href="https://doi.org/10.1109/lra.2023.3333662">Null et al. 2024</a>, at three of its targets. The arm's motion is a simplified model, not recorded motion: each module lengthens and bends with its two pressures, between the values measured in <a href="https://doi.org/10.1109/RoboSoft55895.2023.10122035">Null et al. 2023</a>, without the real arm's hysteresis. Below, Table I of the 2024 paper: five controllers on the real arm, where AutoMPC is the auto-tuned model predictive controller, IK is inverse kinematics, and CQL and TRPO are reinforcement-learning controllers. <span class="fig-kind">A simplified model written for this site, with the papers' limits and scores.</span></figcaption>
+          <figcaption class="caption"><b class="fig-no"></b> The lab's two-module underwater soft arm from above, with its eight valves in your hands. Bring the tip (black dot) into the 2 cm goal square within 50 s without taking a bellows past 118 kPa: the goal size, time limit, and pressure limit of <a href="https://doi.org/10.1109/lra.2023.3333662">Null et al. 2024</a>, at three of its targets. The arm's motion is a simplified model, not recorded motion: each module lengthens and bends with its two pressures, between the values measured in <a href="https://doi.org/10.1109/RoboSoft55895.2023.10122035">Null et al. 2023</a>, without the real arm's hysteresis. A real bellows takes about 40 s to fill, so the picture runs five times faster than the bench clock. Show me hands the valves to a simple look-ahead rule written for this page, not to one of the lab's controllers. Below, Table I of the 2024 paper: five controllers on the real arm, where AutoMPC is the auto-tuned model predictive controller, IK is inverse kinematics, and CQL and TRPO are reinforcement-learning controllers. <span class="fig-kind">A simplified model written for this site, with the papers' limits and scores.</span></figcaption>
           <details class="fig-table"><summary>View the scores as a table</summary><div data-table></div></details>
         </figure>
       </article>
@@ -427,22 +427,22 @@
     </div>
   </footer>
 
-  <script src="assets/js/site.js?v=a8a0072358" defer></script>
-  <script src="assets/js/atombot-mark.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figkit.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/flood.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/water-density.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/fragile.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/salt.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/clocks-data.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/clocks.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/charge.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/metal.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/scale.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/arm.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/soft.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/swarm.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/go2w-model.js?v=a8a0072358" defer></script>
-  <script src="assets/js/figs/go2w.js?v=a8a0072358" defer></script>
+  <script src="assets/js/site.js?v=5757029ee5" defer></script>
+  <script src="assets/js/atombot-mark.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figkit.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/flood.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/water-density.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/fragile.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/salt.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/clocks-data.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/clocks.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/charge.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/metal.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/scale.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/arm.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/soft.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/swarm.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/go2w-model.js?v=5757029ee5" defer></script>
+  <script src="assets/js/figs/go2w.js?v=5757029ee5" defer></script>
 </body>
 </html>

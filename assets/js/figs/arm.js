@@ -33,6 +33,11 @@
  *   hardware paper measured (on the real arm the lower module stays bent by 8.5
  *   degrees after emptying) and the left-right asymmetry the control paper
  *   reports. Nothing here imitates how any of the five controllers behaved.
+ *   Also written for this site: the time-lapse (the picture runs SPEED times faster
+ *   than the bench clock, because a bellows takes about 40 s to fill) and the demo
+ *   behind "Show me" (the function plan: try every valve setting, look ahead with
+ *   the same model, keep the one that ends nearest the target). The demo is not
+ *   one of the lab's controllers.
  *   Drawing: the arm is redrawn after the same line drawing as Fig. 2 of the
  *   home page (base plate, two bellows per module, rungs with three markers).
  */
@@ -53,6 +58,10 @@
   const COMMAND_HZ = 2;
   /* Each run on a target inside the task space lasts 50 s (control paper). */
   const RUN_SECONDS = 50;
+  /* This page's choice, not the paper's: the picture runs this many times faster than the bench clock. */
+  const SPEED = 5;
+  /* The demo looks this many bench seconds ahead when it compares valve settings. */
+  const LOOK_AHEAD = 2;
   /* A goal is a 2 cm by 2 cm square centered on its target (control paper). */
   const GOAL_SIDE = 2;
   /* Three of the paper's targets, in cm from the fixed base with y along the straight arm: those of Fig. 7 of the control paper. */
@@ -131,6 +140,7 @@
     nextCommand: 0,
     outside: 0,
     trail: [],
+    demo: false /* true while "Show me" works the valves */,
   };
   const inGoal = (tip) => Math.abs(tip.x - GOALS[sim.goal].x) <= GOAL_SIDE / 2 && Math.abs(tip.y - GOALS[sim.goal].y) <= GOAL_SIDE / 2;
   const toTarget = (tip) => Math.hypot(tip.x - GOALS[sim.goal].x, tip.y - GOALS[sim.goal].y);
@@ -437,9 +447,11 @@
     stage.redraw();
   }
 
+  const HINT = "Press Fill to pump water into a bellows: it lengthens, and the arm bends away from it. Drain lets the water out. Or press Show me.";
+
   function setState(state, message) {
     sim.state = state;
-    if (startButton) startButton.textContent = { ready: "Start", running: "Pause", paused: "Resume", ended: "Try again" }[state];
+    if (startButton) startButton.textContent = { ready: "Show me", running: "Pause", paused: "Resume", ended: "Try again" }[state];
     if (state === "ended") {
       sim.want.fill(false);
       sim.open.fill(false);
@@ -454,6 +466,11 @@
     loop.setPaused(state !== "running");
   }
 
+  /* The buttons show the valves as they stand, whoever set them. */
+  function showValves() {
+    valveButtons.forEach((b) => b.setAttribute("aria-pressed", String(sim.want[valveIndex(b)])));
+  }
+
   function reset() {
     sim.p.fill(P_REST);
     sim.open.fill(false);
@@ -461,47 +478,99 @@
     sim.t = 0;
     sim.nextCommand = 0;
     sim.outside = 0;
+    sim.demo = false;
     sim.trail = [[0, shape(sim.p).tip.y]];
     valveButtons.forEach((b) => {
       b.setAttribute("aria-pressed", "false");
       b.disabled = false;
     });
-    setState("ready", "Open a valve, or press Start. You have 50 s, as the controllers did; the valves act twice a second.");
+    setState("ready", HINT);
     show();
   }
 
   function finish(over) {
     const tip = shape(sim.p).tip;
+    const who = sim.demo ? "The demo's tip" : "Your tip";
     const message =
       over >= 0
         ? "Stopped: the " + BELLOWS[over] + " bellows passed 118 kPa, above which it may be damaged. Runs on the real arm were stopped the same way."
-        : "Time. The tip ended " + toTarget(tip).toFixed(1) + " cm from the target, " + (inGoal(tip) ? "inside" : "outside") + " the goal, after " + sim.outside.toFixed(1) + " s outside it. On the real arm, AutoMPC averaged 0.3 cm and 19.1 s.";
+        : "Time. " + who + " ended " + toTarget(tip).toFixed(1) + " cm from the target, " + (inGoal(tip) ? "inside" : "outside") + " the goal, after " + sim.outside.toFixed(1) + " s outside it. On the real arm, the lab's best controller averaged 0.3 cm and 19.1 s.";
     setState("ended", message);
     show();
+  }
+
+  /*
+   * The demo's rule, written for this page and not one of the lab's controllers: try every
+   * setting of the valves (each bellows held, filled, or drained), look a little way ahead
+   * with the same model, and keep the setting whose tip ends nearest the target.
+   */
+  function plan() {
+    let best = new Array(8).fill(false);
+    let bestScore = Infinity;
+    for (let c = 0; c < 81; c++) {
+      const p = sim.p.slice();
+      const want = new Array(8).fill(false);
+      let n = c;
+      let busy = 0;
+      let allowed = true;
+      for (let i = 0; i < 4; i++) {
+        const choice = n % 3; /* 0 hold, 1 fill, 2 drain */
+        n = (n - choice) / 3;
+        const k = MODULES[i >> 1];
+        if (choice === 1) {
+          if (p[i] + k.fill > P_LIMIT - 1) allowed = false; /* never fill a bellows that is near its limit */
+          p[i] += k.fill * LOOK_AHEAD;
+          want[2 * i] = true;
+          busy++;
+        } else if (choice === 2) {
+          p[i] = Math.max(P_REST, p[i] - k.drain * LOOK_AHEAD);
+          want[2 * i + 1] = true;
+          busy++;
+        }
+      }
+      if (!allowed) continue;
+      const score = toTarget(shape(p).tip) + 0.004 * busy; /* on a tie, the setting with fewer valves open */
+      if (score < bestScore) {
+        bestScore = score;
+        best = want;
+      }
+    }
+    return best;
   }
 
   /* One frame of the model. Valve commands are taken up at the robot's command rate; pressures move in between. */
   function step(dt) {
     if (sim.state !== "running") return;
-    if (sim.t >= sim.nextCommand) {
-      sim.open = sim.want.slice();
-      sim.nextCommand += 1 / COMMAND_HZ;
+    let left = dt * SPEED; /* bench seconds to run in this frame */
+    while (left > 1e-9 && sim.state === "running") {
+      if (sim.t >= sim.nextCommand - 1e-9) {
+        if (sim.demo) {
+          sim.want = plan();
+          showValves();
+        }
+        sim.open = sim.want.slice();
+        sim.nextCommand += 1 / COMMAND_HZ;
+      }
+      const h = Math.min(left, sim.nextCommand - sim.t, RUN_SECONDS - sim.t);
+      left -= h;
+      let over = -1;
+      for (let i = 0; i < 4; i++) {
+        const k = MODULES[i >> 1];
+        const rate = (sim.open[2 * i] ? k.fill : 0) - (sim.open[2 * i + 1] ? k.drain : 0);
+        sim.p[i] = Math.max(P_REST, sim.p[i] + rate * h);
+        if (sim.p[i] > P_LIMIT) over = i;
+      }
+      sim.t += h;
+      const tip = shape(sim.p).tip;
+      if (!inGoal(tip)) sim.outside += h;
+      const last = sim.trail[sim.trail.length - 1];
+      if (Math.hypot(tip.x - last[0], tip.y - last[1]) > 0.05) sim.trail.push([tip.x, tip.y]);
+      if (over >= 0 || sim.t >= RUN_SECONDS - 1e-6) {
+        finish(over);
+        return;
+      }
     }
-    const h = Math.min(dt, RUN_SECONDS - sim.t);
-    let over = -1;
-    for (let i = 0; i < 4; i++) {
-      const k = MODULES[i >> 1];
-      const rate = (sim.open[2 * i] ? k.fill : 0) - (sim.open[2 * i + 1] ? k.drain : 0);
-      sim.p[i] = Math.max(P_REST, sim.p[i] + rate * h);
-      if (sim.p[i] > P_LIMIT) over = i;
-    }
-    sim.t += h;
-    const tip = shape(sim.p).tip;
-    if (!inGoal(tip)) sim.outside += h;
-    const last = sim.trail[sim.trail.length - 1];
-    if (Math.hypot(tip.x - last[0], tip.y - last[1]) > 0.05) sim.trail.push([tip.x, tip.y]);
-    if (over >= 0 || sim.t >= RUN_SECONDS - 1e-6) finish(over);
-    else show();
+    show();
   }
   const loop = run(armCanvas, step);
 
@@ -509,9 +578,11 @@
     b.addEventListener("click", () => {
       if (sim.state === "ended") return;
       const on = b.getAttribute("aria-pressed") !== "true";
+      const wasDemo = sim.demo;
+      sim.demo = false; /* a touch on a valve takes the arm over from the demo */
       b.setAttribute("aria-pressed", String(on));
       sim.want[valveIndex(b)] = on;
-      if (sim.state === "ready") setState("running", "Running.");
+      if (sim.state === "ready" || wasDemo) setState("running", "You have the valves. The clock shows bench seconds; the picture runs " + SPEED + " times faster.");
     })
   );
   goalButtons.forEach((b) =>
@@ -525,7 +596,11 @@
     startButton.addEventListener("click", () => {
       if (sim.state === "running") setState("paused", "Paused.");
       else if (sim.state === "ended") reset();
-      else setState("running", "Running.");
+      else if (sim.state === "paused") setState("running", sim.demo ? "The demo is working the valves. Press any valve to take over." : "You have the valves.");
+      else {
+        sim.demo = true;
+        setState("running", "The demo is working the valves: a simple rule written for this page, not one of the lab's controllers. Press any valve to take over.");
+      }
     });
   }
   if (resetButton) resetButton.addEventListener("click", reset);
