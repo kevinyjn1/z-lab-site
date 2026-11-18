@@ -47,12 +47,29 @@
       </nav>
     </header>
 
-    <section class="section sheet">
+    <section class="section sheet lead">
       <div class="prose">
         <p>In the Matter domain, we synergistically integrate statistical physics, molecular simulations, artificial intelligence, and neutron scattering experiments to extend our understanding of rare/extreme events and long timescale phenomena in complex materials. Particular emphasis is given to the physics and chemistry of liquids, glasses, and complex fluids, especially at interfaces, under extreme conditions, or when driven away from equilibrium.</p>
         <p>Concurrently, on the Machine front, we build robots for extreme environments, including swarm robots, wheel-leg hybrid robots, and soft robots.</p>
         <p>These two research areas, spanning from fundamental to applied, serve as integral pillars in the lab's overarching mission to foster a sustainable, resilient, and secure energy infrastructure.</p>
       </div>
+      <nav class="figlist" aria-label="Figures on this page">
+        <p class="label">Figures</p>
+        <ol class="toc toc--figs">
+          <li><span></span><a href="#flood">Flood the landscape</a><em>model</em></li>
+          <li><span></span><a href="#water">The water that never froze</a><em>re-plot</em></li>
+          <li><span></span><a href="#fragile">Fragile to strong</a><em>model</em></li>
+          <li><span></span><a href="#salt">A pinch of fission product in a reactor salt</a><em>model, re-plot</em></li>
+          <li><span></span><a href="#clocks">Two clocks in a glass-forming salt</a><em>model</em></li>
+          <li><span></span><a href="#metal">Where the straight line ends</a><em>model</em></li>
+          <li><span></span><a href="#scale">From 100 atoms to 100,000</a><em>re-plot</em></li>
+          <li><span></span><a href="#arm">Be the controller: steer the underwater arm</a><em>model</em></li>
+          <li><span></span><a href="#soft">Soft is not linear</a><em>model, re-plot</em></li>
+          <li><span></span><a href="#swarm">Lose two, keep going</a><em>illustration</em></li>
+          <li><span></span><a href="#wheelleg">Wheels where it is flat, legs where it is not</a><em>illustration</em></li>
+        </ol>
+        <p class="figlist-note">Each figure comes from the lab's papers or public talks, and says whether it re-plots published values, runs a model from a paper, or illustrates an idea.</p>
+      </nav>
     </section>
 
     <section class="section sheet" id="matter">
@@ -67,7 +84,26 @@
         <div><dt>Rare events and long timescales</dt><dd>Rare/extreme events and long timescale phenomena in complex materials.</dd></div>
       </dl>
 
-      <!-- unit:flood -->
+      <article class="unit" id="flood">
+        <div class="unit-text">
+          <h3>Flood the landscape</h3>
+          <p>Many changes in matter are rare because an energy barrier must first be crossed. To chart the barriers, the lab and its collaborators flood an energy landscape from the bottom up and record the energy at which each valley, loop, and void appears and disappears. The resulting barcode holds everything the usual tree of minima and barriers holds, plus the extra pathways it misses, and for alkane chains of any length it can be written down exactly (<a href="https://doi.org/10.1063/5.0036747">Mirth et al., <cite>J. Chem. Phys.</cite> 2021</a>).</p>
+          <p>The same rising sea later turned variables learned by a neural network into molecular motions one can watch (<a href="https://doi.org/10.1063/5.0191446">Lee and Z, <cite>J. Chem. Phys.</cite> 2024</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="flood">
+          <div class="plate">
+            <canvas role="img" aria-label="Contour map of the potential energy of pentane as a function of its two dihedral angles, each from 0 to 360 degrees, on a square that wraps around in both directions. It has nine valleys. The deepest, at 180 and 180 degrees, has energy 0. Four more, with one angle near 63 or 297 degrees and the other at 180, lie at 3.5 kilojoules per mole, and four with both angles near 63 or 297 degrees lie at 6.9. A walker moves over the map while bias, drawn in maize, is added where it has been, so the valley it is in fills until it escapes over a pass into the next. Beside the map is a barcode with one bar for each valley: the first starts at 0 and never ends, four run from 3.5 to 13.8 kilojoules per mole, and four from 6.9 to 17.3. The maize part of each bar shows how far that valley has been filled."></canvas>
+            <div class="fig-controls">
+              <button class="btn btn--small" type="button" data-play aria-pressed="true">Pause</button>
+              <button class="btn btn--small" type="button" data-restart>Restart</button>
+              <label class="range"><span data-temp-out>T = 150 K</span><input type="range" data-temp min="50" max="600" step="10" value="150" aria-label="Temperature of the walker in kelvin"><span class="range-ends"><i>colder</i><i>hotter</i></span></label>
+              <p class="fig-readout" data-readout><span>hills added <b>0</b></span><span>valleys found <b>1 of 9</b></span></p>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> The potential energy of pentane as a function of its two dihedral angles, on a square that wraps around in both directions: Eq. 1 of <a href="https://doi.org/10.1063/5.0036747">Mirth et al. 2021</a> with its three constants. The barcode, computed here on a grid by the paper's flooding rule, gives each valley a bar from the energy of its minimum to the energy at which it merges into a deeper valley; the deepest never ends. The walker illustrates metadynamics: bias piles up wherever it has been, and the maize part of each bar shows how far that valley has filled. <span class="fig-kind">A model: the paper's equation with its published values, run in your browser. The walker and its bias are an illustration.</span></figcaption>
+          <details class="fig-table"><summary>View as table</summary><div data-table></div></details>
+        </figure>
+      </article>
 
       <article class="unit" id="water">
         <div class="unit-text">
@@ -87,11 +123,103 @@
         </figure>
       </article>
 
-      <!-- unit:fragile -->
-      <!-- unit:salt -->
-      <!-- unit:clocks -->
-      <!-- unit:metal -->
-      <!-- unit:scale -->
+      <article class="unit" id="fragile">
+        <div class="unit-text">
+          <h3>Fragile to strong</h3>
+          <p>Neutrons can isolate the one layer of water coating a biomolecule. On DNA it slows along a curved, fragile law on cooling, then switches abruptly at 222 K to a straight, strong one, near the temperature where the DNA's own motion changes (<a href="https://doi.org/10.1063/1.2372491">Chen et al., <cite>J. Chem. Phys.</cite> 2006</a>). So does water on lysozyme and RNA (<a href="https://doi.org/10.3233/SPE-2010-0409">Chen et al., <cite>J. Spectrosc.</cite> 2010</a>).</p>
+          <p>The early papers read this as water driving the biomolecule; a later perspective qualifies that (<a href="https://doi.org/10.1039/c2cp43235h">Bertrand et al., <cite>Phys. Chem. Chem. Phys.</cite> 2013</a>). On lysozyme a second crossover, at 345 K, coincides with the start of reversible unfolding (<a href="https://doi.org/10.1063/1.3081137">Zhang et al., <cite>J. Chem. Phys.</cite> 2009</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="fragile">
+          <div class="plate">
+            <canvas role="img" aria-label="Two plots of fitted laws, each as a ratio to its value at a crossover temperature, on a logarithmic scale against temperature on an inverse scale, colder to the right. Water on lysozyme, 380 to 290 kelvin: the inverse diffusion constant follows a straight Arrhenius law from 0.45 times its 345 kelvin value at 380 kelvin up to the crossover at 345 kelvin, then a curved law that reaches 2.4 times that value at 290 kelvin. Water on DNA, 270 to 185 kelvin: from 270 to 230 kelvin the paper fits a curved law, which is not drawn and would diverge at 180 kelvin; at 222 kelvin the relaxation time switches to a straight Arrhenius law and reaches 4.8 times its 222 kelvin value at 185 kelvin."></canvas>
+            <p class="fig-readout"><b data-where>222 K, water on DNA</b> <span data-what>crossover, 222 &plusmn; 2 K: fragile above, strong below</span></p>
+            <div class="fig-controls">
+              <label class="range"><span data-readout>222 K</span><input type="range" data-pick min="0" max="176" step="1" value="139" aria-label="Temperature to read, from 380 kelvin down to 185 kelvin"><span class="range-ends"><i>380 K</i><i>185 K</i></span></label>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> The laws fitted to neutron data on hydration water, each drawn as a ratio to its value at the crossover because the papers' text gives no prefactors. Water on lysozyme: the inverse diffusion constant is Arrhenius (5.97 kcal/mol) above 345 K and follows a Vogel-Fulcher-Tammann law (<i>T</i><sub>0</sub> = 204 K, <i>C</i> = 0.94) below (<a href="https://doi.org/10.1063/1.3081137">Zhang et al. 2009</a>). Water on DNA: the relaxation time is Arrhenius (3.48 kcal/mol) below 222 K (<a href="https://doi.org/10.1063/1.2372491">Chen et al. 2006</a>). Above 222 K that paper fits a curved law that would diverge at 180 K (dashed); its strength is not printed, so only the fitted range is shaded. <span class="fig-kind">A model: the paper's equation with its published values, run in your browser.</span></figcaption>
+          <details class="fig-table"><summary>View as table</summary><div data-table></div></details>
+        </figure>
+      </article>
+      <article class="unit" id="salt">
+        <div class="unit-text">
+          <h3>A pinch of fission product in a reactor salt</h3>
+          <p>What do fission products do to a molten reactor salt? Neutron measurements on FLiNaK show about 1 mol % of cerium or zirconium slows its ions and raises the diffusion barrier, while cesium changes little (<a href="https://doi.org/10.1021/acsaem.4c03249">Rakib et al., <cite>ACS Appl. Energy Mater.</cite> 2025</a>). The authors' reading: highly charged ions bind fluoride into heavy complexes. Diffraction finds about 7.5 fluorides around each cerium (<a href="https://doi.org/10.1016/j.jnucmat.2025.156000">Rakib et al., <cite>J. Nucl. Mater.</cite> 2025</a>).</p>
+          <p>In simulations of molten LiF-NaF, thorium fuel also gathers fluoride into clusters and lowers the heat conduction (<a href="https://doi.org/10.1021/acs.jpcb.4c01243">Grizzi et al., <cite>J. Phys. Chem. B</cite> 2024</a>; <a href="https://doi.org/10.1103/4dsc-6432">Grizzi et al., <cite>Phys. Rev. Mater.</cite> 2026</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="salt">
+          <div class="plate">
+            <canvas data-panel="diffusion" role="img" aria-label="Panel a. Arrhenius plot of the self-diffusivity of the ions in molten FLiNaK between 500 and 750 degrees Celsius, drawn from the fitted law of Rakib and co-workers for four samples: the pure salt, and the salt with 0.5 mol percent cesium, 1.2 mol percent zirconium, or 1 mol percent cerium. All four are straight lines that rise with temperature. The cerium and zirconium lines are steeper and lie below the pure salt: both about four times lower at 500 degrees, and at 750 degrees cerium about 1.7 times lower and zirconium about three times lower. The cesium line stays within about 12 percent of the pure salt."></canvas>
+            <div class="fig-controls">
+              <div class="segmented" role="group" aria-label="Additive in the salt">
+                <button type="button" data-salt="pure" aria-pressed="false">Pure</button>
+                <button type="button" data-salt="cs" aria-pressed="false">+ Cs</button>
+                <button type="button" data-salt="zr" aria-pressed="false">+ Zr</button>
+                <button type="button" data-salt="ce" aria-pressed="true">+ Ce</button>
+              </div>
+              <label class="range"><span data-temp-out>580 &deg;C</span><input type="range" data-pick min="500" max="750" step="5" value="580" aria-label="Temperature of the salt"><span class="range-ends"><i>500 &deg;C</i><i>750 &deg;C</i></span></label>
+              <p class="fig-readout" data-values></p>
+            </div>
+            <div class="fig-panel">
+              <canvas data-panel="fuel" role="img" aria-label="Panel b. Thermal conductivity of molten LiF-NaF against temperature at six temperatures from 973 to 1473 kelvin, from simulation. For the pure salt it falls from 1.273 to 1.137 watts per meter kelvin. With 9.1 mol percent thorium fluoride it is lower at every temperature, falling from 1.100 to 0.952."></canvas>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> (a) Self-diffusivity of the ions in molten FLiNaK, pure and with about 1 mol % of cerium or zirconium or 0.5 mol % of cesium. The lines are the Arrhenius law <i>D</i> = <i>D</i>&#8320; exp(&minus;<i>E</i>&#8336;/<i>kT</i>) with the fitted values of Table 3 of <a href="https://doi.org/10.1021/acsaem.4c03249">Rakib et al. 2025</a>, over the range measured by neutron scattering; the measured points are published only as a plot and are not drawn. The prefactors <i>D</i>&#8320; carry large uncertainties (see the table), so read the lines as trends. These barriers are about twice those of an earlier capillary experiment and of the lab's own neural-network simulation, a gap the paper discusses without resolving. (b) Thermal conductivity of molten LiF-NaF with and without 9.1 mol % ThF&#8324;, simulated with a machine-learned potential: the values and uncertainties of Table III of <a href="https://doi.org/10.1103/4dsc-6432">Grizzi et al. 2026</a>. <span class="fig-kind">(a) A model: the paper's equation with its published values, run in your browser. (b) Re-plot of published values.</span></figcaption>
+          <details class="fig-table"><summary>View the fitted parameters as a table</summary><div data-table="fits"></div></details>
+          <details class="fig-table"><summary>View the thermal conductivity values (W m&#8315;&sup1; K&#8315;&sup1;) as a table</summary><div data-table="kappa"></div></details>
+        </figure>
+      </article>
+      <article class="unit" id="clocks">
+        <div class="unit-text">
+          <h3>Two clocks in a glass-forming salt</h3>
+          <p>Neutron spin echo times how a ripple in a liquid's density fades. In CKN, a molten nitrate salt that forms a glass, it fades in two steps: a fast one in under a picosecond, then a slow, stretched one that lengthens steeply on cooling. Both follow the liquid's structure, and below about 2.6 &Aring; the slow step obeys different rules (<a href="https://doi.org/10.1038/s41467-022-29778-4">Luo et al., <cite>Nature Commun.</cite> 2022</a>; <a href="https://doi.org/10.1021/acs.jpclett.5c03173">Luo et al., <cite>J. Phys. Chem. Lett.</cite> 2025</a>).</p>
+          <p>EXPANSE, a wide-angle spin echo spectrometer planned for Oak Ridge's Second Target Station, would record many length scales and times at once; the lab is among the authors of its design paper (<a href="https://doi.org/10.1063/5.0089349">Do et al., <cite>Rev. Sci. Instrum.</cite> 2022</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="clocks">
+          <div class="plate">
+            <canvas role="img" aria-label="A model curve of how a density fluctuation in molten CKN fades, as the intermediate scattering function I of Q and t over I of Q and zero, against time on a logarithmic axis from 0.1 picoseconds to 10 nanoseconds. The curve falls in two steps: a fast drop within about a picosecond to a plateau of height f, then a slow stretched decay. At 444 kelvin and a wave vector of 1.86 inverse angstroms the plateau is near 0.71 and the slow step reaches one over e of its height at about 140 picoseconds. Brackets mark the measured time windows: time of flight from 0.1 to 6 picoseconds and spin echo from 2.6 picoseconds to 1.2 nanoseconds. Cooling raises the plateau and moves the slow step to longer times; moving the wave vector away from 1.86 lowers the plateau and stretches the decay."></canvas>
+            <p class="fig-readout"><span>plateau f <b data-f>0.71</b></span> <span>stretch &beta; <b data-beta>0.69</b></span> <span>slow clock <b data-slow>140 ps</b></span> <span>fast clock <b data-fast>0.2 ps</b></span> <span data-scale>3.4 &Aring;, longer than 2.6 &Aring;: nitrate to nitrate</span> <span data-limit></span></p>
+            <div class="fig-controls">
+              <label class="range"><span data-t-out>444 K</span><input type="range" data-t min="383" max="519" step="1" value="444" aria-label="Temperature, 383 to 519 kelvin"><span class="range-ends"><i>383 K</i><i>519 K</i></span></label>
+              <label class="range"><span data-q-out>1.86 &Aring;&#8315;&sup1;</span><input type="range" data-q min="1.08" max="2.82" step="0.01" value="1.86" aria-label="Wave vector Q, 1.08 to 2.82 inverse angstroms"><span class="range-ends"><i>1.08 &Aring;&#8315;&sup1;</i><i>2.82 &Aring;&#8315;&sup1;</i></span></label>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> How a density fluctuation fades in molten CKN, from the two-step law of <a href="https://doi.org/10.1038/s41467-022-29778-4">Luo et al. 2022</a>: (1 &minus; <i>f</i>) exp(&minus;<i>t</i>/<i>&tau;</i><sub>fast</sub>) + <i>f</i> exp(&minus;(<i>t</i>/<i>&tau;</i><sub>slow</sub>)<sup><i>&beta;</i></sup>). This is a model built from the ranges and trends the papers report, not their measured curves: <i>f</i> from 0.45 to 0.85 and <i>&beta;</i> from 0.45 to 0.75, both highest at the structure factor peak (1.86 &Aring;<sup>&minus;1</sup>); a slow time on the Vogel-Fulcher-Tammann law (<i>D</i> = 1.53, <i>T</i><sub>0</sub> = 340 K), kept the same at every wave vector and set to 15 ps at 530 K; a fast time of 0.2 ps, the middle of its range (both from <a href="https://doi.org/10.1021/acs.jpclett.5c03173">Luo et al. 2025</a>). Brackets: the measured time windows; shaded: beyond them. <span class="fig-kind">A model: the paper's equation, with values placed inside the ranges the papers report. Not measured curves.</span></figcaption>
+          <details class="fig-table"><summary>View as table</summary><div data-table></div></details>
+        </figure>
+      </article>
+      <article class="unit" id="metal">
+        <div class="unit-text">
+          <h3>Where the straight line ends</h3>
+          <p>Diffusion in a hot liquid follows an Arrhenius law, a straight line here. In the molten glass former LM601, neutrons find it falling below that line under about 1300 K, as atoms begin to move cooperatively (<a href="https://doi.org/10.1021/acs.jpcb.5b11452">Jaiswal et al., <cite>J. Phys. Chem. B</cite> 2016</a>). That is about twice the glass transition temperature and above the melting point. Simulations of a similar alloy show clusters of similarly mobile atoms growing faster below it (<a href="https://doi.org/10.1103/PhysRevB.91.134204">Jaiswal et al., <cite>Phys. Rev. B</cite> 2015</a>).</p>
+          <p>In eleven metallic liquids the onset sits near twice the glass transition temperature; in molecular liquids, near 1.4 times (<a href="https://doi.org/10.1103/PhysRevLett.117.205701">Jaiswal et al., <cite>Phys. Rev. Lett.</cite> 2016</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="metal">
+          <div class="plate">
+            <canvas role="img" aria-label="Arrhenius plot of the diffusion coefficient of the molten alloy LM601 between 1173 and 1373 kelvin, the range measured by neutron scattering. A straight line, the paper's high-temperature Arrhenius fit, rises from 0.043 square angstroms per picosecond at 1173 kelvin to 0.098 at 1373 kelvin. It is solid above the onset temperature of 1300 plus or minus 50 kelvin, where the measured values follow it, and dashed below, where they fall under it. The measured values themselves are not drawn. Melting is complete at 1170 kelvin, so the onset lies in the stable liquid."></canvas>
+            <div class="fig-controls">
+              <label class="range"><span data-temp-out>1223 K (950 &deg;C)</span><input type="range" data-pick min="0" max="8" step="1" value="2" aria-label="Temperature, one of the nine measured"><span class="range-ends"><i>1173 K</i><i>1373 K</i></span></label>
+              <p class="fig-readout" data-values></p>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> Atomic diffusion in molten LM601 (Zr&#8325;&#8321;Cu&#8323;&#8326;Ni&#8324;Al&#8329;). The line is the paper's high-temperature Arrhenius fit, <i>D</i> = <i>D</i>&#8320; exp(&minus;<i>E</i>&#8336;/<i>RT</i>) with <i>D</i>&#8320; = 13.0 &plusmn; 3.1 &Aring;&sup2;/ps and <i>E</i>&#8336; = 55.8 &plusmn; 2.7 kJ/mol, across the nine temperatures measured by neutron scattering (<a href="https://doi.org/10.1021/acs.jpcb.5b11452">Jaiswal et al. 2016</a>). Below the onset at 1300 &plusmn; 50 K the measured values fall under it. The paper gives them only as a plot, so the line continues dashed as a reference and no measured point is drawn. <span class="fig-kind">A model: the paper's equation with its published values, run in your browser.</span></figcaption>
+          <details class="fig-table"><summary>View the published values as a table</summary><div data-table></div></details>
+        </figure>
+      </article>
+      <article class="unit" id="scale">
+        <div class="unit-text">
+          <h3>From 100 atoms to 100,000</h3>
+          <p>First-principles simulations of a liquid are limited to fewer than about 200 atoms and about 100 picoseconds, too little for a converged viscosity (<a href="https://doi.org/10.1103/4dsc-6432">Grizzi et al., <cite>Phys. Rev. Mater.</cite> 2026</a>). The lab trains neural networks on such calculations so that their accuracy carries over to far larger boxes and longer times. For the reactor salt FLiNaK, the network reproduced first-principles forces about two orders of magnitude better than a classical model and ran about 2140 times faster than the first-principles calculation (<a href="https://doi.org/10.1021/acs.jpcb.1c05608">Lee et al., <cite>J. Phys. Chem. B</cite> 2021</a>).</p>
+          <p>Later potentials followed zinc chloride for nanoseconds (<a href="https://doi.org/10.1063/5.0215370">Lee and Z, <cite>J. Chem. Phys.</cite> 2024</a>), held for compositions of LiF-NaF never seen in training (<a href="https://doi.org/10.1063/5.0244036">Murg et al., <cite>J. Appl. Phys.</cite> 2025</a>), and ran 100,000 atoms of a thorium-bearing salt (<a href="https://doi.org/10.1103/4dsc-6432">Grizzi et al., <cite>Phys. Rev. Mater.</cite> 2026</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="scale">
+          <div class="plate">
+            <canvas role="img" aria-label="Two charts. The first shows, for four molten salts, the number of atoms in the first-principles runs behind each machine-learned potential and in the runs made with it, on a logarithmic axis from 100 to 100,000 atoms. FLiNaK: 100 atoms from first principles, then 10,000 atoms for 1 nanosecond, about 2140 times faster, with a relative squared force error of 0.0043. Zinc chloride: 108 atoms, then 2,916 atoms for 6 nanoseconds, with a root mean square force error of 0.0697 electronvolts per angstrom. LiF-NaF: 100 atoms, then 800 atoms and 2,400 atoms for 400 picoseconds, with a mean absolute force error of 15.679 millielectronvolts per angstrom. LiF-NaF with thorium fluoride: 100 atoms, then 100,000 atoms for 400 picoseconds, with a root mean square force error of 0.153 electronvolts per angstrom. The second chart shows the relative squared error in the forces of three models of molten FLiNaK on a logarithmic axis: a classical model at 1.17, the same model refitted at 0.065, and the neural network at 0.0043."></canvas>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> (a) Atoms in the first-principles runs behind each learned potential and in the runs made with it, with the length of those runs and the force error each paper reports (<a href="https://doi.org/10.1021/acs.jpcb.1c05608">Lee et al. 2021</a>; <a href="https://doi.org/10.1063/5.0215370">Lee and Z 2024</a>; <a href="https://doi.org/10.1063/5.0244036">Murg et al. 2025</a>; <a href="https://doi.org/10.1103/4dsc-6432">Grizzi et al. 2026</a>). The four errors are different measures and cannot be compared with one another. (b) Mean relative squared error in the forces of three models of molten FLiNaK, measured against first-principles forces (Table 2 of <a href="https://doi.org/10.1021/acs.jpcb.1c05608">Lee et al. 2021</a>). <span class="fig-kind">Re-plot of published values.</span></figcaption>
+          <details class="fig-table"><summary>View as table</summary><div data-table></div></details>
+        </figure>
+      </article>
     </section>
 
     <section class="section sheet" id="machine">
@@ -106,10 +234,93 @@
         <div><dt>Wheel-leg hybrid robots</dt><dd>Atombot Helium works toward a more practical robot unit: an advanced wheel-legged robot.</dd></div>
       </dl>
 
-      <!-- unit:arm -->
-      <!-- unit:soft -->
-      <!-- unit:swarm -->
-      <!-- unit:wheelleg -->
+      <article class="unit" id="arm">
+        <div class="unit-text">
+          <h3>Be the controller: steer the underwater arm</h3>
+          <p>The lab's underwater soft arm is a stack of identical, mostly 3D printed modules. Each is bent by two water-filled silicone bellows and carries its own valves, pressure sensors, and circuit board (<a href="https://doi.org/10.1109/RoboSoft55895.2023.10122035">Null et al., <cite>RoboSoft</cite> 2023</a>). It is hard to steer: its response is nonlinear and depends on its history, and its only commands are eight valves, open or shut.</p>
+          <p>A model predictive controller, tuned automatically and entirely offline from one recorded data set, ended inside 39 of 40 goal squares, about 3 mm from the target on average, ahead of four other controllers trained on the same data (<a href="https://doi.org/10.1109/lra.2023.3333662">Null et al., <cite>IEEE Robot. Autom. Lett.</cite> 2024</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="arm">
+          <div class="plate">
+            <canvas role="img" aria-label="Top view of the lab's two-module soft arm lying in its shallow tank, on axes in centimeters from its fixed base. The arm starts straight and 24 centimeters long, with its tip, a black dot, at x 0, y 24. A 2 centimeter goal square sits at one of three targets from the paper: x minus 9, y 27; x 1, y 33; or x 9, y 27. A dashed outline marks the area of the paper's 40 targets. Four gauges show the pressure in each bellows, from 97 to 118 kilopascals. The valve buttons below fill and drain the four bellows, which lengthens and bends the arm. A run lasts 50 seconds and stops early if a bellows passes 118 kilopascals."></canvas>
+            <div class="fig-controls">
+              <div class="valves" role="group" aria-label="The arm's eight valves">
+                <span></span><span class="valves-head">Left bellows</span><span class="valves-head">Right bellows</span>
+                <span>Module 2</span>
+                <span class="segmented"><button type="button" data-valve="2" data-way="fill" aria-pressed="false" aria-label="Fill the left bellows of module 2">Fill</button><button type="button" data-valve="2" data-way="drain" aria-pressed="false" aria-label="Drain the left bellows of module 2">Drain</button></span>
+                <span class="segmented"><button type="button" data-valve="3" data-way="fill" aria-pressed="false" aria-label="Fill the right bellows of module 2">Fill</button><button type="button" data-valve="3" data-way="drain" aria-pressed="false" aria-label="Drain the right bellows of module 2">Drain</button></span>
+                <span>Module 1</span>
+                <span class="segmented"><button type="button" data-valve="0" data-way="fill" aria-pressed="false" aria-label="Fill the left bellows of module 1">Fill</button><button type="button" data-valve="0" data-way="drain" aria-pressed="false" aria-label="Drain the left bellows of module 1">Drain</button></span>
+                <span class="segmented"><button type="button" data-valve="1" data-way="fill" aria-pressed="false" aria-label="Fill the right bellows of module 1">Fill</button><button type="button" data-valve="1" data-way="drain" aria-pressed="false" aria-label="Drain the right bellows of module 1">Drain</button></span>
+              </div>
+              <div class="fig-run">
+                <button class="btn btn--small" type="button" data-start>Start</button>
+                <button class="btn btn--small" type="button" data-reset>Reset</button>
+                <span class="fig-run-pick"><span id="arm-goal-label">Goal</span><span class="segmented" role="group" aria-labelledby="arm-goal-label"><button type="button" data-goal="0" aria-pressed="false">Left</button><button type="button" data-goal="1" aria-pressed="false">Ahead</button><button type="button" data-goal="2" aria-pressed="true">Right</button></span></span>
+              </div>
+              <p class="fig-readout"><span>time left <b data-time>50.0 s</b></span><span>tip to target <b data-dist>9.5 cm</b></span><span>outside goal <b data-outside>0.0 s</b></span></p>
+              <p class="fig-status" data-status role="status">Open a valve, or press Start. You have 50 s, as the controllers did; the valves act twice a second.</p>
+            </div>
+            <div class="fig-panel">
+              <canvas data-scores role="img" aria-label="Bar chart of results on the real arm for five controllers, over 40 targets with 50 seconds each. Targets where the tip was in the goal at the end of the run: open-loop inverse kinematics 7, visual servo 15, CQL 4, TRPO 2, AutoMPC 39. Targets where the tip passed through the goal at some time: 14, 27, 14, 35, and 40."></canvas>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> The lab's two-module underwater soft arm from above, with its eight valves in your hands. Bring the tip (black dot) into the 2 cm goal square within 50 s without taking a bellows past 118 kPa: the goal size, time limit, and pressure limit of <a href="https://doi.org/10.1109/lra.2023.3333662">Null et al. 2024</a>, at three of its targets. The arm's motion is a simplified model, not recorded motion: each module lengthens and bends with its two pressures, between the values measured in <a href="https://doi.org/10.1109/RoboSoft55895.2023.10122035">Null et al. 2023</a>, without the real arm's hysteresis. Below, Table I of the 2024 paper: five controllers on the real arm, where AutoMPC is the auto-tuned model predictive controller, IK is inverse kinematics, and CQL and TRPO are reinforcement-learning controllers. <span class="fig-kind">A simplified model written for this site, with the papers' limits and scores.</span></figcaption>
+          <details class="fig-table"><summary>View the scores as a table</summary><div data-table></div></details>
+        </figure>
+      </article>
+      <article class="unit" id="soft">
+        <div class="unit-text">
+          <h3>Soft is not linear</h3>
+          <p>A soft robot's silicone can stretch to several times its length, and its stress does not rise in a straight line with stretch, so linear material models fail long before the working range. The lab added a hyperelastic (neo-Hookean) material to the open-source MOOSE framework and released it as Kraken. It predicted the pressure needed to extend a real silicone bellows to within 1.4 kPa on average (<a href="https://doi.org/10.1109/ACCESS.2021.3119009">Wandke and Z, <cite>IEEE Access</cite> 2021</a>).</p>
+          <p>Extended to motion, Kraken reproduced the bounce frequency of three silicone bellows to within about 3%; in full 3D swinging it overestimates frequencies by 10 to 30% on average (<a href="https://doi.org/10.1109/ACCESS.2023.3291617">Wandke and Z, <cite>IEEE Access</cite> 2023</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="soft">
+          <div class="plate">
+            <canvas role="img" aria-label="A bar of silicone, 100 millimeters long at rest and fixed to a wall at its left end, drawn stretched to the length set by the slider. Below it, a plot of the stress in the bar in kilopascals against its stretch ratio from 1 to 3. The neo-Hookean curve bends upward, from 0 at rest to 288 kilopascals at twice the rest length and 712 at three times. The straight line that matches it near rest reaches 247 kilopascals at twice the rest length and 493 at three times, so the two part ways as the bar stretches."></canvas>
+            <div class="fig-controls">
+              <label class="range"><span data-readout>stretch 2.50</span><input type="range" data-stretch min="1" max="2.92" step="0.01" value="2.5" aria-label="Stretch of the bar: its length divided by its rest length"><span class="range-ends"><i>at rest</i><i>192 mm longer</i></span></label>
+            </div>
+            <div class="fig-panel">
+              <canvas data-check role="img" aria-label="Dot chart of the difference between oscillation frequencies simulated with Kraken and the measured ones, in percent of the measured value, for bellows of Ecoflex 00-50, Dragon Skin 20, and Dragon Skin 30 carrying a 100 gram mass. Bounce: plus 0.5, plus 3.1, and minus 2.3 percent. Swing in a plane: between minus 8 and plus 25 percent. Swing in 3D: between plus 8 and plus 48 percent, largest for Ecoflex 00-50, the softest of the three."></canvas>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> Stress in a 100 mm bar of Dragon Skin 20 silicone pulled along its length. Solid: the neo-Hookean law of the lab's Kraken simulator for this test, <i>&sigma;</i> = <i>C</i>&#8321;(<i>&lambda;</i>&sup2; &minus; 1/<i>&lambda;</i>) with <i>C</i>&#8321; = 0.0822 MPa; Kraken's finite element solution stayed within 10.8 kPa of it out to 192 mm of stretch (<a href="https://doi.org/10.1109/ACCESS.2021.3119009">Wandke and Z 2021</a>). Dashed: the straight line that agrees with it near rest, drawn here for comparison. Below: simulated against measured oscillation frequencies of three silicone bellows carrying a 100 g mass, one dot per silicone and direction of motion (Tables 1 to 3 of <a href="https://doi.org/10.1109/ACCESS.2023.3291617">Wandke and Z 2023</a>). <span class="fig-kind">A model: the paper's equation with its published constant, run in your browser. The lower panel is a re-plot of published values.</span></figcaption>
+          <details class="fig-table"><summary>View the frequencies as a table</summary><div data-table></div></details>
+        </figure>
+      </article>
+      <article class="unit" id="swarm">
+        <div class="unit-text">
+          <h3>Lose two, keep going</h3>
+          <p>A swarm is many simple, cheap robots that together do what one robot cannot. In a seminar, the lab's principal investigator, Y Z, describes small units driven by vibration motors instead of wheels to keep the cost low, and a swarm that, like an ant colony, is not affected by losing one or two (<a href="https://www.youtube.com/watch?v=_GpB51rHsZg">Michigan Robotics seminar, 2025</a>, from 39:47).</p>
+          <p>The student team describes its miniature swarm system as a platform for studying emergent behavior in many-robot systems (<a href="https://mdp.engin.umich.edu/research_teams/atombot-27/">Atombot on the Multidisciplinary Design Program site</a>).</p>
+        </div>
+        <figure class="unit-fig" data-fig="swarm">
+          <div class="plate">
+            <canvas role="img" aria-label="A floor seen from above with 36 small disc robots, each drawn as a circle with a flat rectangle on top. The working robots shuffle in small random steps and drift together into a loose group around a marked spot in the middle of the floor. A robot that is switched off turns pale and stops where it is, while the others close in around it and carry on. The rules of motion are invented for the illustration."></canvas>
+            <div class="fig-controls">
+              <p class="fig-readout" role="status"><span><b data-working>36</b> of 36 working</span></p>
+              <button class="btn btn--small" type="button" data-off>Switch one off</button>
+              <button class="btn btn--small" type="button" data-reset>Reset</button>
+              <button class="btn btn--small" type="button" data-play aria-pressed="true">Pause</button>
+            </div>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> A floor seen from above. Each disc is one robot: the working ones shuffle toward the marked spot and keep a little room from one another. Click or tap a robot, or press Switch one off: it stops where it is, and the rest close in and carry on. <span class="fig-kind">A concept illustration, not a recording or a design. The rules of motion are invented for the illustration, because no rules, speeds, or recordings are public.</span></figcaption>
+        </figure>
+      </article>
+      <article class="unit" id="wheelleg">
+        <div class="unit-text">
+          <h3>Wheels where it is flat, legs where it is not</h3>
+          <p>Wheel-leg hybrid robots are one of the lab's research themes. Its student team is working on an advanced wheel-legged robot, aiming at a more practical robot unit (<a href="https://mdp.engin.umich.edu/research_teams/atombot-27/">Atombot on the Multidisciplinary Design Program site</a>). In a September 2025 seminar, the lab's principal investigator, Y Z, described it as a four-legged robot with wheels that was still being built (<a href="https://www.youtube.com/watch?v=_GpB51rHsZg">Michigan Robotics seminar, 2025</a>, at 42:11).</p>
+          <p>No picture, design, or result has been made public, so the figure shows only the general idea of such a machine.</p>
+        </div>
+        <figure class="unit-fig" data-fig="wheelleg">
+          <div class="plate">
+            <svg class="drawing" viewBox="14 10 380 250" role="img" aria-label="Line drawing of a generic wheel-leg robot seen from the side, climbing one step. A long box-shaped body, tilted nose up, stands on four jointed legs, and each leg ends in a wheel. The two rear wheels rest on the lower floor, one front wheel rests on the step, and the other front wheel is lifted in mid-step. A small sensor head sits on top of the body at the front. Numbered callouts mark the body, a leg, a wheel, and the sensor head."><path d="M22 240H214V198H386" fill="none" stroke="#12161c" stroke-width="1.6" stroke-linejoin="miter"/><path d="M32 243l-7 9M45 243l-7 9M58 243l-7 9M71 243l-7 9M84 243l-7 9M97 243l-7 9M110 243l-7 9M123 243l-7 9M136 243l-7 9M149 243l-7 9M162 243l-7 9M175 243l-7 9M188 243l-7 9M201 243l-7 9M227 201l-7 9M240 201l-7 9M253 201l-7 9M266 201l-7 9M279 201l-7 9M292 201l-7 9M305 201l-7 9M318 201l-7 9M331 201l-7 9M344 201l-7 9M357 201l-7 9M370 201l-7 9M383 201l-7 9" fill="none" stroke="#12161c" stroke-width="1"/><circle cx="150" cy="213" r="27" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="150" cy="213" r="20.5" fill="none" stroke="#12161c" stroke-width="0.8"/><path d="M154.6 216.9L165.7 226.2M147.8 218.6L142.3 232M144 212.6L129.5 211.6M148.5 207.2L145 193.1M155.1 209.8L167.4 202.1" fill="none" stroke="#12161c" stroke-width="0.8"/><path d="M131.8 144.9L118.8 184.8L150 213" fill="none" stroke="#12161c" stroke-width="8.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M131.8 144.9L118.8 184.8L150 213" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="118.8" cy="184.8" r="3.4" fill="#fff" stroke="#12161c" stroke-width="0.9"/><circle cx="150" cy="213" r="6" fill="#ffcb05" stroke="#12161c" stroke-width="0.9"/><circle cx="314" cy="151" r="27" fill="#fff" stroke="#12161c" stroke-width="1.1"/><circle cx="314" cy="151" r="20.5" fill="none" stroke="#12161c" stroke-width="0.8"/><path d="M316.6 156.4L323 169.4M309.7 155.2L299.3 165.2M308.7 148.2L295.9 141.4M315 145.1L317.6 130.8M319.9 150.2L334.3 148.1" fill="none" stroke="#12161c" stroke-width="0.8"/><path d="M257.8 122.6L273.4 161.7L314 151" fill="none" stroke="#12161c" stroke-width="8.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M257.8 122.6L273.4 161.7L314 151" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="273.4" cy="161.7" r="3.4" fill="#fff" stroke="#12161c" stroke-width="0.9"/><circle cx="314" cy="151" r="6" fill="#ffcb05" stroke="#12161c" stroke-width="0.9"/><path d="M251.6 76L261.5 74.3L263.4 85.1L253.5 86.8Z" fill="#fff" stroke="#12161c" stroke-width="1.6" stroke-linejoin="round"/><path d="M233.3 52.8L276.6 45.2L281.2 70.8L237.8 78.4Z" fill="#fff" stroke="#12161c" stroke-width="1.6" stroke-linejoin="round"/><path d="M277.7 51.1L286.5 49.5L289 63.3L280.1 64.9Z" fill="#fff" stroke="#12161c" stroke-width="1.6" stroke-linejoin="round"/><path d="M97.6 112.3L278.8 80.4L286.4 123.7L105.2 155.6Z" fill="#fff" stroke="#12161c" stroke-width="1.6" stroke-linejoin="round"/><path d="M99.7 124.1L280.9 92.2" stroke="#12161c" stroke-width="1"/><circle cx="104" cy="213" r="27" fill="#fff" stroke="#12161c" stroke-width="1.6"/><circle cx="104" cy="213" r="20.5" fill="none" stroke="#12161c" stroke-width="1.2"/><path d="M109.9 214.2L124.1 217.3M104.6 219L106.1 233.4M98.5 215.4L85.3 221.3M100 208.5L90.3 197.8M107 207.8L114.2 195.2" fill="none" stroke="#12161c" stroke-width="1.2"/><path d="M131.8 144.9L99.1 171.3L104 213" fill="none" stroke="#12161c" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M131.8 144.9L99.1 171.3L104 213" fill="none" stroke="#fff" stroke-width="6.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="99.1" cy="171.3" r="4.2" fill="#fff" stroke="#12161c" stroke-width="1.4"/><circle cx="104" cy="213" r="6" fill="#ffcb05" stroke="#12161c" stroke-width="1.4"/><circle cx="131.8" cy="144.9" r="6.2" fill="#fff" stroke="#12161c" stroke-width="1.6"/><circle cx="268" cy="171" r="27" fill="#fff" stroke="#12161c" stroke-width="1.6"/><circle cx="268" cy="171" r="20.5" fill="none" stroke="#12161c" stroke-width="1.2"/><path d="M273.3 173.8L286.1 180.6M267 176.9L264.4 191.2M262.1 171.8L247.7 173.9M265.4 165.6L259 152.6M272.3 166.8L282.7 156.8" fill="none" stroke="#12161c" stroke-width="1.2"/><path d="M257.8 122.6L229.7 153.8L268 171" fill="none" stroke="#12161c" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M257.8 122.6L229.7 153.8L268 171" fill="none" stroke="#fff" stroke-width="6.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="229.7" cy="153.8" r="4.2" fill="#fff" stroke="#12161c" stroke-width="1.4"/><circle cx="268" cy="171" r="6" fill="#ffcb05" stroke="#12161c" stroke-width="1.4"/><circle cx="257.8" cy="122.6" r="6.2" fill="#fff" stroke="#12161c" stroke-width="1.6"/><path d="M146.5 125L92 70" stroke="#12161c" stroke-width="1"/><circle cx="146.5" cy="125" r="2" fill="#12161c"/><text x="86" y="75" text-anchor="end">10</text><path d="M115.4 158.1L56 146" stroke="#12161c" stroke-width="1"/><circle cx="115.4" cy="158.1" r="2" fill="#12161c"/><text x="50" y="151" text-anchor="end">12</text><path d="M336.6 143.7L364 116" stroke="#12161c" stroke-width="1"/><circle cx="336.6" cy="143.7" r="2" fill="#12161c"/><text x="370" y="121" text-anchor="start">14</text><path d="M266 54.2L312 26" stroke="#12161c" stroke-width="1"/><circle cx="266" cy="54.2" r="2" fill="#12161c"/><text x="318" y="31" text-anchor="start">16</text></svg>
+          </div>
+          <figcaption class="caption"><b class="fig-no"></b> The idea of a wheel-leg robot, drawn at a step: a body (10) on four legs (12), each ending in a wheel (14), with a sensor head (16). Such a machine can roll where the ground is flat and step where it is not. <span class="fig-kind">A concept illustration, not a recording or a design. It shows the general idea of a wheel-leg robot and is not a drawing of the lab's robot, whose design is not public.</span></figcaption>
+        </figure>
+      </article>
 
       <article class="unit unit--team" id="atombot">
         <div class="unit-text">
@@ -178,6 +389,15 @@
 
   <script src="assets/js/site.js" defer></script>
   <script src="assets/js/figkit.js" defer></script>
+  <script src="assets/js/figs/flood.js" defer></script>
   <script src="assets/js/figs/water-density.js" defer></script>
+  <script src="assets/js/figs/fragile.js" defer></script>
+  <script src="assets/js/figs/salt.js" defer></script>
+  <script src="assets/js/figs/clocks.js" defer></script>
+  <script src="assets/js/figs/metal.js" defer></script>
+  <script src="assets/js/figs/scale.js" defer></script>
+  <script src="assets/js/figs/arm.js" defer></script>
+  <script src="assets/js/figs/soft.js" defer></script>
+  <script src="assets/js/figs/swarm.js" defer></script>
 </body>
 </html>

@@ -141,6 +141,23 @@ a:hover {
   outline-offset: 3px;
 }
 
+/* Subscripts and superscripts that do not push their line apart. */
+sub,
+sup {
+  position: relative;
+  font-size: 0.72em;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.45em;
+}
+
+sub {
+  bottom: -0.22em;
+}
+
 ::selection {
   background: var(--maize);
   color: var(--ink);
@@ -1411,6 +1428,21 @@ html:not(.js) .stat-viz {
   cursor: pointer;
 }
 
+/* Focus goes on the thumb, where the hand is, so the ring does not run over the end labels. */
+.range input:focus-visible {
+  outline: none;
+}
+
+.range input:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.range input:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
 .range input::-webkit-slider-runnable-track {
   height: 2px;
   background: var(--ink);
@@ -1598,6 +1630,44 @@ html:not(.js) .stat-viz {
 
 /* 6c. Research ------------------------------------------------------------- */
 
+/* Research opens the way a paper does: its statement beside a list of its figures. */
+.lead {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 5vw, 64px);
+  align-items: start;
+}
+
+.figlist .toc {
+  margin-top: 10px;
+  font-size: 1rem;
+  counter-reset: figlist;
+}
+
+.figlist .toc li {
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 8px 14px;
+  padding-block: 3px;
+  counter-increment: figlist;
+}
+
+.figlist .toc span::before {
+  content: counter(figlist);
+}
+
+.figlist .toc a {
+  font-weight: 400;
+  text-decoration-thickness: 1px;
+}
+
+.figlist-note {
+  margin-top: 14px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
 /* The themes of a domain, as a short definition list in two columns. */
 .themes {
   display: grid;
@@ -1718,6 +1788,149 @@ main {
   width: 100%;
   height: auto;
   border: 1px solid var(--ink);
+}
+
+/* The few rules single figures need beyond the shared ones. ------------------- */
+
+/* A second panel inside one plate follows a hairline, like the controls. */
+.unit-fig .fig-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Where a figure has buttons, a slider, and a readout, the readout takes a line of its
+   own and the slider keeps a usable length or drops to the next line. */
+[data-fig="salt"] .fig-controls > .fig-readout,
+[data-fig="metal"] .fig-controls > .fig-readout,
+[data-fig="flood"] .fig-readout {
+  flex-basis: 100%;
+}
+
+[data-fig="salt"] .fig-controls > .range {
+  flex-basis: 240px;
+}
+
+[data-fig="flood"] .range {
+  flex-basis: 220px;
+}
+
+[data-fig="clocks"] .range {
+  flex: 1 1 250px;
+}
+
+/* Tables with long row labels or more than two columns need more room, and space between the columns. */
+:is([data-fig="salt"], [data-fig="fragile"], [data-fig="clocks"], [data-fig="scale"]) .fig-table table {
+  max-width: 460px;
+}
+
+[data-fig="arm"] .fig-table tbody th[scope="row"] {
+  white-space: nowrap;
+}
+
+[data-fig="soft"] .fig-table table {
+  max-width: 400px;
+}
+
+[data-fig="arm"] .fig-table table {
+  max-width: none;
+}
+
+:is([data-fig="arm"], [data-fig="soft"]) .fig-table :is(th, td) + :is(th, td) {
+  padding-left: 10px;
+}
+
+:is([data-fig="arm"], [data-fig="soft"]) .fig-table tbody th[colspan] {
+  padding-top: 10px;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Lose two, keep going: buttons tall enough for a finger, a quiet look for one that has
+   nothing left to do, and on a phone the count on its own line. */
+@media (max-width: 699px), (pointer: coarse) {
+  [data-fig="swarm"] .btn--small {
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 699px) {
+  [data-fig="swarm"] .fig-readout {
+    flex-basis: 100%;
+  }
+}
+
+[data-fig="swarm"] .btn:disabled {
+  border-color: var(--rule);
+  background: var(--paper);
+  color: var(--ink-3);
+  cursor: default;
+}
+
+/* Be the controller: each group of controls takes a row of its own (the valves, the run,
+   the readout, the status line). */
+[data-fig="arm"] .fig-controls {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+/* The eight valves, set out like the arm seen from above: module 2 over module 1, left and right. */
+.valves {
+  display: grid;
+  grid-template-columns: auto repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  align-items: center;
+  max-width: 440px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.valves-head {
+  text-align: center;
+}
+
+.valves .segmented {
+  display: flex;
+}
+
+.valves .segmented button {
+  flex: 1;
+  padding: 0 8px;
+}
+
+.valves button:disabled {
+  color: var(--ink-3);
+  cursor: default;
+}
+
+.fig-run {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.fig-run .btn {
+  min-height: 38px;
+}
+
+.fig-run-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fig-status {
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-2);
 }
 
 /* 7. Other pages ---------------------------------------------------------- */
@@ -2085,8 +2298,13 @@ main {
   .front,
   .numbers,
   .contact,
+  .lead,
   .unit {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .figlist {
+    max-width: 36rem;
   }
 
   .front h1 {

@@ -1,17 +1,38 @@
 # Z Lab website (redesign concept)
 
 An unofficial redesign concept for the [Z Lab](https://z.engin.umich.edu/) at the
-University of Michigan: *Matter in extremes, Machine for extremes.*
+University of Michigan: *Matter in extremes, machine for extremes.*
 
 Plain HTML, CSS, and JavaScript. There is no build step and there are no dependencies:
 open `index.html`, or copy the folder to any web server.
+
+## The idea: a paper whose figures are alive
+
+The site reads like a physics paper. White page, ink, one hairline gray, Michigan blue for
+links, and maize used the way a highlighter is used: behind a few words, and as the one
+filled mark in a figure. Sections and figures are numbered, tables are set with three rules,
+and nothing is boxed, rounded, or shadowed. The only things that move are the figures, and
+every figure shows something from the lab's own work.
+
+The rules are written at the top of `assets/css/style.css`. Three matter most when adding
+to the site:
+
+- **A figure must trace to a source.** Each one cites the paper, code, or public talk it
+  comes from, in its caption and again in a comment at the top of its script.
+- **A figure says what kind of thing it is.** The small line under each caption reads
+  "Re-plot of published values", "A model: the paper's equation with its published values,
+  run in your browser", or "A concept illustration". Nothing is drawn that the source does
+  not give: where a paper publishes only a plot, the figure draws the fitted law and says so
+  instead of inventing points.
+- **Maize marks one thing.** It is the point being read, the selected series, the player in
+  the game. Everything else is ink.
 
 ## Pages
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Home, with the 3D particle hero (liquid, then the Atombot mark, an atom, and a lattice Z), a scroll story of the lab's robots, and the lab in numbers |
-| `research.html` | The two research domains, with two interactive sketches |
+| `index.html` | Home: the lab's statement as an abstract, a contents list, Fig. 1 (a liquid simulated in the browser with its pair distribution function and structure factor), the lab in numbers beside Fig. 2 (the soft arm), recent papers, contact |
+| `research.html` | The two research domains, each theme followed by figures built from the lab's papers (see the table below) |
 | `people.html` | PI, current members, alums |
 | `publications.html` | Searchable, filterable publication list with two figures that double as filters: papers per year, and the journals with the most papers |
 | `code.html` | Software |
@@ -21,13 +42,35 @@ open `index.html`, or copy the folder to any web server.
 
 File names match the current site, so existing links keep working if this replaces it.
 
+## Figures and where they come from
+
+| Page | Figure | Kind | Source |
+| --- | --- | --- | --- |
+| Home | A liquid, its g(r) and S(k) | Model | Definitions from LiquidLib (Walter et al., Comput. Phys. Commun. 2018); the liquid is a two-dimensional Lennard-Jones model for illustration |
+| Home | The underwater soft arm | Line drawing | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
+| Research | Flood the landscape | Model | Pentane's energy landscape and the barcode summary (the lab's metadynamics papers, cited in the caption) |
+| Research | The water that never froze | Re-plot | Table 1 of Liu et al., Proc. Natl. Acad. Sci. U.S.A. 2007 |
+| Research | Fragile to strong | Model | Fitted laws from Chen et al., J. Chem. Phys. 2006 and Zhang et al., J. Chem. Phys. 2009 |
+| Research | A pinch of fission product in a reactor salt | Model and re-plot | Table 3 of Rakib et al., ACS Appl. Energy Mater. 2025; Table III of Grizzi et al., Phys. Rev. Mater. 2026 |
+| Research | Two clocks in a glass-forming salt | Model | The two-step law and reported ranges of Luo et al., Nature Commun. 2022 and J. Phys. Chem. Lett. 2025 |
+| Research | Where the straight line ends | Model | The Arrhenius fit of Jaiswal et al., J. Phys. Chem. B 2016 |
+| Research | From 100 atoms to 100,000 | Re-plot | The lab's machine-learned potential papers (cited in the caption) |
+| Research | Be the controller: steer the underwater arm | Simplified model, with the paper's limits and scores | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
+| Research | Soft is not linear | Model | The lab's Kraken papers (cited in the caption) |
+| Research | Lose two, keep going | Concept illustration | The PI's Michigan Robotics seminar (2025) and the Atombot page of the Multidisciplinary Design Program |
+| Research | Wheels where it is flat, legs where it is not | Concept illustration | The same two public sources; not a drawing of the lab's robot |
+| Publications | Papers per year; where the work appears | Charts | `data/publications.js` |
+
+The two concept illustrations are the only figures without a paper behind them, because the
+lab has not published on those robots yet. Replace them when it does.
+
 ## Updating content
 
 Most routine updates are a one-line change to a data file. The comment at the top of
 each file explains the fields.
 
 - **Add a paper:** `data/publications.js`. Copy an entry and paste it at the top.
-  The Publications page, the home page list, and the numbers strip update themselves.
+  The Publications page, the home page list, and the numbers table update themselves.
 - **Add or move a person:** `data/people.js`. Drop their photo in `assets/img/people/`,
   cropped square with the face centered and the eyes a little above the middle so it lines
   up with the rest (about 560 px a side is plenty; WebP or JPEG). People without a photo
@@ -36,50 +79,56 @@ each file explains the fields.
   The header and footer are repeated in each page, so a navigation change means editing
   all eight.
 
+### Adding a figure to Research
+
+1. Write `assets/js/figs/<name>.js`: one self-contained script that finds
+   `[data-fig="<name>"]` and draws with the shared tools in `assets/js/figkit.js`
+   (`ZFig.canvas`, `axes`, `path`, `dot`, `text`, `rule`, `run`, `pointer`). Start it with a
+   comment naming the source and saying which numbers are published values and which are
+   modeled. `assets/js/figs/water-density.js` is the shortest example to copy.
+2. Add an `<article class="unit">` to `research.html` in the same shape as the others: a
+   short text with a link to the paper, the `<figure class="unit-fig" data-fig="<name>">`, a
+   caption that begins with `<b class="fig-no"></b>` (the number is filled in by a counter)
+   and ends with a `<span class="fig-kind">`, and a "View as table" when the figure shows
+   tabular data.
+3. Add the script tag at the bottom of `research.html`.
+
+A figure should work at 320 px wide, be usable from the keyboard (native inputs and
+buttons), start paused under "reduce motion" (`ZFig.run` does this), and show a meaningful
+picture before anyone touches it.
+
 ## Layout
 
 ```
-assets/css/style.css     all styles; design tokens and both themes are at the top
-assets/js/theme-init.js  picks light or dark before first paint
-assets/js/site.js        navigation, theme toggle, scroll reveal, shared helpers
-assets/js/fx.js          decorative motion: progress bar, word reveals, tilt, header lattice
-assets/js/hero.js        home page particle scene
-assets/js/atombot-art.js the Atombot mark as a bitmap, shared by the hero and the swarm sketch
-assets/js/story.js       home page scroll story: reactor hall, soft arm, CookieBot swarm, wheel-leg robot
-assets/js/landscape.js   research page: metadynamics sketch (energy landscape, bias layers, walker trace)
-assets/js/swarm.js       research page: robot swarm sketch
-assets/js/home.js        home page numbers, the small figure under each, and recent publications
-assets/js/people.js      renders the People page from data/people.js
-assets/js/publications.js renders the Publications page from data/publications.js
-assets/js/game.js        "Rare Event", the hidden game; loaded only when a visitor finds it
-assets/css/game.css      styles for the game
-data/                    people, publications, and the game's leaderboard settings
+assets/css/style.css        all styles; the design decisions and tokens are at the top
+assets/js/theme-init.js     marks the page as script-enabled before first paint
+assets/js/site.js           navigation menu, shared helpers, the game's loader
+assets/js/home.js           home page numbers table, contents details, recent publications
+assets/js/liquid.js         Home Fig. 1: the simulated liquid, g(r), and S(k)
+assets/js/figkit.js         shared drawing tools for the Research figures (window.ZFig)
+assets/js/figs/             one script per Research figure
+assets/js/people.js         renders the People page from data/people.js
+assets/js/publications.js   renders the Publications page from data/publications.js
+assets/js/game.js           "Rare Event", the hidden game; loaded only when a visitor opens it
+assets/css/game.css         styles for the game
+data/                       people, publications, and the game's leaderboard settings
 ```
 
-The two interactive sketches are illustrative toy models, not research code or data.
+## Charts on Publications and Home
 
-## Figures
-
-The charts (Publications, and the numbers on Home) are drawn from `data/publications.js` and
-`data/people.js`, so they update with the data. They follow one small set of rules, kept in
-`style.css` under "Figures":
+The charts are drawn from `data/publications.js` and `data/people.js`, so they update with
+the data. They follow one small set of rules, kept in `style.css` under "Figures and charts":
 
 - **One message each.** The line under a figure's title says what it shows in plain words
   ("97 since 2006, most in 2021"), and it is rewritten when a filter changes the numbers.
-- **One series color.** `--viz` is the color of the marks, `--viz-hi` the mark being read or
+- **One series color.** `--viz` is the ink of the marks, `--viz-hi` the mark being read or
   selected, `--viz-ghost` the full count shown faintly behind a filtered one, and `--viz-quiet`
-  the marks that are context. Each has a dark and a light value; change them in the two theme
-  blocks at the top of `style.css` and nowhere else. On Home the largest value in each small
-  figure wears the accent and the rest stay quiet.
+  the marks that are context.
 - **Labels are sparing and text is never colored like the data.** Only the peak, the selected
   mark, and ranked rows carry a number. Everything else is on the axis, in the tooltip, and
   in the "View as table" under each figure, so no value depends on hovering.
 - **The scale never moves.** A filter does not rescale a figure; the faint mark keeps the
   full count in view behind the papers that match.
-- **Thin marks, hairline rules, no boxes.** Bars are at most 24 px wide with 3 px rounded
-  ends, gridlines are solid 1 px lines, and a figure sits under a single rule instead of
-  inside a card. The plot height (`--plot-h`) is a multiple of 12 so every gridline lands on
-  a whole pixel.
 
 On the Publications page a year or a journal can be chosen in its figure. Each figure counts
 the papers that pass every filter except its own, so the choice can be changed in place, and
@@ -140,18 +189,16 @@ Then open <http://localhost:4173>.
 - CV and syllabus links point at the files on the official site (`cvBase` in
   `data/people.js`). To host them alongside these pages, copy the `cv/` folder next to
   `index.html` and set `cvBase` to `"cv/"`.
-- The Atombot mark (`assets/img/atombot-mark.webp`) is applied as a CSS mask, so one file takes
-  whatever text color surrounds it. Use `<span class="atombot-mark" aria-hidden="true"></span>`.
-  The home hero and the swarm sketch draw the same mark from the small character bitmap in
-  `assets/js/atombot-art.js`.
 - There is a game, Rare Event: pilot the Atombot mark through a sample that cycles through
-  liquid, crystal, gas, and glass, and catch rare events. It opens from the "Play Rare Event"
-  button in every footer, at the end of the scroll story, and on the 404 page; by typing
-  "atombot"; or by opening any page with `#play` (handy for sharing). To remove it, delete
-  `game.js`, `game.css`, the loader block in `site.js`, and the `data-game` buttons in the pages.
-- The scroll story on Home pins a stage and moves a camera through five illustrated scenes as
-  the page scrolls; its text lives in `index.html` and the drawing in `story.js`. It illustrates
-  ideas from the lab's robotics seminar and is not a drawing of the actual robots. With "reduce
-  motion" on, nothing is pinned and each scene is a still next to its text.
-- All motion respects the "reduce motion" system setting, and the hero has a pause button.
-- Fonts (Instrument Serif, Geist, Geist Mono) load from Google Fonts with system fallbacks.
+  liquid, crystal, gas, and glass, and catch rare events. It is drawn like the figures, ink
+  on paper. It opens from the "Play Rare Event" button in every footer and on the 404 page;
+  by typing "atombot"; or by opening any page with `#play` (handy for sharing). To remove
+  it, delete `game.js`, `game.css`, the loader block in `site.js`, and the `data-game`
+  buttons in the pages.
+- The LiquidLib documentation site and repository linked from the official site return
+  "not found" (checked November 2026), so the Software page links to the LiquidLib paper
+  instead. Restore the links if the lab republishes them.
+- All motion respects the "reduce motion" system setting: figures that animate start paused
+  and keep their Play button.
+- Fonts (STIX Two Text, IBM Plex Sans, IBM Plex Mono) load from Google Fonts with system
+  fallbacks.

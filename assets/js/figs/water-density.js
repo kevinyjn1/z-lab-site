@@ -47,7 +47,11 @@
     ctx.fillRect(box.l + 1, box.t + 24, xf - box.l - 1, box.b - box.t - 24);
     for (const v of [1.04, 1.06, 1.08, 1.1]) rule(ctx, box.l, Math.round(Y(v)) + 0.5, xf, Math.round(Y(v)) + 0.5, color.ruleStrong);
     rule(ctx, xf, box.t + 24, xf, box.b, color.ink3);
-    text(ctx, "bulk water has frozen by here", xf - 8, box.t + 37, { font: font.note, color: color.ink2, align: "right" });
+    /* the note takes two lines when the washed region is narrower than its words (a phone) */
+    const washNote = "bulk water has frozen by here";
+    ctx.font = font.note;
+    const washLines = ctx.measureText(washNote).width <= xf - box.l - 16 ? [washNote] : ["bulk water has", "frozen by here"];
+    washLines.forEach((line, i) => text(ctx, line, xf - 8, box.t + 37 + 15 * i, { font: font.note, color: color.ink2, align: "right" }));
 
     path(ctx, DATA.map(([t, d]) => [X(t), Y(d)]), color.ink, 1.6);
     DATA.forEach(([t, d], i) => {
@@ -56,12 +60,17 @@
     });
 
     /* The two turning points the paper reports. */
+    /* Each label sits on the open side of its turning point (under the minimum, over the
+       maximum), where the curve cannot run through it at any width. */
     const min = DATA.find((d) => d[0] === T_MIN);
-    rule(ctx, X(T_MIN), Y(min[1]) - 10, X(T_MIN), Y(min[1]) - 34, color.ink);
-    text(ctx, "minimum, 210 K", X(T_MIN), Y(min[1]) - 44, { font: font.note, color: color.ink, align: "center" });
+    const minNote = "minimum, 210 K";
+    ctx.font = font.note;
+    text(ctx, minNote, Math.min(X(T_MIN), xf - 7 - ctx.measureText(minNote).width / 2), Y(min[1]) + 21, { font: font.note, color: color.ink, align: "center" });
     const yTop = Y(1.106);
-    rule(ctx, X(T_MAX), yTop + 10, X(T_MAX), yTop + 34, color.ink);
-    text(ctx, "maximum, 284 K", X(T_MAX), yTop + 44, { font: font.note, color: color.ink, align: "center" });
+    const maxNote = "maximum, 284 K";
+    ctx.font = font.note;
+    rule(ctx, X(T_MAX), yTop - 9, X(T_MAX), yTop - 19, color.ink);
+    text(ctx, maxNote, Math.min(X(T_MAX) + ctx.measureText(maxNote).width / 2, box.r), yTop - 28, { font: font.note, color: color.ink, align: "right" });
   });
 
   function pick(i) {

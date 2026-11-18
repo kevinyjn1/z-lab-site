@@ -5,6 +5,8 @@
  *   ZFig.canvas(el, height, draw)   a crisp canvas that redraws when its width changes
  *   ZFig.axes(ctx, box, options)    axes, ticks, gridlines, labels; returns the data-to-pixel maps
  *   ZFig.path / dot / text / rule   the few marks the figures are made of
+ *   ZFig.power(ctx, n, x, y, align) a power of ten with a raised exponent
+ *   ZFig.label(el, string)          text into an element, with superscripts set properly
  *   ZFig.run(el, step)              an animation that rests when off screen, hidden, or paused
  *   ZFig.pointer(el, handlers)      pointer position in canvas pixels
  *
@@ -29,6 +31,7 @@
     mono: '11px "IBM Plex Mono", ui-monospace, Menlo, monospace',
     label: 'italic 15px "STIX Two Text", "Times New Roman", serif',
     note: '12px "IBM Plex Sans", system-ui, sans-serif',
+    sup: '8.5px "IBM Plex Mono", ui-monospace, Menlo, monospace',
   };
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -98,6 +101,21 @@
   }
 
   /*
+   * A power of ten, set as "10" with a small raised exponent. (The mono font's own
+   * superscript characters each take a full cell, which leaves gaps: 10 ⁻ ⁴.)
+   */
+  function power(ctx, exponent, x, y, align) {
+    const exp = String(exponent).replace("-", "\u2212");
+    ctx.font = font.mono;
+    const wb = ctx.measureText("10").width;
+    ctx.font = font.sup;
+    const we = ctx.measureText(exp).width;
+    const left = align === "right" ? x - wb - we - 1 : align === "center" ? x - (wb + we + 1) / 2 : x;
+    text(ctx, "10", left, y, { align: "left" });
+    text(ctx, exp, left + wb + 1, y - 4, { font: font.sup, align: "left" });
+  }
+
+  /*
    * Axes for a plot inside box {l, t, r, b} (pixels).
    * options: x: [min, max], y: [min, max], xLog, yLog, xTicks, yTicks (arrays; default round values),
    *          xFormat, yFormat (value -> string), xLabel, yLabel, grid (default true: horizontal hairlines)
@@ -116,9 +134,10 @@
     };
     const xt = o.xTicks || (o.xLog ? decades(o.x[0], o.x[1]) : ticks(o.x[0], o.x[1], 5));
     const yt = o.yTicks || (o.yLog ? decades(o.y[0], o.y[1]) : ticks(o.y[0], o.y[1], 4));
-    const show = (v, isLog) => (isLog ? "10" + String(Math.round(Math.log10(v))).replace(/-/g, "⁻").replace(/\d/g, (d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[d]) : String(v));
-    const xf = o.xFormat || ((v) => show(v, o.xLog));
-    const yf = o.yFormat || ((v) => show(v, o.yLog));
+    /* On a log axis a tick at a whole power of ten is set as 10 with a raised exponent, unless the figure formats it itself. */
+    const decade = (v) => Math.abs(Math.log10(v) - Math.round(Math.log10(v))) < 1e-9;
+    const xf = o.xFormat || String;
+    const yf = o.yFormat || String;
 
     if (o.grid !== false) {
       for (const v of yt) {
@@ -131,12 +150,14 @@
     for (const v of xt) {
       const x = Math.round(X(v)) + 0.5;
       rule(ctx, x, box.b, x, box.b + 4, color.ink);
-      text(ctx, xf(v), x, box.b + 13, { align: "center" });
+      if (o.xLog && !o.xFormat && decade(v)) power(ctx, Math.round(Math.log10(v)), x, box.b + 13, "center");
+      else text(ctx, xf(v), x, box.b + 13, { align: "center" });
     }
     for (const v of yt) {
       const y = Math.round(Y(v)) + 0.5;
       rule(ctx, box.l - 4, y, box.l, y, color.ink);
-      text(ctx, yf(v), box.l - 8, y, { align: "right" });
+      if (o.yLog && !o.yFormat && decade(v)) power(ctx, Math.round(Math.log10(v)), box.l - 8, y, "right");
+      else text(ctx, yf(v), box.l - 8, y, { align: "right" });
     }
     if (o.xLabel) text(ctx, o.xLabel, box.r, box.b + 32, { font: font.label, color: color.ink, align: "right" });
     if (o.yLabel) text(ctx, o.yLabel, box.l + 8, box.t + 2, { font: font.label, color: color.ink, baseline: "top" });
@@ -204,7 +225,7 @@
     }
     if ("IntersectionObserver" in window) {
       new IntersectionObserver((entries) => {
-        inView = entries[0].isIntersecting;
+        inView = entries[entries.length - 1].isIntersecting; /* the latest of any that queued up */
         kick();
       }).observe(el);
     }
@@ -212,6 +233,21 @@
     document.addEventListener("zlab:game", kick);
     kick();
     return api;
+  }
+
+  /*
+   * Writes a label into an element, turning superscript characters (cm², 10⁻⁶, Å⁻¹) into
+   * <sup> elements, because the mono font gives each of those characters a full cell.
+   */
+  const PLAIN = { "⁻": "\u2212", "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9" };
+  function label(el, str) {
+    el.textContent = "";
+    for (const piece of String(str).split(/([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/)) {
+      if (!piece) continue;
+      if (PLAIN[piece[0]] === undefined) el.append(piece);
+      else el.appendChild(document.createElement("sup")).textContent = Array.from(piece, (c) => PLAIN[c]).join("");
+    }
+    return el;
   }
 
   /* Pointer position in canvas pixels. handlers: move(x, y), leave(), down(x, y). Touch scrolling is left alone. */
@@ -225,5 +261,5 @@
     if (handlers.down) el.addEventListener("pointerdown", (e) => handlers.down.apply(null, at(e).concat(e)));
   }
 
-  window.ZFig = { color, font, canvas, ticks, axes, path, dot, text, rule, run, pointer, reduceMotion };
+  window.ZFig = { color, font, canvas, ticks, axes, power, path, dot, text, rule, run, pointer, label, reduceMotion };
 })();
