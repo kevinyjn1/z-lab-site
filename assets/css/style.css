@@ -345,7 +345,8 @@ mark,
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   font-family: var(--serif);
   font-weight: 700;
   letter-spacing: -0.012em;
@@ -368,7 +369,8 @@ h2 {
   line-height: 1.15;
 }
 
-h3 {
+h3,
+h4 {
   font-size: var(--fs-h3);
   line-height: 1.25;
 }
@@ -1714,30 +1716,55 @@ html:not(.js) .stat-viz {
   color: var(--ink-3);
 }
 
-/* The themes of a domain, as a short definition list in two columns. */
-.themes {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px clamp(28px, 4.5vw, 64px);
-  margin: 0 0 clamp(20px, 3vw, 36px);
-  font-size: 1.06rem;
-  line-height: 1.5;
-}
-
-.themes dt {
-  font-weight: 700;
-}
-
-.themes dd {
-  margin-top: 2px;
-  color: var(--ink-2);
-}
-
-/* A unit: what the lab found, on the left, and a figure built from those papers, on the right. */
+/* Figures on a page are numbered in order, wherever they sit. */
 main {
   counter-reset: fig;
 }
 
+/* A theme of a domain, in the words of the lab's own research statement. The figures that
+   belong to a theme follow it. */
+.theme {
+  padding-top: clamp(26px, 3.4vw, 40px);
+  border-top: 1px solid var(--ink);
+}
+
+.section-head + .theme {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.theme-title {
+  max-width: 34em;
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.theme-note {
+  max-width: 40em;
+  margin-top: 8px;
+  font-size: 1.03rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* a theme's first figure follows it without a rule of its own */
+.theme + .unit {
+  border-top: 0;
+}
+
+/* a theme with no figure of its own keeps some room before the next theme */
+.theme:has(+ .theme) {
+  padding-bottom: clamp(26px, 3.4vw, 40px);
+}
+
+/* The lab's statement, under its own heading. */
+.statement {
+  margin-bottom: 0.6em;
+  font-size: var(--fs-h2);
+}
+
+/* A unit: what the lab found, on the left, and a figure built from those papers, on the right. */
 .unit {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -1751,7 +1778,7 @@ main {
   margin-top: 0.8em;
 }
 
-.unit-text h3 {
+.unit-text :is(h3, h4) {
   font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
 }
 

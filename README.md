@@ -32,7 +32,7 @@ to the site:
 | File | What it is |
 | --- | --- |
 | `index.html` | Home: the lab's statement as an abstract, a contents list, Fig. 1 (a liquid simulated in the browser with its pair distribution function and structure factor), the lab in numbers beside Fig. 2 (the soft arm), Atombot with its mark, recent papers, contact |
-| `research.html` | The two research domains, each theme followed by figures built from the lab's papers (see the table below) |
+| `research.html` | The lab's research statement in its own words (heading, paragraph, and the eight themes of Matter and Machine, in the order the lab lists them), with the figures built from the lab's papers filed under the theme each belongs to (see the table below) |
 | `people.html` | PI, current members, alums |
 | `publications.html` | Searchable, filterable publication list with two figures that double as filters: papers per year, and the journals with the most papers |
 | `code.html` | Software |
