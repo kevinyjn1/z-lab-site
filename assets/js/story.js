@@ -65,6 +65,7 @@
   let wide = true;
   let botSize = 1;
   let aim = [0, 0, 0, 0, 0]; /* how far right of each scene's middle the camera parks */
+  let aimIn = aim; /* where it arrives; in the stairwell it then follows the robot up to aim */
   let park = 230; /* where the wheel-leg robot stops in the finale */
 
   let g = 0; /* story position in scenes, eased toward gTarget */
@@ -662,7 +663,8 @@
   const TABLE = { x0: -170, x1: 40, back: 0.18, front: 0.62, top: 62 };
   const BALL_FROM = [150, 0.82];
   const BALL_TO = [330, 0.5];
-  const AERIAL = [-326, -208]; /* tip of the base station's antenna, in open-floor coordinates */
+  const STATION = -292; /* left edge of the base station, in open-floor coordinates */
+  const AERIAL = [STATION + 46, -208]; /* tip of its antenna */
 
   function seedBots(n) {
     bots.length = 0;
@@ -851,15 +853,15 @@
       ctx.fillStyle = PANEL;
       ctx.strokeStyle = INK;
       ctx.lineWidth = 2.2;
-      box(-372, -124, 92, 124, 6);
+      box(STATION, -124, 92, 124, 6);
       ctx.fill();
       ctx.stroke();
       ctx.strokeStyle = SOFT;
       ctx.lineWidth = 1.3;
-      box(-360, -110, 68, 40, 3);
+      box(STATION + 12, -110, 68, 40, 3);
       ctx.stroke();
       ctx.strokeStyle = SKY;
-      for (let k = 0; k < 4; k++) line(-352, -100 + k * 8, -352 + 22 + hash(k + Math.floor(time * 2)) * 30, -100 + k * 8);
+      for (let k = 0; k < 4; k++) line(STATION + 20, -100 + k * 8, STATION + 42 + hash(k + Math.floor(time * 2)) * 30, -100 + k * 8);
       ctx.strokeStyle = INK;
       ctx.lineWidth = 2;
       line(AERIAL[0], -124, AERIAL[0], AERIAL[1] + 4);
@@ -1312,9 +1314,10 @@
 
   function cameraAt(pos) {
     const c = Math.min(N - 1, Math.floor(pos));
-    if (c === N - 1) return c * ZW + aim[c];
+    const here = c * ZW + lerp(aimIn[c], aim[c], smooth((pos - c) / DWELL));
+    if (c === N - 1) return here;
     const travel = smooth((pos - c - DWELL) / (1 - DWELL));
-    return lerp(c * ZW + aim[c], (c + 1) * ZW + aim[c + 1], travel);
+    return lerp(here, (c + 1) * ZW + aimIn[c + 1], travel);
   }
 
   function fieldNow() {
@@ -1392,18 +1395,28 @@
   /* Put the scene in the space the text leaves free: the right side when wide, the top when narrow. */
   function frameScene(full) {
     wide = full && W >= 900;
-    const boxW = wide ? W * 0.56 : W - 20;
+    const edge = Math.max(24, W * 0.035);
+    let boxW = W - 20;
+    if (wide) {
+      /* beside the text: never under its paragraphs, however narrow the window */
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const textEnd = stepList.getBoundingClientRect().left - mainCanvas.getBoundingClientRect().left + Math.min(stepList.offsetWidth, 27 * rem);
+      boxW = Math.min(W * 0.56, W - edge - textEnd - 16);
+    }
     /* narrow: the scene gets what is left above the tallest block of text, up to half the stage */
     const above = full && !wide ? clamp(H - 78 - stepList.offsetHeight - 146, 170, H * 0.5) : 0;
     const boxH = wide ? H - 226 : full ? above : H - 16;
     const boxTop = wide ? 100 : full ? 78 : 8;
     q = Math.min(boxW / 760, boxH / 640);
-    cx = wide ? W - boxW / 2 - Math.max(24, W * 0.035) : W / 2;
+    cx = wide ? W - boxW / 2 - edge : W / 2;
     gy = boxTop + (boxH - 640 * q) / 2 + 482 * q;
     ZW = Math.max((W * 1.06) / q, 940);
     botSize = q < 0.62 ? 1.45 : 1;
     /* the action in the later scenes runs to the right, so the camera leads it a little */
-    aim = wide ? [0, 0, 70, 230, 40] : full ? [0, 0, 70, 150, 0] : [0, 0, 80, 150, 0];
+    aim = wide ? [0, 0, 40, 230, 40] : full ? [0, 0, 70, 150, 0] : [0, 0, 80, 150, 0];
+    /* beside the text, the stairwell opens on the foot of the stairs so the robot rolls in clear of the words */
+    aimIn = aim.slice();
+    if (wide) aimIn[3] = 40;
     park = wide ? 230 : 170;
   }
 

@@ -2830,7 +2830,9 @@ button.chip:hover {
   display: block;
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #040d1a 0%, rgba(4, 13, 26, 0.98) 28%, rgba(4, 13, 26, 0) 58%);
+  /* Solid to the end of the text column (27rem of paragraph from the page gutter), then a short fade. */
+  --text-end: calc(max(var(--gutter), (100% - var(--wrap)) / 2) + 28rem);
+  background: linear-gradient(90deg, #040d1a 0, #040d1a var(--text-end), rgba(4, 13, 26, 0) calc(var(--text-end) + 6rem));
   pointer-events: none;
 }
 
