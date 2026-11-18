@@ -52,7 +52,7 @@ File names match the current site, so existing links keep working if this replac
 | Research | The water that never froze | Re-plot | Table 1 of Liu et al., Proc. Natl. Acad. Sci. U.S.A. 2007 |
 | Research | Fragile to strong | Model | Fitted laws from Chen et al., J. Chem. Phys. 2006 and Zhang et al., J. Chem. Phys. 2009 |
 | Research | A pinch of fission product in a reactor salt | Model and re-plot | Table 3 of Rakib et al., ACS Appl. Energy Mater. 2025; Table III of Grizzi et al., Phys. Rev. Mater. 2026 |
-| Research | Two clocks in a glass-forming salt | Model | The two-step law and reported ranges of Luo et al., Nature Commun. 2022 and J. Phys. Chem. Lett. 2025 |
+| Research | Two clocks in a glass-forming salt | Re-plot | The measured curves and fitted values in the open Source Data file of Luo et al., Nature Commun. 2022 (CC BY 4.0) |
 | Research | Softer when charged | Model | The Huggins fits (Table 1) and conductivity relation of Farag et al., Phys. Chem. Chem. Phys. 2023 |
 | Research | Where the straight line ends | Model | The Arrhenius fit of Jaiswal et al., J. Phys. Chem. B 2016 |
 | Research | From 100 atoms to 100,000 | Re-plot | Lee et al., J. Phys. Chem. B 2021; Lee and Z, J. Chem. Phys. 2024; Murg et al., J. Appl. Phys. 2025; Grizzi et al., Phys. Rev. Mater. 2026 |
@@ -64,6 +64,11 @@ File names match the current site, so existing links keep working if this replac
 
 The two concept illustrations are the only figures without a paper behind them, because the
 lab has not published on those robots yet. Replace them when it does.
+
+One figure uses a paper's own data file. `assets/js/figs/clocks-data.js` holds measured values
+copied from the Source Data file of Luo et al., Nature Communications 13, 2092 (2022),
+which is published under the Creative Commons Attribution 4.0 International License. The
+file's header and the figure's caption carry the credit; keep both if the figure moves.
 
 ## Updating content
 
@@ -107,7 +112,8 @@ assets/js/site.js           navigation menu, shared helpers, the game's loader
 assets/js/home.js           home page numbers table, contents details, recent publications
 assets/js/liquid.js         Home Fig. 1: the simulated liquid, g(r), and S(k)
 assets/js/figkit.js         shared drawing tools for the Research figures (window.ZFig)
-assets/js/figs/             one script per Research figure
+assets/js/figs/             one script per Research figure (clocks-data.js is generated, see tools/)
+tools/make_clocks_data.py   rebuilds clocks-data.js from the paper's Source Data spreadsheet
 assets/js/people.js         renders the People page from data/people.js
 assets/js/publications.js   renders the Publications page from data/publications.js
 assets/js/game.js           "Rare Event", the hidden game; loaded only when a visitor opens it

@@ -60,7 +60,7 @@
           <li><span></span><a href="#water">The water that never froze</a><em>re-plot</em></li>
           <li><span></span><a href="#fragile">Fragile to strong</a><em>model</em></li>
           <li><span></span><a href="#salt">A pinch of fission product in a reactor salt</a><em>model, re-plot</em></li>
-          <li><span></span><a href="#clocks">Two clocks in a glass-forming salt</a><em>model</em></li>
+          <li><span></span><a href="#clocks">Two clocks in a glass-forming salt</a><em>re-plot</em></li>
           <li><span></span><a href="#charge">Softer when charged</a><em>model</em></li>
           <li><span></span><a href="#metal">Where the straight line ends</a><em>model</em></li>
           <li><span></span><a href="#scale">From 100 atoms to 100,000</a><em>re-plot</em></li>
@@ -173,20 +173,24 @@
       <article class="unit" id="clocks">
         <div class="unit-text">
           <h3>Two clocks in a glass-forming salt</h3>
-          <p>Neutron spin echo times how a ripple in a liquid's density fades. In CKN, a molten nitrate salt that forms a glass, it fades in two steps: a fast one in under a picosecond, then a slow, stretched one that lengthens steeply on cooling. Both follow the liquid's structure, and below about 2.6 &Aring; the slow step obeys different rules (<a href="https://doi.org/10.1038/s41467-022-29778-4">Luo et al., <cite>Nature Commun.</cite> 2022</a>; <a href="https://doi.org/10.1021/acs.jpclett.5c03173">Luo et al., <cite>J. Phys. Chem. Lett.</cite> 2025</a>).</p>
+          <p>Neutron spin echo times how a ripple in a liquid's density fades. In CKN, a molten nitrate salt that forms a glass, it fades in two steps: a fast one within a picosecond, then a slow, stretched one that lengthens from 17 picoseconds at 519 K to 6 nanoseconds at 402 K. Both follow the liquid's structure, and below about 2.6 &Aring; the slow step obeys different rules (<a href="https://doi.org/10.1038/s41467-022-29778-4">Luo et al., <cite>Nature Commun.</cite> 2022</a>; <a href="https://doi.org/10.1021/acs.jpclett.5c03173">Luo et al., <cite>J. Phys. Chem. Lett.</cite> 2025</a>).</p>
           <p>EXPANSE, a wide-angle spin echo spectrometer planned for Oak Ridge's Second Target Station, would record many length scales and times at once; the lab is among the authors of its design paper (<a href="https://doi.org/10.1063/5.0089349">Do et al., <cite>Rev. Sci. Instrum.</cite> 2022</a>).</p>
         </div>
         <figure class="unit-fig" data-fig="clocks">
           <div class="plate">
-            <canvas role="img" aria-label="A model curve of how a density fluctuation in molten CKN fades, as the intermediate scattering function I of Q and t over I of Q and zero, against time on a logarithmic axis from 0.1 picoseconds to 10 nanoseconds. The curve falls in two steps: a fast drop within about a picosecond to a plateau of height f, then a slow stretched decay. At 444 kelvin and a wave vector of 1.86 inverse angstroms the plateau is near 0.71 and the slow step reaches one over e of its height at about 140 picoseconds. Brackets mark the measured time windows: time of flight from 0.1 to 6 picoseconds and spin echo from 2.6 picoseconds to 1.2 nanoseconds. Cooling raises the plateau and moves the slow step to longer times; moving the wave vector away from 1.86 lowers the plateau and stretches the decay."></canvas>
-            <p class="fig-readout"><span>plateau f <b data-f>0.71</b></span> <span>stretch &beta; <b data-beta>0.69</b></span> <span>slow clock <b data-slow>140 ps</b></span> <span>fast clock <b data-fast>0.2 ps</b></span> <span data-scale>3.4 &Aring;, longer than 2.6 &Aring;: nitrate to nitrate</span> <span data-limit></span></p>
+            <canvas role="img" aria-label="Measured decay of density fluctuations in molten CKN against time on a logarithmic axis, from Luo and co-workers. Three views. Both steps: at one wave vector, time of flight points from about 0.1 to 6 picoseconds and spin echo points from 2.6 picoseconds to 1.2 nanoseconds, at about 420 kelvin and about 480 kelvin. The share of the fluctuation left drops quickly to a plateau near 0.75 within a picosecond, then decays slowly, much sooner at the higher temperature. Cooling: twelve spin echo curves from 383 to 519 kelvin at 1.86 inverse angstroms; the slow decay moves to longer times on cooling, from 17 picoseconds at 519 kelvin to 6 nanoseconds at 402 kelvin. Length scale: twelve curves at 444 kelvin for wave vectors from 1.08 to 2.82 inverse angstroms; the plateau is highest near 1.86 inverse angstroms, the peak of the structure factor."></canvas>
             <div class="fig-controls">
-              <label class="range"><span data-t-out>444 K</span><input type="range" data-t min="383" max="519" step="1" value="444" aria-label="Temperature, 383 to 519 kelvin"><span class="range-ends"><i>383 K</i><i>519 K</i></span></label>
-              <label class="range"><span data-q-out>1.86 &Aring;&#8315;&sup1;</span><input type="range" data-q min="1.08" max="2.82" step="0.01" value="1.86" aria-label="Wave vector Q, 1.08 to 2.82 inverse angstroms"><span class="range-ends"><i>1.08 &Aring;&#8315;&sup1;</i><i>2.82 &Aring;&#8315;&sup1;</i></span></label>
+              <div class="segmented" role="group" aria-label="What to show">
+                <button type="button" data-view="both" aria-pressed="true">Both steps</button>
+                <button type="button" data-view="cooling" aria-pressed="false">Cooling</button>
+                <button type="button" data-view="scale" aria-pressed="false">Length scale</button>
+              </div>
+              <label class="range"><span data-out>1.86 &Aring;<sup>&minus;1</sup></span><input type="range" data-pick min="0" max="2" step="1" value="1" aria-label="Wave vector"><span class="range-ends"><i data-lo>1.26 &Aring;<sup>&minus;1</sup></i><i data-hi>2.60 &Aring;<sup>&minus;1</sup></i></span></label>
+              <p class="fig-readout" data-values></p>
             </div>
           </div>
-          <figcaption class="caption"><b class="fig-no"></b> How a density fluctuation fades in molten CKN, from the two-step law of <a href="https://doi.org/10.1038/s41467-022-29778-4">Luo et al. 2022</a>: (1 &minus; <i>f</i>) exp(&minus;<i>t</i>/<i>&tau;</i><sub>fast</sub>) + <i>f</i> exp(&minus;(<i>t</i>/<i>&tau;</i><sub>slow</sub>)<sup><i>&beta;</i></sup>). This is a model built from the ranges and trends the papers report, not their measured curves: <i>f</i> from 0.45 to 0.85 and <i>&beta;</i> from 0.45 to 0.75, both highest at the structure factor peak (1.86 &Aring;<sup>&minus;1</sup>); a slow time on the Vogel-Fulcher-Tammann law (<i>D</i> = 1.53, <i>T</i><sub>0</sub> = 340 K), kept the same at every wave vector and set to 15 ps at 530 K; a fast time of 0.2 ps, the middle of its range (both from <a href="https://doi.org/10.1021/acs.jpclett.5c03173">Luo et al. 2025</a>). Brackets: the measured time windows; shaded: beyond them. <span class="fig-kind">A model: the paper's equation, with values placed inside the ranges the papers report. Not measured curves.</span></figcaption>
-          <details class="fig-table"><summary>View as table</summary><div data-table></div></details>
+          <figcaption class="caption"><b class="fig-no"></b> How a density fluctuation fades in molten CKN, Ca<sub>0.4</sub>K<sub>0.6</sub>(NO<sub>3</sub>)<sub>1.4</sub>: the measured points and error bars of <a href="https://doi.org/10.1038/s41467-022-29778-4">Luo et al. 2022</a>, from the paper's open Source Data file (CC BY 4.0). Both steps: time of flight and spin echo together, at three wave vectors (the paper's Fig. 6). Cooling: twelve temperatures at 1.86 &Aring;<sup>&minus;1</sup>, the peak of the structure factor (Fig. 2b). Length scale: twelve wave vectors at 444 K (Fig. 2a). The line through the chosen curve is the paper's fit to the slow step, <i>f</i> exp(&minus;(<i>t</i>/<i>&tau;</i>)<sup><i>&beta;</i></sup>), with its published values, and the maize dot marks the slow time <i>&tau;</i>. <span class="fig-kind">Re-plot of published values.</span></figcaption>
+          <details class="fig-table"><summary>View the fitted values as a table</summary><div data-table></div></details>
         </figure>
       </article>
       <article class="unit" id="charge">
@@ -417,6 +421,7 @@
   <script src="assets/js/figs/water-density.js" defer></script>
   <script src="assets/js/figs/fragile.js" defer></script>
   <script src="assets/js/figs/salt.js" defer></script>
+  <script src="assets/js/figs/clocks-data.js" defer></script>
   <script src="assets/js/figs/clocks.js" defer></script>
   <script src="assets/js/figs/charge.js" defer></script>
   <script src="assets/js/figs/metal.js" defer></script>

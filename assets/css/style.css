@@ -1807,6 +1807,7 @@ main {
 /* Where a figure has buttons, a slider, and a readout, the readout takes a line of its
    own and the slider keeps a usable length or drops to the next line. */
 [data-fig="salt"] .fig-controls > .fig-readout,
+[data-fig="clocks"] .fig-controls > .fig-readout,
 [data-fig="charge"] .fig-controls > .fig-readout,
 [data-fig="metal"] .fig-controls > .fig-readout,
 [data-fig="flood"] .fig-readout {
@@ -1855,7 +1856,7 @@ main {
   padding-left: 10px;
 }
 
-:is([data-fig="arm"], [data-fig="soft"]) .fig-table tbody th[colspan] {
+:is([data-fig="arm"], [data-fig="soft"], [data-fig="clocks"]) .fig-table tbody th[colspan] {
   padding-top: 10px;
   font-family: var(--sans);
   font-size: 0.75rem;
@@ -2523,6 +2524,11 @@ main {
 }
 
 @media (max-width: 479px) {
+  /* A three-way switch has to fit a 320 px screen. */
+  .unit-fig .segmented button {
+    padding-inline: 10px;
+  }
+
   /* Small phones (down to 320 px): the contact blocks stack, and the numbers table gives its last column room. */
   .contact-list {
     grid-template-columns: minmax(0, 1fr);

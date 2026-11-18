@@ -1,241 +1,254 @@
 /*
- * Research, "Two clocks in a glass-forming salt".
+ * Two clocks in a glass-forming salt: how a density fluctuation in molten CKN fades, as
+ * measured by neutron time of flight and neutron spin echo.
  *
- * A model, not measured curves: the two-step law that P. Luo, Y. Zhai, P. Falus,
- * V. Garcia-Sakai, M. Hartl, M. Kofu, K. Nakajima, A. Faraone, and Y Z fit to
- * the decay of density fluctuations in the molten salt Ca0.4K0.6(NO3)1.4 (CKN),
- * Nature Commun. 13, 2092 (2022), Eq. 1:
+ * Source: P. Luo, Y. Zhai, P. Falus, V. Garcia Sakai, M. Hartl, M. Kofu, K. Nakajima,
+ * A. Faraone, and Y Z, "Q-dependent collective relaxation dynamics of glass-forming liquid
+ * Ca0.4K0.6(NO3)1.4 investigated by wide-angle neutron spin-echo", Nature Communications 13,
+ * 2092 (2022), DOI 10.1038/s41467-022-29778-4, published under CC BY 4.0.
  *
- *   I(Q,t)/I(Q,0) = (1 - f) exp(-t/tau_fast) + f exp(-(t/tau_slow)^beta)
- *
- * run in the browser. The fast time comes from the follow-up paper, P. Luo,
- * Y. Zhai, Z. Cai, L. Trojanowski, M. Kofu, K. Nakajima, A. Faraone, and Y Z,
- * J. Phys. Chem. Lett. 16, 12386 (2025).
- *
- * Published (each constant below names its source): the equation; the ranges of
- * f and beta and how they trend with Q and temperature; the Vogel-Fulcher-
- * Tammann (VFT) law for the slow time, Eq. 2, with the D and T0 of the
- * macroscopic shear relaxation time, which the paper says match the average of
- * its low-Q values; one absolute slow time (about 15 ps at 530 K and
- * 1.86 A^-1); the range of the fast time; the change of regime at 2.4 A^-1; the
- * measured ranges of Q, temperature, and time.
- *
- * The website's own choices, because the papers' text gives ranges and trends
- * but no value at each Q and temperature (they are marked "website" below):
- *   - "in phase with S(Q)" is stood in for by one smooth bump centered on the
- *     main peak of S(Q). The measured S(Q) has a second, broad peak at
- *     2.85 A^-1 that the model leaves out.
- *   - half of each reported range (f, beta) is given to Q and half to temperature,
- *     and beta's response to temperature fades out linearly between 2.33 and
- *     2.60 A^-1, the two wave vectors at which the paper describes it.
- *   - the VFT prefactor is fixed by the one absolute slow time quoted.
- *   - the slow time is the same at every Q. The paper finds that it follows
- *     S(Q)/Q^2 and turns more Arrhenius-like above 2.4 A^-1, without numbers
- *     in the text, so the model does not show it.
- *   - the fast time is held at the middle of its reported range.
- * Nothing is illustration, and no measured point is drawn.
+ * Everything drawn is published: the points and their error bars are the measured
+ * intermediate scattering functions from the paper's Source Data file (Figs. 2a, 2b, and 6),
+ * and the line through the chosen curve is the paper's fitted law for the slow step,
+ * f exp(-(t / tau)^beta), with the fitted values from the same file (Fig. 3). The numbers
+ * live in clocks-data.js, which tools/make_clocks_data.py builds from that file.
+ * Nothing is modeled or interpolated here.
  */
 (() => {
   "use strict";
-
   const root = document.querySelector('[data-fig="clocks"]');
-  if (!root || !window.ZFig) return;
-  const { color, font, canvas, axes, path, dot, text, rule } = window.ZFig;
+  const data = window.ZFigData && window.ZFigData.clocks;
+  if (!root || !window.ZFig || !data) return;
+  const { canvas, axes, path, dot, text, rule, label, color, font } = window.ZFig;
 
-  /* Luo et al. 2022, wide-angle spin echo (WASP) and time of flight (AMATERAS). */
-  const Q_PEAK = 1.86; /* main peak of S(Q), 1/angstrom */
-  const Q_REGIME = 2.4; /* change of regime, 1/angstrom: a length of about 2.6 angstrom */
-  const F = [0.45, 0.85]; /* amplitude f of the slow step: "about 0.45 to about 0.85", in phase with S(Q) */
-  const BETA = [0.45, 0.75]; /* stretching exponent: "about 0.45 to about 0.75", largest near the S(Q) maximum */
-  const T_FLAT = 470; /* K: f falls linearly on heating up to here and is flat above; beta is constant above */
-  const T_F_LOW = 383; /* K: lowest temperature measured; f is reported down to here */
-  const T_BETA_LOW = 402; /* K: lowest temperature at which beta and the slow time are reported */
-  const Q_BETA_FALLS = 2.33; /* 1/angstrom: up to here beta falls on cooling below 470 K */
-  const Q_BETA_FLAT = 2.6; /* 1/angstrom: from here on beta shows no systematic temperature dependence */
-  const VFT_D = 1.53; /* tau = A exp(D T0 / (T - T0)), Eq. 2: D = 1.53 +/- 0.15 from the shear relaxation time */
-  const VFT_T0 = 340.0; /* K: T0 = 340.0 +/- 3.5 K, same fit */
-  const WINDOW_TOF = [0.1, 6]; /* ps: time-of-flight spectra turned into the time domain (Fig. 6) */
-  const WINDOW_NSE = [2.6, 1200]; /* ps: spin echo (Fig. 6) */
-
-  /* Luo et al. 2025, inelastic neutron scattering on the same salt. */
-  const TAU_FAST = 0.2; /* ps: the middle of the reported 0.1 to 0.3 ps (website: held fixed) */
-  const TAU_AT = [530, 15]; /* K, ps: the slow time "is still about 15 ps at 530 K" at 1.86 1/angstrom */
-
-  /* Website: the VFT prefactor that puts the slow time at 15 ps at 530 K. About 0.97 ps. */
-  const VFT_A = TAU_AT[1] / Math.exp((VFT_D * VFT_T0) / (TAU_AT[0] - VFT_T0));
-  /* Website: width (1/angstrom) of the bump that stands in for "in phase with S(Q)". */
-  const BUMP = 0.3;
-
-  const clamp = (v) => Math.max(0, Math.min(1, v));
-  const model = (T, Q) => {
-    const peak = Math.exp(-0.5 * Math.pow((Q - Q_PEAK) / BUMP, 2)); /* website: 1 at the S(Q) peak, 0 far from it */
-    const coolF = clamp((T_FLAT - T) / (T_FLAT - T_F_LOW)); /* 0 at and above 470 K, 1 at 383 K */
-    const coolB = clamp((T_FLAT - T) / (T_FLAT - T_BETA_LOW)); /* 0 at and above 470 K, 1 at and below 402 K */
-    const follows = clamp((Q_BETA_FLAT - Q) / (Q_BETA_FLAT - Q_BETA_FALLS)); /* website: how much beta follows temperature */
-    const halfF = (F[1] - F[0]) / 2;
-    const halfB = (BETA[1] - BETA[0]) / 2;
-    return {
-      f: F[0] + halfF * peak + halfF * coolF,
-      beta: BETA[1] - halfB * (1 - peak) - halfB * coolB * follows,
-      slow: VFT_A * Math.exp((VFT_D * VFT_T0) / (T - VFT_T0)),
-      fast: TAU_FAST,
-    };
+  /* Three views of the same measurements. `list` is what the slider steps through. */
+  const VIEWS = {
+    both: { list: data.bothSteps, start: 1, x: [1e-4, 2], name: (c) => waveVector(c.q), slider: "Wave vector" },
+    cooling: { list: data.byTemperature, start: 6, x: [2e-3, 2], name: (c) => c.T + " K", slider: "Temperature" },
+    scale: { list: data.byWaveVector, start: 4, x: [2e-3, 2], name: (c) => waveVector(c.q) + " (" + (6.2832 / c.q).toFixed(1) + " Å)", slider: "Wave vector" },
   };
-  const decay = (m, t) => (1 - m.f) * Math.exp(-t / m.fast) + m.f * Math.exp(-Math.pow(t / m.slow, m.beta));
+  const picked = { both: VIEWS.both.start, cooling: VIEWS.cooling.start, scale: VIEWS.scale.start };
+  let view = "both";
 
-  const TIME_AXIS = [0.1, 10000]; /* ps: the time axis, layout; it runs a little past the measured window */
-  const two = (v) => Number(v.toPrecision(2));
-  const clock = (ps) => (two(ps) < 1000 ? two(ps) + " ps" : two(ps / 1000) + " ns");
+  function waveVector(q) {
+    return q.toFixed(2) + " Å⁻¹";
+  }
+  /* A time in nanoseconds, written in the unit a reader would use. */
+  function time(ns) {
+    if (ns >= 1) return Number(ns.toPrecision(3)) + " ns";
+    const ps = ns * 1000;
+    return Number(ps.toPrecision(ps < 10 ? 2 : 3)) + " ps";
+  }
+  const tick = (v) => (v >= 1 ? v + " ns" : Number((v * 1000).toPrecision(1)) + " ps");
 
-  const tSlider = root.querySelector("[data-t]");
-  const qSlider = root.querySelector("[data-q]");
-  const out = (name) => root.querySelector("[data-" + name + "]");
-  const state = { T: 444, Q: Q_PEAK };
+  const slider = root.querySelector("[data-pick]");
+  const out = root.querySelector("[data-out]");
+  const lo = root.querySelector("[data-lo]");
+  const hi = root.querySelector("[data-hi]");
+  const values = root.querySelector("[data-values]");
+  const buttons = Array.from(root.querySelectorAll("[data-view]"));
 
-  const stage = canvas(root.querySelector("canvas"), (w) => (w < 480 ? 310 : 350), (ctx, w, h) => {
-    const box = { l: 44, t: 32, r: w - 24, b: h - 46 };
-    const width = (str, f) => {
-      ctx.font = f;
-      return ctx.measureText(str).width;
-    };
-    const { X, Y } = axes(ctx, box, {
-      x: TIME_AXIS,
-      y: [0, 1.3],
-      xLog: true,
-      xTicks: box.r - box.l < 230 ? [0.1, 10, 1000] : undefined, /* every other decade on a narrow plot */
-      xFormat: (v) => (v < 1000 ? v + " ps" : v / 1000 + " ns"),
-      yTicks: [0, 0.25, 0.5, 0.75, 1],
-      xLabel: "time (logarithmic)",
-    });
-    const note = (str, px, py, o) => text(ctx, str, px, py, Object.assign({ font: font.note, color: color.ink2 }, o));
-    const yLabel = "fluctuation remaining, I(Q,t)/I(Q,0)";
-    text(ctx, width(yLabel, font.label) <= w - box.l - 4 ? yLabel : "I(Q,t)/I(Q,0)", box.l, box.t - 16, { font: font.label, color: color.ink });
-
-    /* Longer times than either instrument reached. */
-    const xEnd = Math.round(X(WINDOW_NSE[1])) + 0.5;
-    ctx.fillStyle = color.wash;
-    ctx.fillRect(xEnd, box.t, box.r - xEnd, box.b - box.t);
-    for (const v of [0.25, 0.5, 0.75, 1]) rule(ctx, xEnd, Math.round(Y(v)) + 0.5, box.r, Math.round(Y(v)) + 0.5, color.ruleStrong);
-
-    /* The time windows of the two measurements. */
-    const bracket = (span, level, label) => {
-      const y = Math.round(Y(level)) + 0.5;
-      rule(ctx, X(span[0]), y, X(span[1]), y, color.ink3);
-      rule(ctx, Math.round(X(span[0])) + 0.5, y - 4, Math.round(X(span[0])) + 0.5, y + 4, color.ink3);
-      rule(ctx, Math.round(X(span[1])) + 0.5, y - 4, Math.round(X(span[1])) + 0.5, y + 4, color.ink3);
-      note(label, Math.max((X(span[0]) + X(span[1])) / 2, box.l + 5 + width(label, font.note) / 2), y - 10, { align: "center" });
-    };
-    bracket(WINDOW_TOF, 1.2, "time of flight");
-    bracket(WINDOW_NSE, 1.07, "spin echo");
-
-    const m = model(state.T, state.Q);
-
-    /* The plateau between the two steps. */
-    path(ctx, [[box.l, Y(m.f)], [box.r, Y(m.f)]], color.ink3, 1, [2, 4]);
-    note("plateau f", box.r - 6, Y(m.f) - 9, { align: "right" });
-
-    /* The slow clock: where the slow step has fallen to 1/e of its height. */
-    const onPlot = m.slow <= TIME_AXIS[1];
-    const xs = X(m.slow);
-    const ys = Y(decay(m, m.slow));
-    if (onPlot) rule(ctx, xs, ys, xs, box.b, color.ink);
-
-    const pts = [];
-    for (let i = 0; i <= 250; i++) {
-      const t = TIME_AXIS[0] * Math.pow(TIME_AXIS[1] / TIME_AXIS[0], i / 250);
-      pts.push([X(t), Y(decay(m, t))]);
+  /* Measured points with their published error bars. */
+  function points(ctx, pts, X, Y, opt) {
+    ctx.strokeStyle = opt.stroke;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (const [t, i, e] of pts) {
+      if (Math.abs(Y(i + e) - Y(i - e)) < 3) continue;
+      const x = Math.round(X(t)) + 0.5;
+      ctx.moveTo(x, Y(i + e));
+      ctx.lineTo(x, Y(i - e));
     }
-    path(ctx, pts, color.ink, 1.8);
+    ctx.stroke();
+    for (const [t, i] of pts) dot(ctx, X(t), Y(i), opt.r, opt.fill, opt.stroke, 1.1);
+  }
 
-    /* The fast clock. */
-    const xf = X(m.fast);
-    const yf = Y(decay(m, m.fast));
-    dot(ctx, xf, yf, 3.5, color.ink);
-    note("fast clock", xf + 10, yf - 9, { color: color.ink });
+  /* A span of time along the top of the plot, with its name starting at its left end. */
+  function bracket(ctx, x0, x1, y, name) {
+    rule(ctx, x0, y + 0.5, x1, y + 0.5, color.ink3);
+    rule(ctx, Math.round(x0) + 0.5, y - 3, Math.round(x0) + 0.5, y + 4, color.ink3);
+    rule(ctx, Math.round(x1) + 0.5, y - 3, Math.round(x1) + 0.5, y + 4, color.ink3);
+    text(ctx, name, x0 + 1, y - 9, { font: font.note, color: color.ink2 });
+  }
 
-    const label = "slow clock " + clock(m.slow);
-    if (onPlot) {
-      dot(ctx, xs, ys, 6, color.maize, color.ink, 1.4);
-      const fits = xs + 12 + width(label, font.note) < box.r - 4;
-      if (fits) note(label, xs + 12, ys - 5, { color: color.ink });
-      else note(label, xs - 12, ys + 18, { color: color.ink, align: "right" });
+  const stage = canvas(root.querySelector("canvas"), (w) => (w >= 520 ? 344 : 324), (ctx, w, h) => {
+    const v = VIEWS[view];
+    const box = { l: 44, t: 46, r: w - 14, b: h - 44 };
+    const narrow = w < 420;
+    const { X, Y } = axes(ctx, box, {
+      x: v.x,
+      y: [0, 1],
+      xLog: true,
+      xTicks: (view === "both" ? [1e-4, 1e-3, 1e-2, 1e-1, 1] : [1e-2, 1e-1, 1]).filter((t, k) => !narrow || view !== "both" || k % 2 === 0),
+      xFormat: tick,
+      yTicks: [0, 0.25, 0.5, 0.75, 1],
+      xLabel: "time since the fluctuation (logarithmic)",
+    });
+    text(ctx, "share of the fluctuation left", box.l + 8, 12, { font: font.label, color: color.ink });
+    const item = v.list[picked[view]];
+
+    if (view === "both") {
+      /* cold pair in ink, warm pair in gray; open dots are time of flight, filled dots spin echo */
+      const [tofCold, nseCold, tofWarm, nseWarm] = item.runs;
+      /* each instrument's span of time, named with the step it catches */
+      bracket(ctx, X(tofCold.pts[0][0]), X(tofCold.pts[tofCold.pts.length - 1][0]), box.t - 6, "time of flight: the fast step");
+      bracket(ctx, X(nseCold.pts[0][0]), X(nseCold.pts[nseCold.pts.length - 1][0]), box.t + 16, "spin echo: the slow step");
+      points(ctx, tofWarm.pts, X, Y, { r: 2.2, fill: color.paper, stroke: color.ink3 });
+      points(ctx, nseWarm.pts, X, Y, { r: 2.4, fill: color.ink3, stroke: color.ink3 });
+      points(ctx, tofCold.pts, X, Y, { r: 2.2, fill: color.paper, stroke: color.ink });
+      points(ctx, nseCold.pts, X, Y, { r: 2.4, fill: color.ink, stroke: color.ink });
+
+      /* each temperature named beside its curve: the colder above it, the warmer below */
+      const midCold = nseCold.pts.find((p) => p[1] < 0.62) || nseCold.pts[nseCold.pts.length - 1];
+      text(ctx, nseCold.T + " K", Math.min(X(midCold[0]) + 10, box.r - 34), Y(midCold[1]) - 13, { font: font.note, color: color.ink });
+      const midWarm = nseWarm.pts.find((p) => p[1] < 0.3) || nseWarm.pts[nseWarm.pts.length - 1];
+      text(ctx, nseWarm.T + " K", X(midWarm[0]) - 17, Y(midWarm[1]) + 17, { font: font.note, color: color.ink3, align: "right" });
+      return;
+    }
+
+    /* The paper's fit to the slow step, drawn only across the times that were measured. */
+    const fitted = (c) => {
+      const t0 = c.pts[0][0];
+      const t1 = c.pts[c.pts.length - 1][0];
+      const line = [];
+      for (let k = 0; k <= 100; k++) {
+        const t = t0 * Math.pow(t1 / t0, k / 100);
+        line.push([X(t), Y(c.fit.f * Math.exp(-Math.pow(t / c.fit.tau, c.fit.beta)))]);
+      }
+      return line;
+    };
+    const measured = (c) => c.pts.map(([t, i]) => [X(t), Y(i)]);
+    /* every other curve faintly (its fit, or its points where the paper gives no fit), so the chosen one is read against the rest */
+    v.list.forEach((c, k) => {
+      if (k !== picked[view]) path(ctx, c.fit.tau ? fitted(c) : measured(c), color.ruleStrong, 1.1);
+    });
+    if (view === "cooling") {
+      /* the coldest and warmest curves are named, unless one of them is the chosen curve (the slider names that one) */
+      const first = v.list[0].pts;
+      const last = v.list[v.list.length - 1].pts;
+      if (picked[view] !== 0) text(ctx, v.list[0].T + " K", box.r - 2, Y(first[first.length - 1][1]) - 11, { font: font.note, color: color.ink3, align: "right" });
+      const low = last.find((p) => p[1] < 0.3) || last[last.length - 1];
+      if (picked[view] !== v.list.length - 1) text(ctx, v.list[v.list.length - 1].T + " K", X(low[0]) - 9, Y(low[1]) + 6, { font: font.note, color: color.ink3, align: "right" });
+    }
+
+    /* the chosen curve: the paper's fit as a line where there is one, and the measured points */
+    const fit = item.fit;
+    if (fit.tau) {
+      path(ctx, fitted(item), color.maize, 5);
+      path(ctx, fitted(item), color.ink, 1.4);
     } else {
-      note(label + ", off the axis →", box.r - 6, Y(m.f / Math.E), { color: color.ink, align: "right" });
+      path(ctx, measured(item), color.maize, 5);
+    }
+    points(ctx, item.pts, X, Y, { r: 2.6, fill: color.ink, stroke: color.ink });
+    /* the slow time: where the fitted step has fallen to 1/e of its plateau */
+    if (fit.tau && fit.tau <= v.x[1]) {
+      const x = X(fit.tau);
+      const y = Y(fit.f / Math.E);
+      /* when the slow time lies past the last measured time, the fit is carried on to it as a dashed line */
+      const tEnd = item.pts[item.pts.length - 1][0];
+      if (fit.tau > tEnd) {
+        const beyond = [];
+        for (let k = 0; k <= 20; k++) {
+          const t = tEnd * Math.pow(fit.tau / tEnd, k / 20);
+          beyond.push([X(t), Y(fit.f * Math.exp(-Math.pow(t / fit.tau, fit.beta)))]);
+        }
+        path(ctx, beyond, color.ink, 1.2, [4, 4]);
+      }
+      rule(ctx, Math.round(x) + 0.5, y, Math.round(x) + 0.5, box.b, color.ink3);
+      dot(ctx, x, y, 6, color.maize, color.ink, 1.4);
+      /* on a narrow plot the label would lie across the other curves; the readout below gives the value */
+      if (!narrow) {
+        /* near the right edge the label goes to the lower left of its dot, on a halo of paper so the faint curves do not run through it */
+        const left = x > box.r - 110;
+        const note = "slow time, " + time(fit.tau);
+        const at = [x + (left ? -11 : 11), y + (left ? 15 : -8)];
+        ctx.font = font.note;
+        ctx.textAlign = left ? "right" : "left";
+        ctx.textBaseline = "middle";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = color.paper;
+        ctx.strokeText(note, at[0], at[1]);
+        text(ctx, note, at[0], at[1], { font: font.note, color: color.ink, align: left ? "right" : "left" });
+      }
     }
   });
 
-  function update() {
-    const { T, Q } = state;
-    const m = model(T, Q);
-    const length = (2 * Math.PI / Q).toFixed(1);
-    const local = Q >= Q_REGIME;
-    const side = local ? "shorter than 2.6" : "longer than 2.6";
-    const pair = local ? "nitrate to cation" : "nitrate to nitrate";
-    if (tSlider) {
-      tSlider.value = String(T);
-      tSlider.setAttribute("aria-valuetext", T + " kelvin, slow clock " + clock(m.slow) + ", plateau " + m.f.toFixed(2) + ", stretch " + m.beta.toFixed(2));
+  function part(name, value) {
+    const span = document.createElement("span");
+    if (name) span.append(name + " ");
+    label(span.appendChild(document.createElement("b")), value);
+    return span;
+  }
+
+  function show() {
+    const v = VIEWS[view];
+    const item = v.list[picked[view]];
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+    if (slider) {
+      slider.max = String(v.list.length - 1);
+      slider.value = String(picked[view]);
+      slider.setAttribute("aria-label", v.slider);
+      slider.setAttribute("aria-valuetext", v.name(item).replace("Å⁻¹", "inverse angstroms").replace("Å", "angstroms"));
     }
-    if (qSlider) {
-      qSlider.value = String(Q);
-      qSlider.setAttribute("aria-valuetext", Q.toFixed(2) + " inverse angstroms, a length of " + length + " angstroms, " + side + " angstroms, " + pair + ", plateau " + m.f.toFixed(2) + ", stretch " + m.beta.toFixed(2));
+    if (out) label(out, v.name(item));
+    if (lo) label(lo, v.name(v.list[0]).replace(/ \(.*/, ""));
+    if (hi) label(hi, v.name(v.list[v.list.length - 1]).replace(/ \(.*/, ""));
+    if (values) {
+      if (view === "both") {
+        const r = item.runs;
+        values.replaceChildren(part("open dots", "time of flight"), part("filled dots", "spin echo"), part("black", r[0].T + " and " + r[1].T + " K"), part("gray", r[2].T + " and " + r[3].T + " K"));
+      } else {
+        const f = item.fit;
+        const where = view === "cooling" ? "at " + waveVector(data.waveVectorAt) : "at " + data.temperatureAt + " K";
+        values.replaceChildren(
+          part(where + ":", "plateau " + f.f.toFixed(2)),
+          f.tau ? part("slow time", time(f.tau)) : part("slow time", "too long for this window"),
+          f.tau ? part("stretch β", f.beta.toFixed(2)) : ""
+        );
+      }
     }
-    const set = (name, str) => {
-      const el = out(name);
-      if (el) window.ZFig.label(el, str);
-    };
-    set("t-out", T + " K");
-    set("q-out", Q.toFixed(2) + " Å⁻¹");
-    set("f", m.f.toFixed(2));
-    set("beta", m.beta.toFixed(2));
-    set("slow", clock(m.slow));
-    set("fast", clock(m.fast));
-    set("scale", length + " Å, " + side + " Å: " + pair);
-    set("limit", T < T_BETA_LOW ? "below 402 K the paper reports only f: the slow step leaves the window" : "");
     stage.redraw();
   }
 
-  if (tSlider) {
-    tSlider.addEventListener("input", () => {
-      state.T = Number(tSlider.value);
-      update();
-    });
-  }
-  if (qSlider) {
-    qSlider.addEventListener("input", () => {
-      state.Q = Number(qSlider.value);
-      update();
+  buttons.forEach((b) =>
+    b.addEventListener("click", () => {
+      view = b.dataset.view;
+      show();
+    })
+  );
+  if (slider) {
+    slider.min = "0";
+    slider.step = "1";
+    slider.addEventListener("input", () => {
+      picked[view] = Number(slider.value);
+      show();
     });
   }
 
-  /* What the model is built from. */
-  const table = root.querySelector("[data-table]");
-  if (table) {
-    const rows = [
-      ["Amplitude of the slow step, f", F[0] + " to " + F[1]],
-      ["Stretching exponent, β", BETA[0] + " to " + BETA[1]],
-      ["f and β stop changing above", T_FLAT + " K"],
-      ["β follows temperature up to", Q_BETA_FALLS.toFixed(2) + " Å⁻¹"],
-      ["β independent of temperature from", Q_BETA_FLAT.toFixed(2) + " Å⁻¹"],
-      ["Change of regime", Q_REGIME.toFixed(1) + " Å⁻¹ (2.6 Å)"],
-      ["Slow time, VFT D", "1.53 ± 0.15"],
-      ["Slow time, VFT T₀", "340.0 ± 3.5 K"],
-      ["Slow time at 530 K, 1.86 Å⁻¹", "about 15 ps"],
-      ["Fast time", "0.1 to 0.3 ps"],
-      ["Wave vectors measured", "1.08 to 2.82 Å⁻¹"],
-      ["Temperatures measured", "383 to 519 K"],
-      ["Times measured", "0.1 ps to 1.2 ns"],
-    ];
+  /* The fitted values of the slow step as a table: one row for each curve in the two slices. */
+  const host = root.querySelector("[data-table]");
+  if (host) {
     const el = document.createElement("table");
-    el.innerHTML = "<thead><tr><th scope=\"col\">Reported in the papers</th><th scope=\"col\">Value</th></tr></thead>";
+    el.innerHTML = '<thead><tr><th scope="col">Curve</th><th scope="col">Plateau f</th><th scope="col">Slow time</th><th scope="col">Stretch β</th></tr></thead>';
     const body = el.appendChild(document.createElement("tbody"));
-    rows.forEach(([name, value]) => {
-      const tr = body.appendChild(document.createElement("tr"));
-      tr.appendChild(document.createElement("th")).textContent = name;
-      tr.lastChild.scope = "row";
-      tr.appendChild(document.createElement("td")).textContent = value.replace(/ /g, "\u00a0"); /* a value stays on one line */
-    });
-    table.replaceChildren(el);
+    const group = (title, list, name) => {
+      const head = body.appendChild(document.createElement("tr")).appendChild(document.createElement("th"));
+      head.colSpan = 4;
+      head.scope = "rowgroup";
+      label(head, title);
+      for (const c of list) {
+        const tr = body.appendChild(document.createElement("tr"));
+        const th = tr.appendChild(document.createElement("th"));
+        th.scope = "row";
+        label(th, name(c));
+        for (const cell of [c.fit.f.toFixed(3), c.fit.tau ? time(c.fit.tau) : "not fitted", c.fit.tau ? c.fit.beta.toFixed(3) : "not fitted"]) tr.appendChild(document.createElement("td")).textContent = cell;
+      }
+    };
+    group("At " + waveVector(data.waveVectorAt) + ", by temperature", data.byTemperature, (c) => c.T + " K");
+    group("At " + data.temperatureAt + " K, by wave vector", data.byWaveVector, (c) => waveVector(c.q));
+    host.replaceChildren(el);
   }
 
-  update();
+  show();
 })();
