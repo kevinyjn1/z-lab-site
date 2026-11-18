@@ -816,7 +816,7 @@ window.ZLAB_PUBLICATIONS = [
     authors: "Y. Zhang, M. Lagi, D. Liu, F. Mallamace, E. Fratini, P. Baglioni, E. Mamontov, M. Hagen, S.-H. Chen",
     title: "Observation of high-temperature dynamic crossover in protein hydration water and its relation to reversible denaturation of lysozyme",
     venue: "J. Chem. Phys.",
-    ref: "130, 13501",
+    ref: "130, 135101",
     year: 2009,
     doi: "10.1063/1.3081137",
     highlights: [
@@ -911,6 +911,7 @@ window.ZLAB_PUBLICATIONS = [
     venue: "Transactions of the American Nuclear Society",
     ref: "128, 888",
     year: 2023,
+    doi: "10.13182/T130-42224",
   },
   {
     type: "proceedings",
@@ -919,6 +920,7 @@ window.ZLAB_PUBLICATIONS = [
     venue: "Transactions of the American Nuclear Society",
     ref: "128, 368",
     year: 2023,
+    doi: "10.13182/T130-42095",
   },
   {
     type: "proceedings",
@@ -927,6 +929,7 @@ window.ZLAB_PUBLICATIONS = [
     venue: "Transactions of the American Nuclear Society",
     ref: "128, 365",
     year: 2023,
+    doi: "10.13182/T130-41919",
   },
   {
     type: "proceedings",
@@ -935,6 +938,7 @@ window.ZLAB_PUBLICATIONS = [
     venue: "Transactions of the American Nuclear Society",
     ref: "127, 491",
     year: 2022,
+    doi: "10.13182/T130-39873",
   },
   {
     type: "proceedings",
@@ -943,6 +947,7 @@ window.ZLAB_PUBLICATIONS = [
     venue: "Transactions of the American Nuclear Society",
     ref: "127, 470",
     year: 2022,
+    doi: "10.13182/T130-39871",
   },
   {
     type: "proceedings",
