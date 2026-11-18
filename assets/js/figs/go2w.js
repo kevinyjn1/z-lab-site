@@ -23,7 +23,7 @@
   if (!root || !window.ZFig || !model) return;
   const { canvas, text, rule, run, color, font } = window.ZFig;
   const SELF = document.currentScript && document.currentScript.src ? document.currentScript.src : new URL("assets/js/figs/go2w.js", document.baseURI).href;
-  const MODEL_URL = new URL("../../models/go2w.bin", SELF).href;
+  const MODEL_URL = new URL("../../models/go2w.bin" + new URL(SELF).search, SELF).href; /* same version stamp as this script */
 
   const stageEl = root.querySelector("[data-stage]");
   const floor = root.querySelector("canvas[data-floor]");
@@ -33,6 +33,14 @@
   const turn = root.querySelector("[data-turn]");
   const values = root.querySelector("[data-values]");
   const note = root.querySelector("[data-note]");
+
+  /* The robot's canvas lies exactly over the floor's. This is set here, not only in the
+     stylesheet, so that an out-of-date copy of the stylesheet cannot pull the two apart. */
+  const poster = root.querySelector(".go2w-poster");
+  const over = { position: "absolute", inset: "0", width: "100%", height: "100%" };
+  stageEl.style.position = "relative";
+  Object.assign(glCanvas.style, over);
+  if (poster) Object.assign(poster.style, over, { objectFit: "contain", background: "#fff", zIndex: "1" });
 
   /* ---- small matrix kit (column-major 4 x 4) ------------------------------------- */
 
@@ -403,6 +411,7 @@
     };
     ready = true;
     stageEl.classList.add("is-live");
+    if (poster) poster.style.display = "none"; /* the live drawing takes over from the still */
     show();
   }
 

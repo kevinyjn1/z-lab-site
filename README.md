@@ -122,6 +122,7 @@ assets/js/liquid.js         Home Fig. 1: the simulated liquid, g(r), and S(k)
 assets/js/atombot-mark.js   the Atombot mark painting itself in, on Home and in the Atombot section
 assets/js/figkit.js         shared drawing tools for the Research figures (window.ZFig)
 assets/js/figs/             one script per Research figure (clocks-data.js is generated, see tools/)
+tools/stamp_assets.py       stamps asset links with a version; run before publishing
 tools/make_clocks_data.py   rebuilds clocks-data.js from the paper's Source Data spreadsheet
 tools/make_go2w_model.py    rebuilds the Go2-W model from Unitree's go2w_description package
 assets/models/go2w.bin      the simplified Go2-W meshes (generated)
@@ -192,6 +193,20 @@ Things to know:
 - Scores are sent by the visitor's browser, so they can be faked. The game ignores posted
   scores above 3000; anything else that looks wrong has to be deleted by hand.
 
+## Publishing a change
+
+After changing anything under `assets/` or `data/`, run this before you commit:
+
+```bash
+python3 tools/stamp_assets.py
+```
+
+It stamps every page's links to the site's own styles and scripts with a version
+(`style.css?v=...`) that changes whenever one of those files does. Without it, a returning
+visitor's browser can show the new page with an old cached stylesheet or script, and the
+page looks broken until the old copy expires. `python3 tools/stamp_assets.py --check`
+changes nothing and fails if a page is out of date.
+
 ## Previewing locally
 
 ```bash
@@ -208,12 +223,12 @@ Then open <http://localhost:4173>.
 - CV and syllabus links point at the files on the official site (`cvBase` in
   `data/people.js`). To host them alongside these pages, copy the `cv/` folder next to
   `index.html` and set `cvBase` to `"cv/"`.
-- The Atombot mark (`assets/img/atombot-mark.webp`) is three brush strokes, electrons circling
-  an atom. On Home and in the Atombot section of Research it paints itself in: three small
-  electrons fly in and each lays one stroke behind it (`assets/js/atombot-mark.js`). It plays
-  once when it comes into view and again on a click or when a pointer comes over it; with
-  "reduce motion" on, the finished mark is simply shown. The script splits the mark's image
-  into its three strokes by geometry, so a new version of the same mark needs no other change.
+- The Atombot mark (`assets/img/atombot-mark.webp`) is three brush strokes. On Home and in
+  the Atombot section of Research it paints itself in, one stroke after another, with the
+  ragged front of a brush running dry (`assets/js/atombot-mark.js`). It plays once when it
+  comes into view and again on a click or when a pointer comes over it; with "reduce motion"
+  on, the finished mark is simply shown. The script splits the mark's image into its three
+  strokes by geometry, so a new version of the same mark needs no other change.
 - There is a game, Rare Event: pilot the Atombot mark through a sample that cycles through
   liquid, crystal, gas, and glass, and catch rare events. It is drawn like the figures, ink
   on paper. It opens from the "Play Rare Event" button in every footer and on the 404 page;

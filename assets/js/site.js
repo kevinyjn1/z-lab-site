@@ -68,11 +68,13 @@
       gameFiles = new Promise((resolve, reject) => {
         const css = document.createElement("link");
         css.rel = "stylesheet";
-        css.href = new URL("../css/game.css", here).href;
+        /* the files carry this script's own version stamp, so they always match the page (see tools/stamp_assets.py) */
+        const version = new URL(here).search;
+        css.href = new URL("../css/game.css" + version, here).href;
         const board = document.createElement("script");
-        board.src = new URL("../../data/leaderboard.js", here).href;
+        board.src = new URL("../../data/leaderboard.js" + version, here).href;
         const js = document.createElement("script");
-        js.src = new URL("game.js", here).href;
+        js.src = new URL("game.js" + version, here).href;
         const parts = [css, board, js];
         let waiting = parts.length;
         const loaded = () => {

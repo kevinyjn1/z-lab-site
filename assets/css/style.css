@@ -1646,13 +1646,6 @@ html:not(.js) .stat-viz {
   height: 100%;
 }
 
-.atombot-note {
-  margin-top: 4px;
-  font-family: var(--sans);
-  font-size: 0.8125rem;
-  color: var(--ink-3);
-}
-
 .unit-text .atombot-mark {
   margin: 0 0 18px -6px;
 }

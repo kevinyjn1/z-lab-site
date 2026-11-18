@@ -1,9 +1,9 @@
 /*
  * The Atombot mark, painted in.
  *
- * The mark is three brush strokes circling a center, the way electrons circle an atom. Here
- * three small electrons fly in, and each lays one stroke down behind it, from the stroke's
- * heavy head to its thin tail, with the ragged leading edge of a brush that is running dry.
+ * The mark is three brush strokes circling a center. Here each stroke is laid down in turn,
+ * from its heavy head to its thin tail, with the ragged leading edge of a brush that is
+ * running dry.
  *
  * It works from the mark's own image. Each pixel of ink is given to one of the three strokes
  * by where it sits around the center (the strokes are a third of a turn apart, and where one
@@ -34,16 +34,7 @@
   const RING_TO = 336;
   const RAGGED = 17; /* how many degrees one ring may trail behind the front */
   const INK = [18, 22, 28];
-  const TAU = Math.PI * 2;
   const rad = (deg) => (deg * Math.PI) / 180;
-
-  /* How far from the center the middle of a stroke is, at an angle along it. An electron
-     comes in from outside before the head and falls toward the center after the tail. */
-  function midRadius(along) {
-    if (along < 0) return 262 - along * 0.9;
-    if (along > 150) return 130 - (along - 150) * 0.8;
-    return 262 - 132 * Math.pow(along / 150, 0.9);
-  }
 
   /* Splits the mark's image into three canvases, one for each stroke, in the site's ink. */
   function strokesOf(img) {
@@ -152,40 +143,17 @@
       }
     }
 
-    function electron(k, along, strength) {
-      if (strength <= 0) return;
-      const a = rad(HEADS[k] + along);
-      const r = midRadius(along);
-      ctx.globalAlpha = strength;
-      ctx.beginPath();
-      ctx.arc(CENTER[0] + Math.cos(a) * r, CENTER[1] + Math.sin(a) * r, 15, 0, TAU);
-      ctx.fillStyle = "#ffcb05";
-      ctx.fill();
-      ctx.lineWidth = 1.4 / scale;
-      ctx.strokeStyle = "rgb(" + INK.join(",") + ")";
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-
     /* Draws the mark `t` seconds into the animation; returns false once it is finished. */
     function draw(t) {
       ctx.setTransform(scale, 0, 0, scale, 0, 0);
       ctx.clearRect(0, 0, SIZE[0], SIZE[1]);
       let busy = false;
-      const dots = [];
       for (let k = 0; k < 3; k++) {
-        const u = Math.max(0, Math.min(1, (t - 0.18 * k) / 1.9));
+        const u = Math.max(0, Math.min(1, (t - 0.2 * k) / 1.25));
         const eased = (1 - Math.cos(Math.PI * u)) / 2; /* in gently, a steady stroke, out gently */
-        const along = -78 + (SWEEP + RAGGED + 4 + 78 + 46) * eased; /* from outside the head to past the tail */
-        paint(k, along);
-        if (u < 1) {
-          busy = true;
-          const fadeIn = Math.min(1, (along + 78) / 40);
-          const fadeOut = Math.min(1, (SWEEP + RAGGED + 50 - along) / 46);
-          dots.push([k, Math.min(along, SWEEP + 60), Math.max(0, Math.min(fadeIn, fadeOut))]);
-        }
+        paint(k, (SWEEP + RAGGED + 4) * eased);
+        if (u < 1) busy = true;
       }
-      for (const d of dots) electron(d[0], d[1], d[2]);
       return busy;
     }
 
