@@ -109,11 +109,9 @@
   const atombotCells = window.ZLabAtombot.cells; /* from atombot-art.js */
   const atombotSlots = {}; /* cache: swarm size -> slots */
 
+  /* Ink on paper: each robot is an ink ring, its core the highlighter. */
   function readColors() {
-    const light = document.documentElement.dataset.theme === "light";
-    colors = light
-      ? { body: "#0a5c9e", core: "#b98f00", link: "rgba(10,92,158,0.2)", ring: "rgba(10,26,47,0.14)" }
-      : { body: "#7cc8ff", core: "#ffcb05", link: "rgba(124,200,255,0.2)", ring: "rgba(163,180,200,0.16)" };
+    colors = { body: "#12161c", core: "#ffcb05", link: "rgba(18,22,28,0.16)", ring: "rgba(18,22,28,0.12)" };
   }
 
   /* Slots for the current formation, as [x, y] pairs. */
@@ -425,11 +423,6 @@
   }
   document.addEventListener("visibilitychange", schedule);
   document.addEventListener("zlab:game", schedule); /* rest while the hidden game covers the page */
-  document.addEventListener("themechange", () => {
-    readColors();
-    draw();
-  });
-
   readColors();
   resize();
   if (reduceMotion.matches) {

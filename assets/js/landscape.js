@@ -201,11 +201,9 @@
     if (basinsEl) basinsEl.textContent = visited.filter(Boolean).length + " / " + wells.length;
   }
 
+  /* Ink on paper: the landscape is a line over a pale wash, the bias is the highlighter. */
   function readColors() {
-    const light = document.documentElement.dataset.theme === "light";
-    colors = light
-      ? { land: "#e6e0cf", ridge: "#0a1a2f", bias: "#ffcb05", biasEdge: "#c79a00", layer: "rgba(27,21,0,0.3)", walker: "#0a1a2f", walkerRing: "#ffffff", grid: "rgba(12,32,60,0.13)", base: "rgba(12,32,60,0.3)", label: "#46586e", faint: "#8a96a8", text: "#0a1a2f", trail: "10,26,47" }
-      : { land: "#14263d", ridge: "#b9c8da", bias: "#ffcb05", biasEdge: "#ffe27a", layer: "rgba(27,21,0,0.34)", walker: "#ffffff", walkerRing: "#040c17", grid: "rgba(150,180,215,0.16)", base: "rgba(150,180,215,0.32)", label: "#a3b4c8", faint: "#5d7089", text: "#e7edf4", trail: "231,237,244" };
+    colors = { land: "#eceef0", ridge: "#12161c", bias: "#ffcb05", biasEdge: "#12161c", layer: "rgba(18,22,28,0.3)", walker: "#12161c", walkerRing: "#ffffff", grid: "#e6e8eb", base: "#12161c", label: "#3d4652", faint: "#6b7480", text: "#12161c", trail: "18,22,28" };
   }
 
   function resize() {
@@ -236,7 +234,7 @@
   }
 
   function setFont(spacing) {
-    ctx.font = '500 10px "Geist Mono", ui-monospace, Menlo, monospace';
+    ctx.font = '400 11px "IBM Plex Mono", ui-monospace, Menlo, monospace';
     if ("letterSpacing" in ctx) ctx.letterSpacing = spacing || "0px";
   }
 
@@ -522,11 +520,6 @@
   }
   document.addEventListener("visibilitychange", schedule);
   document.addEventListener("zlab:game", schedule); /* rest while the hidden game covers the page */
-  document.addEventListener("themechange", () => {
-    readColors();
-    draw();
-  });
-
   readColors();
   resize();
   buildLandscape();
