@@ -37,7 +37,7 @@ to the site:
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Home: the lab's statement as an abstract, a contents list, Fig. 1 (a liquid simulated in the browser with its pair distribution function and structure factor), the lab in numbers beside Fig. 2 (the soft arm), Atombot with its mark, recent papers, contact |
+| `index.html` | Home: the lab's statement as an abstract, a contents list, Fig. 1 (a liquid simulated in the browser with its pair distribution function and structure factor), Fig. 2 (the soft arm, a line drawing) and Atombot with its mark as two picture-and-text bands, recent papers, contact |
 | `research.html` | The lab's research statement in its own words (heading, paragraph, and the eight themes of Matter and Machine, in the order the lab lists them), with one figure under each theme (see the table below), then Atombot and the lab's own overview picture |
 | `people.html` | PI, current members, alums |
 | `publications.html` | Searchable, filterable publication list with two figures that double as filters: papers per year, and the journals with the most papers |
@@ -90,7 +90,7 @@ Most routine updates are a one-line change to a data file. The comment at the to
 each file explains the fields.
 
 - **Add a paper:** `data/publications.js`. Copy an entry and paste it at the top.
-  The Publications page, the home page list, and the numbers table update themselves.
+  The Publications page and the home page list update themselves.
 - **Add or move a person:** `data/people.js`. Drop their photo in `assets/img/people/`,
   cropped square with the face centered and the eyes a little above the middle so it lines
   up with the rest (about 560 px a side is plenty; WebP or JPEG). People without a photo
@@ -127,7 +127,7 @@ this) while showing a meaningful picture, and keep its controls to one or two.
 assets/css/style.css        all styles; the design decisions and tokens are at the top
 assets/js/theme-init.js     marks the page as script-enabled before first paint
 assets/js/site.js           navigation menu, shared helpers, the game's loader
-assets/js/home.js           home page numbers table, contents details, recent publications
+assets/js/home.js           home page: the recent publications list
 assets/js/liquid.js         Home Fig. 1: the simulated liquid, g(r), and S(k)
 assets/js/atombot-mark.js   the Atombot mark painting itself in, on Home and in the Atombot section
 assets/js/figkit.js         shared drawing tools for the Research figures (window.ZFig)
@@ -145,10 +145,9 @@ assets/css/game.css         styles for the game
 data/                       people, publications, and the game's leaderboard settings
 ```
 
-## Charts on Publications and Home
+## Charts on Publications
 
-The charts are drawn from `data/publications.js` and `data/people.js`, so they update with
-the data. They follow one small set of rules, kept in `style.css` under "Figures and charts":
+The charts are drawn from `data/publications.js`, so they update with the data. They follow one small set of rules, kept in `style.css` under "Figures and charts":
 
 - **One message each.** The line under a figure's title says what it shows in plain words
   ("97 since 2006, most in 2021"), and it is rewritten when a filter changes the numbers.
