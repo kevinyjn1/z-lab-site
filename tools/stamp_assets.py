@@ -14,6 +14,9 @@ Run it after changing anything under assets/ or data/, before publishing:
 The version is a hash of every file under assets/ and data/, so it changes exactly when
 one of them does, and running the tool twice changes nothing. Scripts that fetch further
 files themselves (the game, the robot's model) pass their own version along.
+
+Images named in a page (src="assets/img/...") are stamped too, each with a hash of that one
+file, so a replaced photo shows at once and the others stay cached.
 """
 import glob
 import hashlib
@@ -23,6 +26,7 @@ import sys
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 LINK = re.compile(r'\b(href|src)="((?:assets|data)/[^"?#]+\.(?:css|js))(?:\?v=[0-9a-f]+)?"')
+IMAGE = re.compile(r'\b(href|src)="(assets/img/[^"?#]+\.(?:webp|png|jpe?g|gif|svg|avif))(?:\?v=[0-9a-f]+)?"')
 
 
 def version():
@@ -40,13 +44,33 @@ def version():
     return digest.hexdigest()[:10]
 
 
+def file_version(path):
+    """A hash of one file, or None if a page names a file that is not there."""
+    full = os.path.join(ROOT, path)
+    if not os.path.isfile(full):
+        return None
+    with open(full, "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()[:10]
+
+
+def stamp_image(match, missing):
+    v = file_version(match.group(2))
+    if v is None:
+        missing.add(match.group(2))
+        return match.group(0)
+    return '%s="%s?v=%s"' % (match.group(1), match.group(2), v)
+
+
 def main(check):
     v = version()
     stale = []
+    missing = set()
     for page in sorted(glob.glob(os.path.join(ROOT, "*.html"))):
         with open(page, encoding="utf-8") as fh:
             old = fh.read()
         new, count = LINK.subn(lambda m: '%s="%s?v=%s"' % (m.group(1), m.group(2), v), old)
+        new, images = IMAGE.subn(lambda m: stamp_image(m, missing), new)
+        count += images
         name = os.path.basename(page)
         if new != old:
             stale.append(name)
@@ -55,6 +79,8 @@ def main(check):
                     fh.write(new)
         print("%-18s %2d links %s" % (name, count, "out of date" if new != old and check else "stamped" if new != old else "current"))
     print("version", v)
+    if missing:
+        sys.exit("a page names an image that does not exist: " + ", ".join(sorted(missing)))
     if check and stale:
         sys.exit("out of date: " + ", ".join(stale) + ". Run python3 tools/stamp_assets.py")
 

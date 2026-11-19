@@ -93,9 +93,10 @@ each file explains the fields.
 - **Add a paper:** `data/publications.js`. Copy an entry and paste it at the top.
   The Publications page and the home page list update themselves.
 - **Add or move a person:** `data/people.js`. Drop their photo in `assets/img/people/`,
-  cropped square with the face centered and the eyes a little above the middle so it lines
-  up with the rest (about 560 px a side is plenty; WebP or JPEG). People without a photo
-  get a monogram. Moving someone to `alumni` is a cut and paste.
+  cropped square with the head centered and the eyes a little above the middle so it lines
+  up with the rest (about 560 px a side is plenty; WebP or JPEG). Center the whole head,
+  hair included, not the eyes and nose: when a head is turned, centering the features
+  pushes the head to one side of the frame. People without a photo get a monogram. Moving someone to `alumni` is a cut and paste.
 - **Everything else** (research text, software, courses) is ordinary HTML in the page files.
   The header and footer are repeated in each page, so a navigation change means editing
   all eight.
@@ -215,8 +216,9 @@ python3 tools/stamp_assets.py
 It stamps every page's links to the site's own styles and scripts with a version
 (`style.css?v=...`) that changes whenever one of those files does. Without it, a returning
 visitor's browser can show the new page with an old cached stylesheet or script, and the
-page looks broken until the old copy expires. `python3 tools/stamp_assets.py --check`
-changes nothing and fails if a page is out of date.
+page looks broken until the old copy expires. Images named in a page are stamped as well,
+each with a hash of its own file, so a replaced picture shows at once. `python3
+tools/stamp_assets.py --check` changes nothing and fails if a page is out of date.
 
 ## Previewing locally
 
