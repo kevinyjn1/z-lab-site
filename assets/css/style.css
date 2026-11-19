@@ -651,8 +651,7 @@ a.chip:hover {
 }
 
 /* The figures are built from the data files by script; without it there is nothing to show. */
-html:not(.js) .figs,
-html:not(.js) .stat-viz {
+html:not(.js) .figs {
   display: none;
 }
 
@@ -1652,6 +1651,19 @@ html:not(.js) .stat-viz {
   margin: 0 0 18px -6px;
 }
 
+/* the team's few lines: name, one sentence, links */
+.unit-text p {
+  margin-top: 10px;
+  font-size: 1.12rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.unit-text .unit-links {
+  margin-top: 16px;
+  font-size: 0.875rem;
+}
+
 /* Home: the student team, with its mark. */
 .team {
   display: grid;
@@ -1678,42 +1690,9 @@ html:not(.js) .stat-viz {
 
 /* 6c. Research ------------------------------------------------------------- */
 
-/* Research opens the way a paper does: its statement beside a list of its figures. */
-.lead {
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: clamp(32px, 5vw, 64px);
-  align-items: start;
-}
-
-.figlist .toc {
-  margin-top: 10px;
-  font-size: 1rem;
-  counter-reset: figlist;
-}
-
-.figlist .toc li {
-  grid-template-columns: 22px minmax(0, 1fr) auto;
-  gap: 8px 14px;
-  padding-block: 3px;
-  counter-increment: figlist;
-}
-
-.figlist .toc span::before {
-  content: counter(figlist);
-}
-
-.figlist .toc a {
-  font-weight: 400;
-  text-decoration-thickness: 1px;
-}
-
-.figlist-note {
-  margin-top: 14px;
-  font-family: var(--sans);
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--ink-3);
+/* Research opens with the lab's own statement. */
+.lead .prose {
+  max-width: 44em;
 }
 
 /* Figures on a page are numbered in order, wherever they sit. */
@@ -1740,14 +1719,6 @@ main {
   line-height: 1.3;
 }
 
-.theme-note {
-  max-width: 40em;
-  margin-top: 8px;
-  font-size: 1.03rem;
-  line-height: 1.5;
-  color: var(--ink-2);
-}
-
 /* a theme's first figure follows it without a rule of its own */
 .theme + .unit {
   border-top: 0;
@@ -1764,24 +1735,33 @@ main {
   font-size: var(--fs-h2);
 }
 
-/* A unit: what the lab found, on the left, and a figure built from those papers, on the right. */
+/* A unit: a title and one sentence, then its figure across the whole sheet. */
 .unit {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: clamp(28px, 4.5vw, 64px);
-  align-items: start;
   padding-block: clamp(30px, 4vw, 48px);
   border-top: 1px solid var(--rule);
 }
 
-.unit-text > * + * {
-  margin-top: 0.8em;
+.unit-head {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 8px clamp(28px, 4.5vw, 64px);
+  align-items: baseline;
+  margin-bottom: clamp(16px, 2.2vw, 26px);
 }
 
-.unit-text :is(h3, h4) {
+.unit-head h4,
+.unit-text h3 {
   font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
 }
 
+.unit-head p {
+  max-width: 40em;
+  font-size: 1.12rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.unit-head cite,
 .unit-text cite {
   font-style: italic;
 }
@@ -1868,49 +1848,76 @@ main {
   border: 1px solid var(--ink);
 }
 
+/* The student team: its mark and a few lines beside its photograph. */
+.unit--team {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(28px, 4.5vw, 64px);
+  align-items: start;
+}
+
+/* The fine print of a figure (sources, what is measured and what is modeled, the numbers),
+   behind one quiet link. */
+.fig-about {
+  margin-top: 10px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+}
+
+.fig-about summary {
+  width: fit-content;
+  list-style: none;
+  cursor: pointer;
+  color: var(--ink-2);
+}
+
+.fig-about summary::-webkit-details-marker {
+  display: none;
+}
+
+.fig-about summary::after {
+  content: " +";
+  color: var(--ink-3);
+}
+
+.fig-about details[open] summary::after {
+  content: " \2212";
+}
+
+.fig-about .fig-no {
+  margin-right: 0.5em;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.fig-about .caption {
+  max-width: 46em;
+  margin-top: 10px;
+}
+
+.fig-table-title {
+  margin: 16px 0 6px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* A short hint beside a figure's one control. */
+.fig-hint {
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+/* A 3D picture (fig3d.js): the kit lays its canvases out itself; this only keeps the focus ring tidy. */
+.stage3 {
+  position: relative;
+}
+
 /* The few rules single figures need beyond the shared ones. ------------------- */
 
-/* A second panel inside one plate follows a hairline, like the controls. */
-.unit-fig .fig-panel {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--rule);
-}
-
-/* Where a figure has buttons, a slider, and a readout, the readout takes a line of its
-   own and the slider keeps a usable length or drops to the next line. */
-[data-fig="salt"] .fig-controls > .fig-readout,
-[data-fig="clocks"] .fig-controls > .fig-readout,
-[data-fig="charge"] .fig-controls > .fig-readout,
-[data-fig="metal"] .fig-controls > .fig-readout,
-[data-fig="flood"] .fig-readout {
-  flex-basis: 100%;
-}
-
-[data-fig="salt"] .fig-controls > .range,
-[data-fig="charge"] .fig-controls > .range {
-  flex-basis: 240px;
-}
-
-[data-fig="flood"] .range {
-  flex-basis: 220px;
-}
-
-[data-fig="clocks"] .range {
-  flex: 1 1 250px;
-}
-
-/* Tables with long row labels or more than two columns need more room, and space between the columns. */
-:is([data-fig="salt"], [data-fig="fragile"], [data-fig="clocks"], [data-fig="scale"]) .fig-table table {
+/* Tables with long row labels or more than two columns need more room. */
+:is([data-fig="clocks"], [data-fig="scale"]) .fig-table table {
   max-width: 460px;
-}
-
-[data-fig="charge"] .fig-table table {
-  max-width: none;
-}
-
-[data-fig="charge"] .fig-table :is(th, td) + :is(th, td) {
-  padding-left: 10px;
 }
 
 [data-fig="arm"] .fig-table tbody th[scope="row"] {
@@ -1929,6 +1936,15 @@ main {
   padding-left: 10px;
 }
 
+[data-fig="scale"] .fig-table :is(th, td) + :is(th, td) {
+  padding-left: 14px;
+}
+
+/* a control that does not apply (no WebGL, so nothing to play) is taken away */
+.btn[hidden] {
+  display: none;
+}
+
 :is([data-fig="arm"], [data-fig="soft"], [data-fig="clocks"]) .fig-table tbody th[colspan] {
   padding-top: 10px;
   font-family: var(--sans);
@@ -1936,8 +1952,7 @@ main {
   font-weight: 600;
 }
 
-/* Lose two, keep going: buttons tall enough for a finger, a quiet look for one that has
-   nothing left to do, and on a phone the count on its own line. */
+/* Lose two, keep going: a button tall enough for a finger, and on a phone the count on its own line. */
 @media (max-width: 699px), (pointer: coarse) {
   [data-fig="swarm"] .btn--small {
     min-height: 36px;
@@ -1950,28 +1965,9 @@ main {
   }
 }
 
-[data-fig="swarm"] .btn:disabled {
-  border-color: var(--rule);
-  background: var(--paper);
-  color: var(--ink-3);
-  cursor: default;
-}
-
-/* The wheel-leg robot: a 2D canvas for the floor, and the 3D drawing of the robot laid over it. */
-.go2w-stage {
-  position: relative;
-}
-
-.go2w-stage canvas[data-robot] {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  cursor: grab;
-}
-
-/* A still of the flip, shown until the live drawing is ready, and kept where WebGL is missing. */
-.go2w-poster {
+/* The wheel-leg robot's still picture: laid over the stage until the live drawing is ready, kept
+   where WebGL is missing, and shown as a plain image where there is no script at all. */
+html.js .go2w-poster {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -1981,83 +1977,18 @@ main {
   background: var(--paper);
 }
 
-.go2w-stage.is-live .go2w-poster {
-  display: none;
+html:not(.js) .go2w-poster {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-.go2w-stage canvas[data-robot]:active {
-  cursor: grabbing;
-}
-
-[data-fig="go2w"] .fig-controls > .range {
-  flex: 1 1 200px;
-}
-
-[data-fig="go2w"] .fig-controls > .fig-readout,
 [data-fig="go2w"] .fig-status {
   flex-basis: 100%;
 }
 
 [data-fig="go2w"] .fig-status:empty {
   display: none;
-}
-
-/* Be the controller: each group of controls takes a row of its own (the valves, the run,
-   the readout, the status line). */
-[data-fig="arm"] .fig-controls {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
-}
-
-/* The eight valves, set out like the arm seen from above: module 2 over module 1, left and right. */
-.valves {
-  display: grid;
-  grid-template-columns: auto repeat(2, minmax(0, 1fr));
-  gap: 8px 12px;
-  align-items: center;
-  max-width: 440px;
-  font-family: var(--sans);
-  font-size: 0.8125rem;
-  color: var(--ink-2);
-}
-
-.valves-head {
-  text-align: center;
-}
-
-.valves .segmented {
-  display: flex;
-}
-
-.valves .segmented button {
-  flex: 1;
-  padding: 0 8px;
-}
-
-.valves button:disabled {
-  color: var(--ink-3);
-  cursor: default;
-}
-
-.fig-run {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 12px;
-  font-family: var(--sans);
-  font-size: 0.8125rem;
-  color: var(--ink-2);
-}
-
-.fig-run .btn {
-  min-height: 38px;
-}
-
-.fig-run-pick {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .fig-status {
@@ -2432,13 +2363,9 @@ main {
   .front,
   .numbers,
   .contact,
-  .lead,
-  .unit {
+  .unit-head,
+  .unit--team {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .figlist {
-    max-width: 36rem;
   }
 
   .front h1 {
@@ -2542,10 +2469,6 @@ main {
 
   .toc em {
     display: none;
-  }
-
-  .themes {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .toc li {

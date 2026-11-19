@@ -9,13 +9,18 @@
  * The paper puts the density maximum at 284 +/- 5 K and the minimum at
  * 210 +/- 5 K (1.041 +/- 0.003 g/cm3), and notes that bulk water crystallizes
  * at about 235 K. Nothing here is modelled or smoothed.
+ *
+ * The figure plays by itself: a marker cools along the measured points, from 290 K
+ * down to 160 K and back, and reads out the point it is on. Moving a pointer over the
+ * plot takes the marker over. The marker only ever rests on measured points; between
+ * them it travels along the line that joins them.
  */
 (() => {
   "use strict";
 
   const root = document.querySelector('[data-fig="water-density"]');
   if (!root || !window.ZFig) return;
-  const { color, font, canvas, axes, path, dot, text, rule, pointer } = window.ZFig;
+  const { color, font, canvas, axes, path, dot, text, rule, pointer, run } = window.ZFig;
 
   const DATA = [
     [160, 1.061], [170, 1.059], [180, 1.057], [190, 1.053], [200, 1.046], [210, 1.041], [220, 1.042],
@@ -25,11 +30,11 @@
   const T_MAX = 284; /* stated in the paper; it falls between two measured temperatures */
   const T_BULK_FREEZES = 235;
 
-  const slider = root.querySelector("[data-pick]");
-  const readout = root.querySelector("[data-readout]");
-  let picked = DATA.findIndex((d) => d[0] === T_MIN);
+  let picked = DATA.findIndex((d) => d[0] === T_MIN); /* the measured point being read */
+  let at = picked; /* where the marker is along the points, as a fractional index */
+  let hand = false; /* true while a pointer is choosing the point */
 
-  const stage = canvas(root.querySelector("canvas"), (w) => (w < 480 ? 300 : 340), (ctx, w, h) => {
+  const stage = canvas(root.querySelector("canvas"), (w) => (w >= 900 ? 430 : w >= 520 ? 360 : 300), (ctx, w, h) => {
     const box = { l: 50, t: 40, r: w - 14, b: h - 44 };
     const { X, Y } = axes(ctx, box, {
       x: [150, 300],
@@ -54,12 +59,26 @@
     washLines.forEach((line, i) => text(ctx, line, xf - 8, box.t + 37 + 15 * i, { font: font.note, color: color.ink2, align: "right" }));
 
     path(ctx, DATA.map(([t, d]) => [X(t), Y(d)]), color.ink, 1.6);
-    DATA.forEach(([t, d], i) => {
-      const isMin = t === T_MIN;
-      dot(ctx, X(t), Y(d), i === picked ? 6 : 4, isMin || i === picked ? color.maize : color.ink, isMin || i === picked ? color.ink : color.paper, 1.4);
+    DATA.forEach(([t, d]) => dot(ctx, X(t), Y(d), 4, color.ink, color.paper, 1.4));
+
+    /* the marker, on the line between the two measured points it is passing, and the value of the one it is nearest */
+    const i = Math.max(0, Math.min(DATA.length - 2, Math.floor(at)));
+    const f = at - i;
+    const mx = X(DATA[i][0] + (DATA[i + 1][0] - DATA[i][0]) * f);
+    const my = Y(DATA[i][1] + (DATA[i + 1][1] - DATA[i][1]) * f);
+    rule(ctx, Math.round(mx) + 0.5, my, Math.round(mx) + 0.5, box.b, color.ruleStrong);
+    dot(ctx, mx, my, 7, color.maize, color.ink, 1.5);
+    /* The reading stays in the one corner the curve never enters (warm and light), so it cannot
+       run into a label; on a phone that corner is narrow and the reading takes two lines. */
+    const [pt, pd] = DATA[picked];
+    const reading = [pt + " K", pd.toFixed(3) + " g/cm³"];
+    ctx.font = font.mono;
+    const oneLine = ctx.measureText(reading.join("   ")).width <= box.r - xf - 20;
+    /* in two lines it stands a row higher, clear of the note under the minimum, which reaches this far on a small phone */
+    (oneLine ? [reading.join("   ")] : reading).forEach((line, k, lines) => {
+      text(ctx, line, box.r - 8, box.b - (oneLine ? 14 : 36) - 17 * (lines.length - 1 - k), { align: "right", color: color.ink });
     });
 
-    /* The two turning points the paper reports. */
     /* Each label sits on the open side of its turning point (under the minimum, over the
        maximum), where the curve cannot run through it at any width. */
     const min = DATA.find((d) => d[0] === T_MIN);
@@ -73,27 +92,54 @@
     text(ctx, maxNote, Math.min(X(T_MAX) + ctx.measureText(maxNote).width / 2, box.r), yTop - 28, { font: font.note, color: color.ink, align: "right" });
   });
 
-  function pick(i) {
-    picked = Math.max(0, Math.min(DATA.length - 1, i));
-    const [t, d] = DATA[picked];
-    if (slider) slider.value = String(picked);
-    if (readout) readout.textContent = t + " K: " + d.toFixed(3) + " g/cm³";
+  /* Cooling and warming along the points, with a rest at each end and a longer look at the minimum. */
+  const REST = { [DATA.length - 1]: 0.9, [DATA.findIndex((d) => d[0] === T_MIN)]: 1.4, 0: 0.9 };
+  const LAST = DATA.length - 1;
+  let direction = -1; /* toward colder first */
+  let resting = 0;
+  let stopped = -1; /* the point it last rested at, so that it does not rest there again on its way out */
+  const loop = run(root.querySelector("canvas"), (dt) => {
+    if (hand) return;
+    if (resting > 0) {
+      resting -= dt;
+      return;
+    }
+    at = Math.max(0, Math.min(LAST, at + direction * dt * 2.6));
+    /* the reading is always that of the measured point the marker is nearest */
+    picked = Math.round(at);
+    if (picked !== stopped && REST[picked] && Math.abs(at - picked) < 0.08) {
+      at = picked;
+      stopped = picked;
+      resting = REST[picked];
+    }
+    /* at either end it turns back, whichever way it came to be there */
+    if (at <= 0) direction = 1;
+    else if (at >= LAST) direction = -1;
     stage.redraw();
+  });
+  if (!loop.paused) {
+    /* when it plays, it starts warm */
+    at = LAST;
+    picked = LAST;
+    stopped = LAST;
   }
 
-  if (slider) {
-    slider.max = String(DATA.length - 1);
-    slider.addEventListener("input", () => pick(Number(slider.value)));
-  }
   pointer(root.querySelector("canvas"), {
     move: (x) => {
       const w = stage.w;
       const t = 150 + ((x - 50) / (w - 14 - 50)) * 150;
       let best = 0;
-      DATA.forEach((d, i) => {
-        if (Math.abs(d[0] - t) < Math.abs(DATA[best][0] - t)) best = i;
+      DATA.forEach((d, k) => {
+        if (Math.abs(d[0] - t) < Math.abs(DATA[best][0] - t)) best = k;
       });
-      if (best !== picked) pick(best);
+      hand = true;
+      picked = best;
+      at = best;
+      stage.redraw();
+    },
+    leave: () => {
+      hand = false;
+      resting = 0.6;
     },
   });
 
@@ -112,5 +158,5 @@
     table.replaceChildren(el);
   }
 
-  pick(picked);
+  stage.redraw();
 })();

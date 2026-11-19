@@ -1,62 +1,49 @@
 /*
- * Research, "Soft is not linear".
+ * Research, "A simulator for soft machines".
  *
- * Two panels.
- * First: a 100 mm bar of Dragon Skin 20 silicone pulled along its length, and the
- * stress in it against stretch under two material laws: the neo-Hookean
- * (hyperelastic) law that the lab's Kraken simulator uses, and a straight line.
- * Second: how far the oscillation frequencies simulated with Kraken fell from the
- * measured ones, for bellows actuators of three silicones carrying a 100 g mass.
+ * What it shows: the test the lab used to check Kraken, its open-source simulator for soft
+ * materials and robots. A silicone bellows hangs with a 100 g mass on its end and bounces up
+ * and down. Three silicones are drawn side by side. Each is drawn twice: in ink, bouncing at
+ * the frequency measured by motion capture, and in gray beside it, bouncing at the frequency
+ * Kraken simulated. The two start together, so how far they have drifted apart is how far
+ * simulation is from measurement. When the pair that drifts fastest is half a cycle apart
+ * (the two Dragon Skin pairs reach that together), all come to rest and start again together.
  *
  * Sources:
- *   K. Wandke and Y Z, "MOOSE-based finite element hyperelastic modeling for soft
- *   robot simulations", IEEE Access 9, 139627 (2021),
- *   doi:10.1109/ACCESS.2021.3119009. Called "the statics paper" below.
- *   K. Wandke and Y Z, "Physics-based finite element simulation of the dynamics
- *   of soft robots", IEEE Access 11, 67996 (2023),
- *   doi:10.1109/ACCESS.2023.3291617. Called "the dynamics paper" below.
+ *   K. Wandke and Y Z, "Physics-based finite element simulation of the dynamics of soft
+ *   robots", IEEE Access 11, 67996 (2023), doi:10.1109/ACCESS.2023.3291617. Every published
+ *   number in this file comes from its Tables 1 to 3.
+ *   K. Wandke and Y Z, "MOOSE-based finite element hyperelastic modeling for soft robot
+ *   simulations", IEEE Access 9, 139627 (2021), doi:10.1109/ACCESS.2021.3119009. It sets
+ *   out the neo-Hookean (hyperelastic) material law Kraken uses. No number is taken from it.
  *
  * What is what:
- *   The paper's equation, run in the browser: the neo-Hookean curve. It is Eq. 3
- *   of the statics paper as printed, stress = C1 (L^2 - 1/L) with L the stretch
- *   ratio, which is what Kraken's law (Eq. 2, stress = 2 D1 (J - 1) I + 2 C1 B)
- *   gives for an incompressible bar pulled along its length. C1 is that paper's
- *   value for Dragon Skin 20.
- *   Derived here, not taken from the paper: the linear law. It is the tangent to
- *   that curve at rest, stress = 3 C1 (L - 1): the straight line that agrees with
- *   it for small stretch. The paper also ran a linear-elastic finite element
- *   model for comparison; its modulus was not to hand when this figure was
- *   written, so that run is not reproduced here.
- *   Published data, re-plotted: the measured and simulated frequencies in TESTS
- *   (Tables 1 to 3 of the dynamics paper). The percentage differences are
- *   computed here from those two columns; the paper does not print them.
- *   Illustration: the drawing of the bar. Its length follows the stretch and its
- *   thinning follows from constant volume; nothing else is implied.
+ *   Published: the measured and simulated frequencies in TESTS. The drawing uses the bounce
+ *   test (Table 1), in hertz: Ecoflex 00-50 2.05 measured and 2.06 simulated, Dragon Skin 20
+ *   4.20 and 4.33, Dragon Skin 30 5.57 and 5.44. The table under "About this figure" lists
+ *   all three tables.
+ *   Computed here, not printed in the paper: the percentage differences in that table, and
+ *   the moment of the restart (half a cycle divided by the largest difference in frequency).
+ *   Slowed: time runs SLOW (4) times slower than life, for every bellows alike, so the ratio
+ *   of simulated to measured frequency, which is the point, is unchanged.
+ *   Illustration: the shape and size of the bellows, the mass, and the plate they hang from;
+ *   the size of the bounce, chosen to be seen; the way it starts (pulled down and let go);
+ *   and the absence of damping (a real bounce dies away; this one keeps its size until the
+ *   restart, when it is faded out by hand).
  *
- * On the material constant: the two papers use different C1 for Dragon Skin 20
- * (0.0822 MPa in the statics paper, 0.116 MPa in the dynamics paper). The curve
- * uses only the statics paper's value, with that paper's equation. The second
- * panel uses no material constant at all.
+ * Drawing: the shared 3D kit (fig3d.js), which renders the parts as ink lines on paper.
+ * Without WebGL 2 the same motion is drawn flat, as outlines.
  */
 (() => {
   "use strict";
 
   const root = document.querySelector('[data-fig="soft"]');
   if (!root || !window.ZFig) return;
-  const { color, font, canvas, axes, path, dot, text, rule, pointer } = window.ZFig;
-
-  /* C1 = 0.0822 MPa for Dragon Skin 20: the best neo-Hookean fit over 0 to 110% strain (statics paper). In kPa. */
-  const C1 = 82.2;
-  /* The paper's test bar is 100 mm x 10 mm x 10 mm (statics paper). */
-  const BAR = { length: 100, side: 10 };
-  /* Its bar test ran to 192 mm of displacement, where simulation was at most 10.8 kPa under this curve (statics paper). */
-  const L_MAX = 2.92;
-  const hyper = (L) => C1 * (L * L - 1 / L); /* Eq. 3 of the statics paper, as printed */
-  const linear = (L) => 3 * C1 * (L - 1); /* its tangent at L = 1, where d/dL of Eq. 3 is 3 C1 */
+  const { text, rule, run, color } = window.ZFig;
 
   /*
    * Resonant frequencies in Hz of a bellows with a 100 g mass, measured by motion capture and simulated with
-   * Kraken, for Ecoflex 00-50, Dragon Skin 20, and Dragon Skin 30 in that order (dynamics paper).
+   * Kraken, for Ecoflex 00-50, Dragon Skin 20, and Dragon Skin 30 in that order (the 2023 paper).
    * Each row: direction of motion, measured, simulated.
    */
   const RUBBERS = ["Ecoflex 00-50", "Dragon Skin 20", "Dragon Skin 30"];
@@ -79,174 +66,9 @@
     },
   ];
   const off = (measured, simulated) => (100 * (simulated - measured)) / measured;
+  const hz = (f) => f.toFixed(2) + " Hz";
 
-  /* ---- The bar and the two laws --------------------------------------------- */
-
-  const slider = root.querySelector("[data-stretch]");
-  const readout = root.querySelector("[data-readout]");
-  let stretch = slider ? Number(slider.value) : 2.5;
-
-  const WALL = 14; /* x of the wall the bar is fixed to */
-  const BAND = 100; /* height of the strip the bar is drawn in */
-  const geometry = (w, h) => ({ unit: (w - WALL - 24) / L_MAX, box: { l: 46, t: BAND + 6, r: w - 14, b: h - 44 } });
-
-  const barCanvas = root.querySelector("canvas");
-  const stage = canvas(barCanvas, (w) => (w < 480 ? 372 : 410), (ctx, w, h) => {
-    const { unit, box } = geometry(w, h);
-    const y = 46;
-    const end = WALL + stretch * unit;
-    const rest = (unit * BAR.side) / BAR.length;
-    const thick = rest / Math.sqrt(stretch); /* constant volume: the cross-section shrinks as the bar lengthens */
-
-    /* The wall, the bar at rest (dashed), and the bar as stretched, with ten marks that were evenly spaced at rest. */
-    for (let k = -24; k <= 16; k += 8) rule(ctx, WALL, y + k, WALL - 8, y + k + 8, color.ink3);
-    rule(ctx, WALL, y - 25, WALL, y + 25, color.ink, 2);
-    path(ctx, [[WALL, y - rest / 2], [WALL + unit, y - rest / 2], [WALL + unit, y + rest / 2], [WALL, y + rest / 2]], color.ink3, 1, [3, 3]);
-    ctx.fillStyle = color.wash;
-    ctx.fillRect(WALL, y - thick / 2, end - WALL, thick);
-    for (let k = 1; k < 10; k++) {
-      const x = Math.round(WALL + ((end - WALL) * k) / 10) + 0.5;
-      rule(ctx, x, y - thick / 2, x, y + thick / 2, color.ink3);
-    }
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = color.ink;
-    ctx.strokeRect(WALL, y - thick / 2, end - WALL, thick);
-    dot(ctx, end, y, 6, color.maize, color.ink, 1.6);
-    text(ctx, Math.round(BAR.length * stretch) + " mm", Math.min(end, w - 24), y - 28, { color: color.ink, align: "center" });
-    text(ctx, BAR.length + " mm at rest", WALL + 6, y + 30, { font: font.note, color: color.ink3 });
-
-    const { X, Y } = axes(ctx, box, {
-      x: [1, 3],
-      y: [0, 800],
-      xTicks: [1, 1.5, 2, 2.5, 3],
-      yTicks: [0, 200, 400, 600, 800],
-      xFormat: (v) => v.toFixed(1),
-      xLabel: "length ÷ rest length",
-      yLabel: "stress (kPa)",
-    });
-    const curve = (law) => {
-      const pts = [];
-      for (let k = 0; k <= 100; k++) pts.push([X(1 + k / 50), Y(law(1 + k / 50))]);
-      return pts;
-    };
-    path(ctx, curve(linear), color.ink3, 1.5, [5, 4]);
-    path(ctx, curve(hyper), color.ink, 1.8);
-
-    /* The two laws at this stretch. */
-    const x = Math.round(X(stretch)) + 0.5;
-    rule(ctx, x, Y(hyper(stretch)), x, box.b, color.ruleStrong);
-    dot(ctx, x, Y(linear(stretch)), 3.5, color.paper, color.ink, 1.4);
-    dot(ctx, x, Y(hyper(stretch)), 5.5, color.maize, color.ink, 1.6);
-
-    const lx = box.l + 12;
-    const ly = box.t + 36;
-    const vx = Math.min(lx + 166, box.r - 30); /* the values keep clear of the curve on the narrowest screens */
-    path(ctx, [[lx, ly], [lx + 20, ly]], color.ink, 1.8);
-    text(ctx, "neo-Hookean", lx + 28, ly, { font: font.note, color: color.ink });
-    text(ctx, Math.round(hyper(stretch)) + " kPa", vx, ly, { color: color.ink, align: "right" });
-    path(ctx, [[lx, ly + 18], [lx + 20, ly + 18]], color.ink3, 1.5, [5, 4]);
-    text(ctx, "linear", lx + 28, ly + 18, { font: font.note, color: color.ink });
-    text(ctx, Math.round(linear(stretch)) + " kPa", vx, ly + 18, { color: color.ink, align: "right" });
-    text(ctx, "C₁ = 0.0822 MPa", lx, ly + 37, { color: color.ink3 });
-  });
-
-  function set(value) {
-    stretch = Math.max(1, Math.min(L_MAX, Math.round(value * 100) / 100));
-    const a = Math.round(hyper(stretch));
-    const b = Math.round(linear(stretch));
-    if (slider) {
-      slider.value = String(stretch);
-      slider.setAttribute("aria-valuetext", stretch.toFixed(2) + " times the rest length: neo-Hookean " + a + " kilopascals, linear " + b + " kilopascals");
-    }
-    if (readout) readout.textContent = "stretch " + stretch.toFixed(2);
-    stage.redraw();
-  }
-  if (slider) {
-    slider.max = String(L_MAX);
-    slider.addEventListener("input", () => set(Number(slider.value)));
-  }
-
-  /* The bar's end, or the plot, can also be dragged. A touch must move sideways first, so scrolling the page is left alone. */
-  let drag = null;
-  const stretchAt = (x) => {
-    const { unit, box } = geometry(stage.w, stage.h);
-    return drag.onBar ? (x - WALL) / unit : 1 + (2 * (x - box.l)) / (box.r - box.l);
-  };
-  pointer(barCanvas, {
-    down: (x, y, e) => {
-      drag = { x, y, onBar: y < BAND, live: e.pointerType === "mouse" };
-      if (drag.live) {
-        try {
-          barCanvas.setPointerCapture(e.pointerId); /* keep following the mouse past the canvas edge */
-        } catch (err) {
-          /* the pointer is already gone: nothing to follow */
-        }
-        set(stretchAt(x));
-      }
-    },
-    move: (x, y) => {
-      if (!drag) return;
-      if (!drag.live && (Math.abs(x - drag.x) < 10 || Math.abs(x - drag.x) < Math.abs(y - drag.y))) return;
-      drag.live = true;
-      set(stretchAt(x));
-    },
-  });
-  for (const type of ["pointerup", "pointercancel"]) barCanvas.addEventListener(type, () => (drag = null));
-  barCanvas.style.cursor = "ew-resize";
-
-  /* ---- Kraken against measurement ------------------------------------------- */
-
-  const fills = [color.paper, color.ruleStrong, color.ink]; /* softest rubber lightest */
-  const checkCanvas = root.querySelector("canvas[data-check]");
-  if (checkCanvas) {
-    const wraps = (w) => w < 350; /* the third legend entry drops to a second line */
-    canvas(checkCanvas, (w) => (wraps(w) ? 290 : 274), (ctx, w) => {
-      const l = 104;
-      const r = w - 16;
-      const X = (v) => l + ((v + 10) / 60) * (r - l);
-      text(ctx, "Kraken against experiment", 0, 8, { font: font.note, color: color.ink });
-      let kx = 0;
-      let ky = 28;
-      RUBBERS.forEach((name, i) => {
-        if (i === 2 && wraps(w)) {
-          kx = 0;
-          ky += 16;
-        }
-        dot(ctx, kx + 5, ky, 4.5, fills[i], color.ink, 1.3);
-        text(ctx, name, kx + 14, ky, { font: font.note });
-        kx += 14 + ctx.measureText(name).width + 16;
-      });
-
-      const top = ky + 16;
-      let y = top + 8;
-      const marks = [];
-      for (const test of TESTS) {
-        text(ctx, test.name, 0, y, { font: font.note, color: color.ink });
-        y += 17;
-        for (const [direction, measured, simulated] of test.rows) {
-          text(ctx, direction, 10, y, { font: font.note });
-          marks.push([y, measured.map((m, i) => off(m, simulated[i]))]);
-          y += 17;
-        }
-        y += 7;
-      }
-      const base = y - 12;
-      for (const v of [-10, 10, 20, 30, 40, 50]) rule(ctx, Math.round(X(v)) + 0.5, top, Math.round(X(v)) + 0.5, base, color.rule);
-      for (const [my] of marks) rule(ctx, l, my + 0.5, r, my + 0.5, color.rule);
-      rule(ctx, Math.round(X(0)) + 0.5, top, Math.round(X(0)) + 0.5, base, color.ink);
-      for (const [my, values] of marks) values.forEach((v, i) => dot(ctx, X(v), my, 4.5, fills[i], color.ink, 1.3));
-      rule(ctx, l, base + 0.5, r, base + 0.5, color.ink);
-      for (const v of [-10, 0, 10, 20, 30, 40, 50]) {
-        const x = Math.round(X(v)) + 0.5;
-        rule(ctx, x, base, x, base + 4, color.ink);
-        if (r - l < 190 && v % 20) continue; /* every other label where they would touch */
-        text(ctx, (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v), x, base + 13, { align: "center" });
-      }
-      text(ctx, "simulated − measured frequency (%)", r, base + 32, { font: font.label, color: color.ink, align: "right" });
-    }).redraw();
-  }
-
-  /* The same frequencies as a table. */
+  /* The same frequencies as a table, for every test and direction. */
   const table = root.querySelector("[data-table]");
   if (table) {
     const el = document.createElement("table");
@@ -260,7 +82,7 @@
         head.textContent = test.name + ", " + direction;
         RUBBERS.forEach((name, i) => {
           const tr = body.appendChild(document.createElement("tr"));
-          tr.appendChild(document.createElement("th")).textContent = name;
+          tr.appendChild(document.createElement("th")).textContent = name.replace(/ /g, "\u00a0"); /* a name stays on one line */
           tr.lastChild.scope = "row";
           const d = off(measured[i], simulated[i]);
           for (const cell of [measured[i].toFixed(2), simulated[i].toFixed(2), (d < 0 ? "−" : "+") + Math.abs(d).toFixed(1) + "%"]) tr.appendChild(document.createElement("td")).textContent = cell;
@@ -270,5 +92,244 @@
     table.replaceChildren(el);
   }
 
-  set(stretch);
+  const stageEl = root.querySelector("[data-stage]");
+  const playBtn = root.querySelector("[data-play]");
+  if (!stageEl || !window.ZFig3D) return;
+  const { mul, translate, scale } = window.ZFig3D.mat;
+  const { lathe, cylinder } = window.ZFig3D.shape;
+
+  /* ---- the bounce ------------------------------------------------------------------------ */
+
+  const [, MEASURED, SIMULATED] = TESTS[0].rows[0]; /* the vertical bounce, Table 1 */
+  const SLOW = 4; /* seconds on screen for one second of the test */
+  /* A pair is half a cycle apart 0.5 / |simulated - measured| seconds into the test; the soonest of the three sets the restart. */
+  const RUN = (SLOW * 0.5) / Math.max(...MEASURED.map((m, i) => Math.abs(SIMULATED[i] - m)));
+  /* Then, in seconds on screen: the bounce is faded out, the masses hang still, are drawn down together, and are held before the release. */
+  const SETTLE = 1.4;
+  const REST = 0.5;
+  const PULL = 1.1;
+  const HOLD = 0.4;
+  const LOOP = RUN + SETTLE + REST + PULL + HOLD;
+  const ease = (u) => u * u * (3 - 2 * u);
+
+  /* How far below its resting place a mass hangs, as a fraction of the full bounce, t seconds on screen after the release. */
+  function drop(f, t) {
+    if (t < RUN + SETTLE) return (t < RUN ? 1 : 1 - ease((t - RUN) / SETTLE)) * Math.cos((2 * Math.PI * f * t) / SLOW);
+    const u = (t - RUN - SETTLE - REST) / PULL;
+    return u <= 0 ? 0 : u >= 1 ? 1 : ease(u);
+  }
+
+  /* ---- the shapes: an illustration, in arbitrary units -------------------------------------- */
+
+  const LENGTH = 0.62; /* of a bellows with its mass hanging still */
+  const BOUNCE = 0.13; /* how far the mass moves each way */
+  const LONGER = 1.15; /* a narrow picture has height to spare: there the bellows and its bounce are drawn up to this much longer */
+  const PLEATS = 7;
+  const RIDGE = 0.082; /* radius at a ridge */
+  const FOLD = 0.036; /* and at the bottom of a fold */
+  const CUFF = { r: 0.056, part: 0.05 }; /* the plain ends: radius, and share of the length */
+  const MASS = { r: 0.066, h: 0.12 };
+  const PLATE = { r: 0.188, h: 0.022 }; /* the disc a pair hangs from */
+  const APART = 0.118; /* each bellows of a pair is this far from the middle of its plate */
+  const ASIDE = 0.45; /* the simulated copy sits to the right and a little behind: this angle off the line across the picture */
+  const TILT = -0.17; /* the view looks up a little, to where they hang from */
+  const TURN = 0.9; /* how far the view turns each way */
+
+  /* A ridged tube hanging from z = 0 down to z = -1; the model matrix stretches it to its length. */
+  const tube = [[CUFF.r, 0], [CUFF.r, -CUFF.part]];
+  for (let k = 0; k <= 2 * PLEATS; k++) tube.push([k % 2 ? RIDGE : FOLD, -CUFF.part - ((1 - 2 * CUFF.part) * k) / (2 * PLEATS)]);
+  tube.push([CUFF.r, CUFF.part - 1], [CUFF.r, -1]);
+
+  /* What the picture must hold above and below the line everything hangs from, in the same units, as the tilted camera sees it. */
+  const ABOVE = PLATE.h * Math.cos(TILT) + PLATE.r * Math.abs(Math.sin(TILT));
+  const UNDER = (APART + MASS.r) * Math.abs(Math.sin(TILT)); /* the far edge of a mass shows below its middle */
+  const tall = (longer) => ABOVE + (longer * (LENGTH + BOUNCE) + MASS.h) * Math.cos(TILT) + UNDER;
+  const COLUMN = 2 * PLATE.r + 0.06; /* the least width one pair needs */
+  const TOP = 10; /* pixels kept clear above the picture */
+
+  /* ---- the labels: all the text on the picture ---------------------------------------------- */
+
+  const sans = (px, weight) => (weight ? weight + " " : "") + px + 'px "IBM Plex Sans", system-ui, sans-serif';
+  const WORDS = ["measured", "simulated"];
+  const DOT = "  ·  ";
+  const VALUES = RUBBERS.map((name, i) => [hz(MEASURED[i]), hz(SIMULATED[i])]);
+  const ruler = document.createElement("canvas").getContext("2d");
+  /* The first of these sizes at which every string is at most max pixels wide, or 0. */
+  function fits(strings, sizes, weight, max) {
+    return (
+      sizes.find((px) => {
+        ruler.font = sans(px, weight);
+        return strings.every((str) => ruler.measureText(str).width <= max);
+      }) || 0
+    );
+  }
+  /* How the label under a pair is set where pairs are `column` pixels apart: the two frequencies on one line, on two, or word over number. */
+  function labelPlan(column) {
+    if (fits(VALUES.map((v) => WORDS[0] + " " + v[0] + DOT + WORDS[1] + " " + v[1]), [12], "", column - 24)) return { rows: 2, name: 13, size: 12, below: 56 };
+    const name = fits(RUBBERS, [12, 11, 10], 600, column - 10) || 10;
+    const size = fits(VALUES.flatMap((v) => [WORDS[0] + " " + v[0], WORDS[1] + " " + v[1]]), [11, 10.5, 10], "", column - 10);
+    return size ? { rows: 3, name, size, below: 66 } : { rows: 5, name, size: fits(WORDS, [11, 10], "", column - 10) || 10, below: 94 };
+  }
+  function labels(ctx, lay, h) {
+    const { rows, name, size } = lay.plan;
+    const set = (str, x, y, ink, align) => text(ctx, str, x, y, { font: sans(size), color: ink ? color.ink : color.ink3, align: align || "center" });
+    lay.pairs.forEach((pair, i) => {
+      const x = Math.round(pair.column);
+      const [m, s] = VALUES[i].map((v, k) => WORDS[k] + " " + v);
+      text(ctx, pair.name, x, h - (rows === 2 ? 35 : rows === 3 ? 46 : 74), { font: sans(name, 600), color: color.ink, align: "center" });
+      if (rows === 2) {
+        ctx.font = sans(size);
+        const wm = ctx.measureText(m).width;
+        const wd = ctx.measureText(DOT).width;
+        const left = x - (wm + wd + ctx.measureText(s).width) / 2;
+        set(m, left, h - 15, true, "left");
+        set(DOT, left + wm, h - 15, false, "left");
+        set(s, left + wm + wd, h - 15, false, "left");
+      } else if (rows === 3) {
+        set(m, x, h - 29, true);
+        set(s, x, h - 14, false);
+      } else {
+        set(WORDS[0], x, h - 57, true);
+        set(VALUES[i][0], x, h - 43, true);
+        set(WORDS[1], x, h - 28, false);
+        set(VALUES[i][1], x, h - 14, false);
+      }
+    });
+  }
+
+  /* ---- where things are ----------------------------------------------------------------------- */
+
+  let now = (SLOW * 0.25) / Math.abs(SIMULATED[1] - MEASURED[1]); /* the still picture when nothing moves: the middle pair a quarter cycle apart */
+  let fixed = null; /* what follows from the size of the picture alone, kept until the size changes */
+
+  /* Scale and place for a picture w by h pixels: sets the camera, returns the pixel layout and the six bellows as they are now. */
+  function arrange(w, h, camera) {
+    if (!fixed || fixed.w !== w || fixed.h !== h) {
+      const plan = labelPlan(w / 3);
+      const room = h - TOP - plan.below; /* the labels go under the picture */
+      const ppu = Math.min(room / tall(1), w / (3 * COLUMN)); /* pixels per unit: the picture is as large as its height or its width lets it be */
+      const longer = Math.max(1, Math.min(LONGER, ((room / ppu - ABOVE - UNDER) / Math.cos(TILT) - MASS.h) / (LENGTH + BOUNCE)));
+      fixed = { w, h, plan, ppu, longer, gap: Math.min(w / 3 / ppu, 1), hang: TOP + ABOVE * ppu };
+    }
+    const { plan, ppu, longer, gap, hang } = fixed;
+    camera.elevation = TILT;
+    camera.halfHeight = h / (2 * ppu);
+    camera.minHalfWidth = 0;
+    camera.center = [0, 0, (hang - h / 2) / (ppu * Math.cos(TILT))]; /* puts z = 0 on the line y = hang */
+    /* The pairs stand along the line across the picture however the view is turned, so each stays over its label and turns in place. */
+    const a = camera.azimuth;
+    const pairs = RUBBERS.map((name, i) => {
+      const cx = (i - 1) * gap * Math.cos(a);
+      const cy = (i - 1) * gap * Math.sin(a);
+      const one = (simulated) => {
+        const side = simulated ? 1 : -1;
+        const f = simulated ? SIMULATED[i] : MEASURED[i];
+        return { simulated, x: cx + side * APART * Math.cos(ASIDE), y: cy + side * APART * Math.sin(ASIDE), length: longer * (LENGTH + BOUNCE * drop(f, now)) };
+      };
+      return { name, cx, cy, column: w / 2 + (i - 1) * gap * ppu, measured: one(false), simulated: one(true) };
+    });
+    return { plan, hang, pairs };
+  }
+
+  /* ---- the picture ------------------------------------------------------------------------- */
+
+  const stage = window.ZFig3D.stage(stageEl, {
+    height: (w) => (w >= 900 ? 480 : w >= 520 ? 420 : 340),
+    camera: { azimuth: 0, elevation: TILT },
+    /* The undersides of the plates and masses are seen almost edge-on, so distance changes fast across them; at the
+       kit's default a small picture would ink them in. Lines here come from folds and outlines, not from steps in distance. */
+    depthEdge: 0.07,
+    /* the line they hang from and the labels; and the whole picture, flat, where WebGL 2 is missing */
+    underlay(ctx, w, h, st) {
+      const lay = arrange(w, h, st.camera);
+      rule(ctx, 0, Math.round(lay.hang) + 0.5, w, Math.round(lay.hang) + 0.5, color.ink);
+      if (!st.ok) flat(ctx, lay, st);
+      labels(ctx, lay, h);
+    },
+  });
+
+  /* The same picture as flat outlines, drawn with the kit's own projection. */
+  function flat(ctx, lay, st) {
+    const a = st.camera.azimuth;
+    const across = [Math.cos(a), Math.sin(a)];
+    const outline = (x, y, profile, zScale, zShift, stroke, fill) => {
+      const side = (sign) => profile.map(([r, z]) => st.project([x + sign * r * across[0], y + sign * r * across[1], z * zScale + zShift]));
+      const pts = side(1).concat(side(-1).reverse());
+      ctx.beginPath();
+      pts.forEach((p, k) => (k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.lineWidth = 1.2;
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = stroke;
+      ctx.stroke();
+    };
+    for (const pair of lay.pairs) {
+      const behind = Math.sin(ASIDE - a) >= 0 ? [pair.simulated, pair.measured] : [pair.measured, pair.simulated]; /* far one first */
+      for (const b of behind) {
+        const stroke = b.simulated ? "#a8b0b8" : color.ink; /* the gray the kit draws a quiet part in */
+        outline(b.x, b.y, tube, b.length, 0, stroke, color.paper);
+        outline(b.x, b.y, [[MASS.r, 0], [MASS.r, -MASS.h]], 1, -b.length, stroke, b.simulated ? color.paper : color.maize);
+      }
+      outline(pair.cx, pair.cy, [[PLATE.r, PLATE.h], [PLATE.r, 0]], 1, 0, color.ink, color.paper);
+    }
+  }
+
+  const mesh = stage.ok ? { tube: stage.mesh(lathe(tube, 48)), mass: stage.mesh(cylinder(MASS.r, MASS.h, 48)), plate: stage.mesh(cylinder(PLATE.r, PLATE.h, 64)) } : null;
+
+  function show() {
+    if (!mesh) {
+      stage.render([]);
+      return;
+    }
+    const lay = arrange(stage.size.w, stage.size.h, stage.camera);
+    const items = [];
+    for (const pair of lay.pairs) {
+      items.push({ mesh: mesh.plate, model: translate(pair.cx, pair.cy, 0) });
+      for (const b of [pair.simulated, pair.measured]) {
+        items.push({ mesh: mesh.tube, model: mul(translate(b.x, b.y, 0), scale(1, 1, b.length)), quiet: b.simulated });
+        items.push({ mesh: mesh.mass, model: translate(b.x, b.y, -b.length - MASS.h), quiet: b.simulated, maize: !b.simulated });
+      }
+    }
+    stage.render(items);
+  }
+
+  const loop = run(stageEl, (dt) => {
+    now += dt;
+    if (now >= LOOP) now -= LOOP;
+    show();
+  });
+  function setPlaying(on) {
+    loop.setPaused(!on);
+    if (playBtn) {
+      playBtn.setAttribute("aria-pressed", String(on));
+      playBtn.textContent = on ? "Pause" : "Play";
+    }
+  }
+  if (playBtn) playBtn.addEventListener("click", () => setPlaying(loop.paused));
+
+  /* drag sideways to turn the view, or use the arrow keys when the picture has the focus */
+  stage.orbit({ min: -TURN, max: TURN, onTurn: show });
+  stageEl.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    stage.camera.azimuth = Math.max(-TURN, Math.min(TURN, stage.camera.azimuth + (e.key === "ArrowLeft" ? 0.12 : -0.12)));
+    show();
+    e.preventDefault();
+  });
+  /* the spacing follows the width, so a new width needs the parts placed again, also while paused */
+  if ("ResizeObserver" in window) new ResizeObserver(() => requestAnimationFrame(show)).observe(stageEl);
+  /* the labels are measured to choose their setting, so they are measured again once the page's type has loaded */
+  if (document.fonts && document.fonts.addEventListener) {
+    const again = () => {
+      fixed = null;
+      show();
+    };
+    document.fonts.ready.then(again);
+    document.fonts.addEventListener("loadingdone", again);
+  }
+
+  if (!loop.paused) now = LOOP - HOLD - PULL; /* when it plays, it starts with the masses being drawn down, then let go */
+  setPlaying(!loop.paused);
+  show();
 })();

@@ -315,15 +315,16 @@
   /* Where things go for a canvas of width w: map and barcode side by side, or stacked on a narrow screen. */
   function layout(w) {
     const side = w >= 500;
-    const size = side ? Math.min(340, Math.round(w * 0.46), w - 285) : Math.min(340, w - 58);
+    const wide = w >= 900; /* the figure has the whole sheet: a larger map, and room for longer bars */
+    const size = side ? Math.min(wide ? 440 : 340, Math.round(w * 0.46), w - 285) : Math.min(340, w - 58);
     const map = { l: 40, t: 30, r: 40 + size, b: 30 + size };
-    const pitch = side ? 18 : 13;
-    const left = side ? map.r + 44 : 26;
+    const pitch = wide ? 40 : side ? 18 : 13; /* wide: the nine bars stand as tall as the map beside them */
+    const left = side ? map.r + (wide ? 72 : 44) : 26;
     const top = side ? map.t + 6 : map.b + 78;
-    const bars = { l: left, t: top, r: Math.min(w - 16, left + 380), b: top + valleys.length * pitch + 10 };
+    const bars = { l: left, t: top, r: Math.min(w - 16, left + (wide ? 560 : 380)), b: top + valleys.length * pitch + 10 };
     const legend = { x: side ? bars.l - 18 : 8, y: bars.b + 58, w: side ? w - bars.l + 10 : w - 16, rows: side ? 3 : 2 };
     const h = Math.max(side ? map.b + 46 : 0, legend.y + (legend.rows - 1) * 18 + 14);
-    return { side, size, map, pitch, bars, legend, h };
+    return { side, wide, size, map, pitch, bars, legend, h };
   }
 
   /*
@@ -417,7 +418,7 @@
 
   function drawBarcode(ctx, L) {
     const b = L.bars;
-    const thick = L.side ? 8 : 7;
+    const thick = L.wide ? 14 : L.side ? 8 : 7;
     const tickLabel = (v) => (v === 0 ? "0" : v.toFixed(1));
     text(ctx, "barcode: one bar for each valley", b.l - 18, b.t - 20, { font: font.note, color: color.ink });
     energies.forEach((e) => {
@@ -490,65 +491,51 @@
     drawLegend(ctx, L);
   });
 
-  /* Controls and readout ------------------------------------------------------ */
-
-  const playBtn = root.querySelector("[data-play]");
-  const restartBtn = root.querySelector("[data-restart]");
-  const tempInput = root.querySelector("[data-temp]");
-  const tempOut = root.querySelector("[data-temp-out]");
-  const readout = root.querySelector("[data-readout]");
-  let shown = "";
-  let sinceReport = 0;
-
-  function report() {
-    sinceReport = 0;
-    if (!readout) return;
-    const count = found === valleys.length ? "all " + found : found + " of " + valleys.length;
-    const html = "<span>hills added <b>" + hills.toLocaleString("en-US") + "</b></span><span>valleys found <b>" + count + "</b></span>";
-    if (html !== shown) readout.innerHTML = shown = html;
-  }
+  /* Running by itself ------------------------------------------------------------ */
 
   function frame() {
     measure();
     stage.redraw();
-    report();
   }
 
+  /* When every valley has been found the picture holds for a moment, then the landscape is emptied and it starts again. */
+  let held = 0;
   const loop = run(root.querySelector("canvas"), (dt) => {
+    if (found === valleys.length) {
+      held += dt;
+      if (held > 4.5) {
+        held = 0;
+        reset();
+      }
+    }
     owed += dt * STEPS_PER_SECOND;
     const count = Math.min(16, Math.floor(owed));
     owed -= count;
-    const before = found;
     if (count > 0) advance(count);
-    measure();
-    stage.redraw();
-    /* The counters are text on the page: a few updates a second are enough. */
-    sinceReport += dt;
-    if (sinceReport > 0.2 || found !== before) report();
+    frame();
   });
 
-  function setPaused(value) {
-    loop.setPaused(value);
-    if (!playBtn) return;
-    playBtn.textContent = loop.paused ? "Play" : "Pause";
-    playBtn.setAttribute("aria-pressed", String(!loop.paused));
-  }
-
-  if (playBtn) playBtn.addEventListener("click", () => setPaused(!loop.paused));
-  if (restartBtn) {
-    restartBtn.addEventListener("click", () => {
-      reset();
-      frame();
-    });
-  }
-  if (tempInput) {
-    const read = () => {
-      temperature = Number(tempInput.value);
-      if (tempOut) tempOut.textContent = "T = " + temperature + " K";
-    };
-    tempInput.addEventListener("input", read);
-    read();
-  }
+  /* Click or tap the map to set the walker down somewhere else. */
+  const sheet = root.querySelector("canvas");
+  const onMap = (e, L) => {
+    const r = sheet.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    return x >= L.map.l && x <= L.map.r && y >= L.map.t && y <= L.map.b ? [x, y] : null;
+  };
+  sheet.addEventListener("pointermove", (e) => {
+    sheet.style.cursor = onMap(e, layout(stage.w)) ? "crosshair" : "";
+  });
+  sheet.addEventListener("pointerdown", (e) => {
+    const L = layout(stage.w);
+    const at = onMap(e, L);
+    if (!at) return;
+    const [x, y] = at;
+    px = wrap(((x - L.map.l) / L.size) * TAU);
+    py = wrap(((L.map.b - y) / L.size) * TAU);
+    trail.length = 0;
+    frame();
+  });
 
   /* The same barcode as a table. */
   const table = root.querySelector("[data-table]");
@@ -568,8 +555,7 @@
   }
 
   reset();
-  /* Where motion is reduced the figure starts paused, so show it part way: the first valley filled and left. */
+  /* Where motion is reduced the figure stays still, so show it part way: the first valleys filled and left. */
   if (loop.paused) for (let k = 0; k < 600 && found < 3; k++) advance(40);
-  setPaused(loop.paused);
   frame();
 })();

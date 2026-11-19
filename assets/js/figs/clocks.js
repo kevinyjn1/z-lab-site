@@ -13,22 +13,25 @@
  * f exp(-(t / tau)^beta), with the fitted values from the same file (Fig. 3). The numbers
  * live in clocks-data.js, which tools/make_clocks_data.py builds from that file.
  * Nothing is modeled or interpolated here.
+ *
+ * It plays by itself: the chosen curve steps through the measured temperatures (or wave
+ * vectors) and back. Pointing at a curve chooses it.
  */
 (() => {
   "use strict";
   const root = document.querySelector('[data-fig="clocks"]');
   const data = window.ZFigData && window.ZFigData.clocks;
   if (!root || !window.ZFig || !data) return;
-  const { canvas, axes, path, dot, text, rule, label, color, font } = window.ZFig;
+  const { canvas, axes, path, dot, text, rule, label, run, color, font } = window.ZFig;
 
-  /* Three views of the same measurements. `list` is what the slider steps through. */
+  /* Three views of the same measurements. `list` is what the figure steps through. */
   const VIEWS = {
-    both: { list: data.bothSteps, start: 1, x: [1e-4, 2], name: (c) => waveVector(c.q), slider: "Wave vector" },
-    cooling: { list: data.byTemperature, start: 6, x: [2e-3, 2], name: (c) => c.T + " K", slider: "Temperature" },
-    scale: { list: data.byWaveVector, start: 4, x: [2e-3, 2], name: (c) => waveVector(c.q) + " (" + (6.2832 / c.q).toFixed(1) + " Å)", slider: "Wave vector" },
+    both: { list: data.bothSteps, start: 1, x: [1e-4, 2], name: (c) => waveVector(c.q) },
+    cooling: { list: data.byTemperature, start: 6, x: [2e-3, 2], name: (c) => c.T + " K" },
+    scale: { list: data.byWaveVector, start: 4, x: [2e-3, 2], name: (c) => waveVector(c.q) + " (" + (6.2832 / c.q).toFixed(1) + " Å)" },
   };
   const picked = { both: VIEWS.both.start, cooling: VIEWS.cooling.start, scale: VIEWS.scale.start };
-  let view = "both";
+  let view = "cooling";
 
   function waveVector(q) {
     return q.toFixed(2) + " Å⁻¹";
@@ -41,12 +44,10 @@
   }
   const tick = (v) => (v >= 1 ? v + " ns" : Number((v * 1000).toPrecision(1)) + " ps");
 
-  const slider = root.querySelector("[data-pick]");
-  const out = root.querySelector("[data-out]");
-  const lo = root.querySelector("[data-lo]");
-  const hi = root.querySelector("[data-hi]");
-  const values = root.querySelector("[data-values]");
   const buttons = Array.from(root.querySelectorAll("[data-view]"));
+  const plot = root.querySelector("canvas");
+  let hand = false; /* true while a pointer is choosing the curve */
+  let scales = null; /* the plot's data-to-pixel maps, kept for the pointer */
 
   /* Measured points with their published error bars. */
   function points(ctx, pts, X, Y, opt) {
@@ -71,10 +72,15 @@
     text(ctx, name, x0 + 1, y - 9, { font: font.note, color: color.ink2 });
   }
 
-  const stage = canvas(root.querySelector("canvas"), (w) => (w >= 520 ? 344 : 324), (ctx, w, h) => {
+  const stage = canvas(plot, (w) => (w >= 900 ? 440 : w >= 520 ? 360 : 324), (ctx, w, h) => {
     const v = VIEWS[view];
     const box = { l: 44, t: 46, r: w - 14, b: h - 44 };
     const narrow = w < 420;
+    /* whether a label, set as an axis label, is no wider than the room it has */
+    const fits = (label, room) => {
+      ctx.font = font.label;
+      return ctx.measureText(label).width <= room;
+    };
     const { X, Y } = axes(ctx, box, {
       x: v.x,
       y: [0, 1],
@@ -82,10 +88,18 @@
       xTicks: (view === "both" ? [1e-4, 1e-3, 1e-2, 1e-1, 1] : [1e-2, 1e-1, 1]).filter((t, k) => !narrow || view !== "both" || k % 2 === 0),
       xFormat: tick,
       yTicks: [0, 0.25, 0.5, 0.75, 1],
-      xLabel: "time since the fluctuation (logarithmic)",
+      xLabel: fits("time since the fluctuation (logarithmic)", box.r - box.l) ? "time since the fluctuation (logarithmic)" : "time since the fluctuation (log)",
     });
-    text(ctx, "share of the fluctuation left", box.l + 8, 12, { font: font.label, color: color.ink });
     const item = v.list[picked[view]];
+    scales = { X, Y, box };
+    /* the one thing that changes, named in the corner: the temperature or the wave vector of the chosen curve */
+    const corner = font.mono.replace("11px", "500 13px");
+    const name = v.name(item);
+    text(ctx, name, box.r, 12, { font: corner, color: color.ink, align: "right" });
+    /* the axis label gives way to it on a small phone, where both do not fit on the line */
+    ctx.font = corner;
+    const room = box.r - box.l - 8 - ctx.measureText(name).width - 14;
+    text(ctx, fits("share of the fluctuation left", room) ? "share of the fluctuation left" : "share left", box.l + 8, 12, { font: font.label, color: color.ink });
 
     if (view === "both") {
       /* cold pair in ink, warm pair in gray; open dots are time of flight, filled dots spin echo */
@@ -123,7 +137,7 @@
       if (k !== picked[view]) path(ctx, c.fit.tau ? fitted(c) : measured(c), color.ruleStrong, 1.1);
     });
     if (view === "cooling") {
-      /* the coldest and warmest curves are named, unless one of them is the chosen curve (the slider names that one) */
+      /* the coldest and warmest curves are named, unless one of them is the chosen curve (the corner names that one) */
       const first = v.list[0].pts;
       const last = v.list[v.list.length - 1].pts;
       if (picked[view] !== 0) text(ctx, v.list[0].T + " K", box.r - 2, Y(first[first.length - 1][1]) - 11, { font: font.note, color: color.ink3, align: "right" });
@@ -174,57 +188,65 @@
     }
   });
 
-  function part(name, value) {
-    const span = document.createElement("span");
-    if (name) span.append(name + " ");
-    label(span.appendChild(document.createElement("b")), value);
-    return span;
-  }
-
   function show() {
-    const v = VIEWS[view];
-    const item = v.list[picked[view]];
     buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
-    if (slider) {
-      slider.max = String(v.list.length - 1);
-      slider.value = String(picked[view]);
-      slider.setAttribute("aria-label", v.slider);
-      slider.setAttribute("aria-valuetext", v.name(item).replace("Å⁻¹", "inverse angstroms").replace("Å", "angstroms"));
-    }
-    if (out) label(out, v.name(item));
-    if (lo) label(lo, v.name(v.list[0]).replace(/ \(.*/, ""));
-    if (hi) label(hi, v.name(v.list[v.list.length - 1]).replace(/ \(.*/, ""));
-    if (values) {
-      if (view === "both") {
-        const r = item.runs;
-        values.replaceChildren(part("open dots", "time of flight"), part("filled dots", "spin echo"), part("black", r[0].T + " and " + r[1].T + " K"), part("gray", r[2].T + " and " + r[3].T + " K"));
-      } else {
-        const f = item.fit;
-        const where = view === "cooling" ? "at " + waveVector(data.waveVectorAt) : "at " + data.temperatureAt + " K";
-        values.replaceChildren(
-          part(where + ":", "plateau " + f.f.toFixed(2)),
-          f.tau ? part("slow time", time(f.tau)) : part("slow time", "too long for this window"),
-          f.tau ? part("stretch β", f.beta.toFixed(2)) : ""
-        );
-      }
-    }
     stage.redraw();
   }
+
+  /* It plays by itself: the chosen curve steps through the temperatures (or wave vectors) and back. */
+  let direction = -1;
+  let wait = 0;
+  run(plot, (dt) => {
+    if (hand) return;
+    wait -= dt;
+    if (wait > 0) return;
+    const n = VIEWS[view].list.length;
+    const first = view === "cooling" ? 2 : 0; /* the two coldest curves barely decay in the window; the sweep turns before them */
+    let next = picked[view] + direction;
+    if (next < first || next > n - 1) {
+      direction = -direction;
+      next = picked[view] + direction;
+    }
+    picked[view] = Math.max(0, Math.min(n - 1, next));
+    wait = view === "both" ? 2.6 : picked[view] === first || picked[view] === n - 1 ? 1.3 : 0.62;
+    stage.redraw();
+  });
 
   buttons.forEach((b) =>
     b.addEventListener("click", () => {
       view = b.dataset.view;
+      wait = 1.2;
       show();
     })
   );
-  if (slider) {
-    slider.min = "0";
-    slider.step = "1";
-    slider.addEventListener("input", () => {
-      picked[view] = Number(slider.value);
-      show();
+
+  /* Point at a curve to choose it: the one nearest the pointer at that time. Leaving hands it back. */
+  plot.addEventListener("pointermove", (e) => {
+    if (view === "both" || !scales) return;
+    const r = plot.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    if (x < scales.box.l || x > scales.box.r || y < scales.box.t - 10 || y > scales.box.b) return;
+    let best = picked[view];
+    let bestD = Infinity;
+    VIEWS[view].list.forEach((c, k) => {
+      const p = c.pts.reduce((a, q) => (Math.abs(scales.X(q[0]) - x) < Math.abs(scales.X(a[0]) - x) ? q : a));
+      const d = Math.abs(scales.Y(p[1]) - y);
+      if (d < bestD) {
+        bestD = d;
+        best = k;
+      }
     });
-  }
+    hand = true;
+    if (best !== picked[view]) {
+      picked[view] = best;
+      stage.redraw();
+    }
+  });
+  plot.addEventListener("pointerleave", () => {
+    hand = false;
+    wait = 0.8;
+  });
 
   /* The fitted values of the slow step as a table: one row for each curve in the two slices. */
   const host = root.querySelector("[data-table]");

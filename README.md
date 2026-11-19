@@ -14,12 +14,18 @@ filled mark in a figure. Sections and figures are numbered, tables are set with 
 and nothing is boxed, rounded, or shadowed. The only things that move are the figures, and
 every figure shows something from the lab's own work.
 
+The Research page is kept short on purpose. Each of the lab's eight themes gets one figure,
+a title, and one sentence that says what the lab found and links to the paper. The figure
+runs the width of the page, plays by itself, and can be touched. Everything else (sources,
+what is measured and what is modeled, the numbers as a table) sits behind a small "About
+this figure" link under it.
+
 The rules are written at the top of `assets/css/style.css`. Three matter most when adding
 to the site:
 
 - **A figure must trace to a source.** Each one cites the paper, code, or public talk it
   comes from, in its caption and again in a comment at the top of its script.
-- **A figure says what kind of thing it is.** The small line under each caption reads
+- **A figure says what kind of thing it is.** The last line behind "About this figure" reads
   "Re-plot of published values", "A model: the paper's equation with its published values,
   run in your browser", or "A concept illustration". Nothing is drawn that the source does
   not give: where a paper publishes only a plot, the figure draws the fitted law and says so
@@ -32,7 +38,7 @@ to the site:
 | File | What it is |
 | --- | --- |
 | `index.html` | Home: the lab's statement as an abstract, a contents list, Fig. 1 (a liquid simulated in the browser with its pair distribution function and structure factor), the lab in numbers beside Fig. 2 (the soft arm), Atombot with its mark, recent papers, contact |
-| `research.html` | The lab's research statement in its own words (heading, paragraph, and the eight themes of Matter and Machine, in the order the lab lists them), with the figures built from the lab's papers filed under the theme each belongs to (see the table below) |
+| `research.html` | The lab's research statement in its own words (heading, paragraph, and the eight themes of Matter and Machine, in the order the lab lists them), with one figure under each theme (see the table below), then Atombot and the lab's own overview picture |
 | `people.html` | PI, current members, alums |
 | `publications.html` | Searchable, filterable publication list with two figures that double as filters: papers per year, and the journals with the most papers |
 | `code.html` | Software |
@@ -48,22 +54,22 @@ File names match the current site, so existing links keep working if this replac
 | --- | --- | --- | --- |
 | Home | A liquid, its g(r) and S(k) | Model | Definitions from LiquidLib (Walter et al., Comput. Phys. Commun. 2018); the liquid is a two-dimensional Lennard-Jones model for illustration |
 | Home | The underwater soft arm | Line drawing | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
-| Research | Flood the landscape | Model | Pentane's energy landscape (Eq. 1 and its constants) and the barcode summary of Mirth et al., J. Chem. Phys. 2021; the walker is textbook metadynamics |
 | Research | The water that never froze | Re-plot | Table 1 of Liu et al., Proc. Natl. Acad. Sci. U.S.A. 2007 |
-| Research | Fragile to strong | Model | Fitted laws from Chen et al., J. Chem. Phys. 2006 and Zhang et al., J. Chem. Phys. 2009 |
-| Research | A pinch of fission product in a reactor salt | Model and re-plot | Table 3 of Rakib et al., ACS Appl. Energy Mater. 2025; Table III of Grizzi et al., Phys. Rev. Mater. 2026 |
+| Research | From 100 atoms to 100,000 | Published system sizes, drawn in 3D | Lee et al., J. Phys. Chem. B 2021; Lee and Z, J. Chem. Phys. 2024; Murg et al., J. Appl. Phys. 2025; Grizzi et al., Phys. Rev. Mater. 2026. The atoms' positions are an illustration |
 | Research | Two clocks in a glass-forming salt | Re-plot | The measured curves and fitted values in the open Source Data file of Luo et al., Nature Commun. 2022 (CC BY 4.0) |
-| Research | Softer when charged | Model | The Huggins fits (Table 1) and conductivity relation of Farag et al., Phys. Chem. Chem. Phys. 2023 |
-| Research | Where the straight line ends | Model | The Arrhenius fit of Jaiswal et al., J. Phys. Chem. B 2016 |
-| Research | From 100 atoms to 100,000 | Re-plot | Lee et al., J. Phys. Chem. B 2021; Lee and Z, J. Chem. Phys. 2024; Murg et al., J. Appl. Phys. 2025; Grizzi et al., Phys. Rev. Mater. 2026 |
-| Research | Be the controller: steer the underwater arm | Simplified model, with the paper's limits and scores | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
-| Research | Soft is not linear | Model and re-plot | Wandke and Z, IEEE Access 2021 (the material law) and 2023 (Tables 1 to 3) |
-| Research | Lose two, keep going | Concept illustration | The PI's Michigan Robotics seminar (2025) and the Atombot page of the Multidisciplinary Design Program |
+| Research | Flood the landscape | Model | Pentane's energy landscape (Eq. 1 and its constants) and the barcode summary of Mirth et al., J. Chem. Phys. 2021; the walker is textbook metadynamics |
+| Research | Steer the underwater arm | Simplified model in 3D, with the papers' limits and scores | Null et al., RoboSoft 2023; Null et al., IEEE Robot. Autom. Lett. 2024 |
+| Research | Lose two, keep going | Concept illustration in 3D | The PI's Michigan Robotics seminar (2025) and the Atombot page of the Multidisciplinary Design Program |
 | Research | Wheels and legs in one machine | Animation of the real robot's model | The URDF and meshes of the Unitree Go2-W from Unitree's `unitree_ros` repository (BSD 3-Clause); the backflip is keyframed by hand |
+| Research | A simulator for soft machines | Published frequencies, drawn in 3D | Tables 1 to 3 of Wandke and Z, IEEE Access 2023 (and the material law of Wandke and Z, IEEE Access 2021). The bellows and the size of the bounce are an illustration |
 | Publications | Papers per year; where the work appears | Charts | `data/publications.js` |
 
 The swarm figure is a concept illustration, the only figure without a paper behind it, because
 the lab has not published on those robots yet. Replace it when it does.
+
+The order above is the order of the lab's eight themes on the page. Five of the eight are
+drawn in three dimensions by `assets/js/fig3d.js`, which needs WebGL 2; where a browser has
+none, each falls back to a still or a flat drawing.
 
 The wheel-leg figure draws Unitree's own model of the Go2-W live with WebGL. `tools/make_go2w_model.py`
 reads the URDF and meshes of Unitree's `go2w_description` package and writes a simplified
@@ -96,20 +102,24 @@ each file explains the fields.
 ### Adding a figure to Research
 
 1. Write `assets/js/figs/<name>.js`: one self-contained script that finds
-   `[data-fig="<name>"]` and draws with the shared tools in `assets/js/figkit.js`
-   (`ZFig.canvas`, `axes`, `path`, `dot`, `text`, `rule`, `run`, `pointer`). Start it with a
-   comment naming the source and saying which numbers are published values and which are
-   modeled. `assets/js/figs/water-density.js` is the shortest example to copy.
+   `[data-fig="<name>"]` and draws. Flat figures use the shared tools in
+   `assets/js/figkit.js` (`ZFig.canvas`, `axes`, `path`, `dot`, `text`, `rule`, `run`,
+   `pointer`); `assets/js/figs/water-density.js` is the shortest example. Figures in three
+   dimensions use `assets/js/fig3d.js` (`ZFig3D.stage`, which draws solids as ink lines on
+   paper with WebGL, plus `mat` and `shape`); `assets/js/figs/go2w.js` is the example. Start
+   the script with a comment naming the source and saying which numbers are published values
+   and which are modeled.
 2. Add an `<article class="unit">` to `research.html` in the same shape as the others: a
-   short text with a link to the paper, the `<figure class="unit-fig" data-fig="<name>">`, a
-   caption that begins with `<b class="fig-no"></b>` (the number is filled in by a counter)
-   and ends with a `<span class="fig-kind">`, and a "View as table" when the figure shows
-   tabular data.
-3. Add the script tag at the bottom of `research.html`.
+   `<header class="unit-head">` with the title and one sentence that links to the paper, then
+   the `<figure class="unit-fig" data-fig="<name>">` with its plate, and a
+   `<figcaption class="fig-about">` whose `<details>` holds the caption (it begins with
+   `<b class="fig-no"></b>`, numbered by a counter, and ends with a `<span class="fig-kind">`)
+   and the numbers as a table when the figure shows tabular data.
+3. Add the script tag at the bottom of `research.html`, then run `python3 tools/stamp_assets.py`.
 
-A figure should work at 320 px wide, be usable from the keyboard (native inputs and
-buttons), start paused under "reduce motion" (`ZFig.run` does this), and show a meaningful
-picture before anyone touches it.
+A figure should play by itself, work at 320 px wide, be usable from the keyboard (native
+buttons; a 3D stage takes the arrow keys), hold still under "reduce motion" (`ZFig.run` does
+this) while showing a meaningful picture, and keep its controls to one or two.
 
 ## Layout
 
@@ -121,6 +131,7 @@ assets/js/home.js           home page numbers table, contents details, recent pu
 assets/js/liquid.js         Home Fig. 1: the simulated liquid, g(r), and S(k)
 assets/js/atombot-mark.js   the Atombot mark painting itself in, on Home and in the Atombot section
 assets/js/figkit.js         shared drawing tools for the Research figures (window.ZFig)
+assets/js/fig3d.js          shared 3D ink renderer for the Research figures (window.ZFig3D, WebGL 2)
 assets/js/figs/             one script per Research figure (clocks-data.js is generated, see tools/)
 tools/stamp_assets.py       stamps asset links with a version; run before publishing
 tools/make_clocks_data.py   rebuilds clocks-data.js from the paper's Source Data spreadsheet
