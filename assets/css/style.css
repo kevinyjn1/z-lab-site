@@ -1793,15 +1793,6 @@ main {
   color: var(--ink);
 }
 
-/* What kind of figure this is: a re-plot, a model, or an illustration. */
-.fig-kind {
-  display: block;
-  margin-top: 4px;
-  font-family: var(--sans);
-  font-size: 0.8125rem;
-  color: var(--ink-3);
-}
-
 .overview img {
   width: 100%;
   height: auto;

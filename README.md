@@ -25,11 +25,12 @@ to the site:
 
 - **A figure must trace to a source.** Each one cites the paper, code, or public talk it
   comes from, in its caption and again in a comment at the top of its script.
-- **A figure says what kind of thing it is.** The last line behind "About this figure" reads
-  "Re-plot of published values", "A model: the paper's equation with its published values,
-  run in your browser", or "A concept illustration". Nothing is drawn that the source does
-  not give: where a paper publishes only a plot, the figure draws the fitted law and says so
-  instead of inventing points.
+- **A figure says what is measured and what is drawn.** Its caption, behind "About this
+  figure", states in a plain sentence which numbers are published values and what was made
+  up for the page (a walker, the placing of atoms, a robot's motion). There are no category
+  labels such as "re-plot" or "illustration"; the sentence does that work. Nothing is drawn
+  that the source does not give: where a paper publishes only a plot, the figure draws the
+  fitted law and says so instead of inventing points.
 - **Maize marks one thing.** It is the point being read, the selected series, the player in
   the game. Everything else is ink.
 
@@ -113,7 +114,7 @@ each file explains the fields.
    `<header class="unit-head">` with the title and one sentence that links to the paper, then
    the `<figure class="unit-fig" data-fig="<name>">` with its plate, and a
    `<figcaption class="fig-about">` whose `<details>` holds the caption (it begins with
-   `<b class="fig-no"></b>`, numbered by a counter, and ends with a `<span class="fig-kind">`)
+   `<b class="fig-no"></b>`, numbered by a counter)
    and the numbers as a table when the figure shows tabular data.
 3. Add the script tag at the bottom of `research.html`, then run `python3 tools/stamp_assets.py`.
 
